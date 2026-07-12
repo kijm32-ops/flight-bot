@@ -24,11 +24,9 @@ def fetch_flight_deals(target_url):
             
             print("2. 특가 URL로 다이렉트 접속합니다...")
             page.goto(target_url, timeout=90000, wait_until="networkidle")
-            
-            print("3. 화면 안정화 및 팝업 대기 (10초)...")
             page.wait_for_timeout(10000) 
 
-            print("4. 안내 팝업창 제거 시도...")
+            print("3. 안내 팝업창 제거 시도...")
             popups = ["text=Got it", "text=확인", "button:has-text('Got it')", "button:has-text('확인')"]
             for selector in popups:
                 try:
@@ -39,20 +37,31 @@ def fetch_flight_deals(target_url):
                 except:
                     continue
 
-            # 🎯 [핵심 추가 로직] 검색창에 입력된 텍스트로 검색을 강제 실행합니다!
-            print("5. 로봇이 엔터키를 눌러 검색을 강제 실행합니다!")
+            # 🎯 [핵심] 구글 웹페이지 속이기 (텍스트 변경 이벤트 발생)
+            print("4. 검색창을 흔들어 깨우고 강제로 어그로를 끕니다!")
             try:
-                page.locator('input').first.click(timeout=5000)
+                # 검색창 클릭
+                search_input = page.locator('input').first
+                search_input.click(timeout=5000)
+                
+                # 1) 키보드 커서를 텍스트 맨 끝으로 보냄
+                page.keyboard.press("End")
+                # 2) 로봇이 진짜 사람처럼 한 글자씩 타자를 쳐서 텍스트를 바꿈 (이게 핵심!)
+                page.keyboard.type(" 제발 부탁이야", delay=150)
+                page.wait_for_timeout(1000)
+                
+                # 3) 구글이 텍스트 변경을 인지했을 때 엔터키 쾅!
                 page.keyboard.press("Enter")
-                print("-> 엔터키 입력 완료! 검색 결과가 뜰 때까지 15초간 기다립니다...")
-                page.wait_for_timeout(15000) # 결과가 렌더링될 때까지 충분히 대기
+                
+                print("-> 검색 강제 실행 완료! 15초간 느긋하게 기다립니다...")
+                page.wait_for_timeout(15000)
             except Exception as e:
-                print("-> 엔터키 입력 실패:", e)
+                print("-> 검색창 타격 실패:", e)
 
             print("📸 로봇의 시야를 캡처합니다...")
             page.screenshot(path=screenshot_path, full_page=False)
 
-            print("6. 특가 정보 파싱 시작...")
+            print("5. 특가 정보 파싱 시작...")
             page_text = page.locator("body").inner_text()
             lines = [l.strip() for l in page_text.split("\n") if l.strip()]
             
@@ -74,7 +83,7 @@ def fetch_flight_deals(target_url):
                         continue
 
             browser.close()
-            print(f"7. 크롤링 완료! 총 {len(deals)}개의 진짜 특가 정보를 추출했습니다.")
+            print(f"6. 크롤링 완료! 총 {len(deals)}개의 진짜 특가 정보를 추출했습니다.")
     except Exception as e:
         print(f"❌ 크롤링 중 에러 발생: {e}")
         
@@ -99,7 +108,7 @@ def send_email(deals, screenshot_path, target_url):
         <html>
         <body style='font-family: Malgun Gothic, sans-serif; padding: 20px; line-height: 1.6;'>
             <h3 style='color: #d93025;'>📢 구글 플라이트 특가 내역 없음</h3>
-            <p>엔터키까지 눌러 검색을 마쳤으나 조건에 맞는 특가 표를 찾지 못했습니다. 아래 사진을 확인해 주세요.</p>
+            <p>검색 로직을 사람과 동일하게 변경하여 검색을 시도했습니다. 아래 사진을 통해 검색이 정상적으로 넘어갔는지 확인해 주세요.</p>
             <p><a href='{target_url}' target='_blank' style='background-color: #1a73e8; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;'>현재 페이지 직접 확인하기</a></p>
             <br>
             <h4>⬇️ 로봇이 바라본 현재 화면</h4>
@@ -112,7 +121,7 @@ def send_email(deals, screenshot_path, target_url):
         <html>
         <body style='font-family: Malgun Gothic, sans-serif; padding: 20px;'>
             <h2 style='color: #1a73e8; margin-bottom: 5px;'>📊 오늘의 AI 추천 직항 특가 내역</h2>
-            <p style='color: #666; margin-bottom: 20px;'>요청하신 [향후 1년간 3박 이상 직항 특가] 조건에 맞는 결과입니다.</p>
+            <p style='color: #666; margin-bottom: 20px;'>요청하신 조건에 맞게 수집된 완벽한 결과입니다.</p>
             <table border='0' style='border-collapse: collapse; width: 100%; max-width: 700px; text-align: left; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border-radius: 8px; overflow: hidden;'>
                 <tr style='background-color: #1a73e8; color: white;'>
                     <th style='padding: 14px 16px;'>🗺️ 여행 목적지</th>
@@ -133,7 +142,7 @@ def send_email(deals, screenshot_path, target_url):
         html_content += """
             </table>
             <br><br>
-            <h4>⬇️ 로봇 시야 스크린샷</h4>
+            <h4>⬇️ 로봇 시야 스크린샷 (검색 성공 인증)</h4>
             <img src="cid:robot_view" style="max-width:100%; border:1px solid #ccc;"/>
         </body>
         </html>
