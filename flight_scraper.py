@@ -40,22 +40,31 @@ def fetch_flight_deals():
 
             print("4. AI 검색창 정밀 타격 및 타이핑 시작...")
             try:
-                # 🎯 [핵심 수정] '어떻게 여행하고 싶으신가요' 문구가 있는 진짜 AI 껍데기를 찾아 클릭
+                # '어떻게 여행하고 싶으신가요' 문구가 있는 진짜 AI 껍데기를 찾아 클릭
                 ai_box = page.locator("text=/어떻게 여행하고 싶으신가요/").first
                 ai_box.click(force=True)
-                page.wait_for_timeout(1000) # 클릭 후 커서가 깜빡일 때까지 1초 대기
+                page.wait_for_timeout(2000) # 클릭 후 커서가 깜빡일 때까지 충분히 대기
 
-                # [핵심] 다른 칸을 찾지 않고, 현재 커서가 있는 그 자리에 그대로 사람처럼 타이핑 시작!
+                # 타이핑 시작
                 search_query = "인천에서 출발하는 3박 이상 직항 특가 1년치 알아봐 줘"
                 print(f"-> 커서 위치에 바로 검색어 타이핑 중: {search_query}")
-                page.keyboard.type(search_query, delay=100)
+                page.keyboard.type(search_query, delay=150)
+                page.wait_for_timeout(2000) # 타이핑 후 구글이 인식할 시간 넉넉히 대기
+
+                # 🎯 [핵심 수정] 구글 검색창의 이중 엔터 방어막 뚫기
+                print("5. 검색 실행 (엔터 더블클릭 & 돋보기 강제 클릭)!")
+                page.keyboard.press("Enter")
+                page.wait_for_timeout(1000)
+                page.keyboard.press("Enter") # 드롭다운 선택용이 아닌 진짜 실행용 두 번째 엔터
                 page.wait_for_timeout(1000)
                 
-                # 엔터키를 눌러 검색 실행
-                print("5. 검색창에서 엔터키 입력!")
-                page.keyboard.press("Enter")
-                
-                print("-> 검색 결과 로딩 15초 대기...")
+                # 그래도 안 넘어갔을 경우를 대비해 숨겨진 '검색' 돋보기 버튼을 찾아 강제 클릭
+                try:
+                    page.locator("button[aria-label='검색']").last.click(timeout=2000)
+                except:
+                    pass
+
+                print("-> 검색 명령 하달 완료! 결과 로딩 15초 대기...")
                 page.wait_for_timeout(15000)
             except Exception as e:
                 print("-> 검색창 타격 실패:", e)
