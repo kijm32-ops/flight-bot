@@ -12,18 +12,17 @@ def fetch_flight_deals(target_url):
     
     try:
         with sync_playwright() as p:
-            print("1. 가상 브라우저를 실행합니다...")
-            # 🛑 [핵심 해결책] 브라우저가 켜질 때부터 '한국어, 한국 시간대'를 뇌에 주입합니다!
+            print("1. 가상 브라우저를 실행합니다 (한국인 패치 완료)...")
             browser = p.chromium.launch(headless=True)
             context = browser.new_context(
                 viewport={"width": 1440, "height": 1200},
                 user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
-                locale="ko-KR",          # 무조건 한국어로 인식하게 만듦
-                timezone_id="Asia/Seoul" # 시간대도 서울로 고정
+                locale="ko-KR",          
+                timezone_id="Asia/Seoul" 
             )
             page = context.new_page()
             
-            print("2. 처음 주셨던 완벽한 특가 URL로 다이렉트 접속합니다...")
+            print("2. 특가 URL로 다이렉트 접속합니다...")
             page.goto(target_url, timeout=90000, wait_until="networkidle")
             
             print("3. 화면 안정화 및 팝업 대기 (10초)...")
@@ -40,10 +39,20 @@ def fetch_flight_deals(target_url):
                 except:
                     continue
 
+            # 🎯 [핵심 추가 로직] 검색창에 입력된 텍스트로 검색을 강제 실행합니다!
+            print("5. 로봇이 엔터키를 눌러 검색을 강제 실행합니다!")
+            try:
+                page.locator('input').first.click(timeout=5000)
+                page.keyboard.press("Enter")
+                print("-> 엔터키 입력 완료! 검색 결과가 뜰 때까지 15초간 기다립니다...")
+                page.wait_for_timeout(15000) # 결과가 렌더링될 때까지 충분히 대기
+            except Exception as e:
+                print("-> 엔터키 입력 실패:", e)
+
             print("📸 로봇의 시야를 캡처합니다...")
             page.screenshot(path=screenshot_path, full_page=False)
 
-            print("5. 특가 정보 파싱 시작...")
+            print("6. 특가 정보 파싱 시작...")
             page_text = page.locator("body").inner_text()
             lines = [l.strip() for l in page_text.split("\n") if l.strip()]
             
@@ -53,7 +62,6 @@ def fetch_flight_deals(target_url):
                         destination = lines[i-2] if i-2 >= 0 else "특가 지역"
                         price = lines[i-1] if i-1 >= 0 else "가격 정보"
                         
-                        # 진짜 가격 데이터인지 한 번 더 검증
                         if "원" in price or "₩" in price:
                             if destination and not any(d['destination'] == destination for d in deals):
                                 deals.append({
@@ -66,7 +74,7 @@ def fetch_flight_deals(target_url):
                         continue
 
             browser.close()
-            print(f"6. 크롤링 완료! 총 {len(deals)}개의 진짜 특가 정보를 추출했습니다.")
+            print(f"7. 크롤링 완료! 총 {len(deals)}개의 진짜 특가 정보를 추출했습니다.")
     except Exception as e:
         print(f"❌ 크롤링 중 에러 발생: {e}")
         
@@ -91,7 +99,7 @@ def send_email(deals, screenshot_path, target_url):
         <html>
         <body style='font-family: Malgun Gothic, sans-serif; padding: 20px; line-height: 1.6;'>
             <h3 style='color: #d93025;'>📢 구글 플라이트 특가 내역 없음</h3>
-            <p>지정하신 조건으로 검색된 특가 항공편이 현재 없습니다. 아래 사진을 확인해 주세요.</p>
+            <p>엔터키까지 눌러 검색을 마쳤으나 조건에 맞는 특가 표를 찾지 못했습니다. 아래 사진을 확인해 주세요.</p>
             <p><a href='{target_url}' target='_blank' style='background-color: #1a73e8; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;'>현재 페이지 직접 확인하기</a></p>
             <br>
             <h4>⬇️ 로봇이 바라본 현재 화면</h4>
