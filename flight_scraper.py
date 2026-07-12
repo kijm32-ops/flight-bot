@@ -25,10 +25,9 @@ def fetch_flight_deals():
             
             print("2. 구글 플라이트로 이동 중...")
             page.goto(base_url, timeout=60000, wait_until="networkidle")
-            
-            print("3. 눈치 없는 AI 팝업창 대기...")
             page.wait_for_timeout(8000) 
 
+            # 3. 팝업창 무자비하게 부수기
             popups = ["text='확인'", "button:has-text('확인')", "text='Got it'"]
             for selector in popups:
                 try:
@@ -39,33 +38,29 @@ def fetch_flight_deals():
                 except:
                     pass
 
-            print("4. AI 검색창 입력 시작...")
+            print("4. AI 검색창 정밀 타격 및 타이핑 시작...")
             try:
-                # 껍데기 버튼 치우기
-                fake_box = page.locator("text='언제, 어디로, 어떻게 여행하고 싶으신가요?'").first
-                if fake_box.is_visible():
-                    fake_box.click(force=True)
-                    page.wait_for_timeout(1000)
+                # 🎯 [핵심 수정] '어떻게 여행하고 싶으신가요' 문구가 있는 진짜 AI 껍데기를 찾아 클릭
+                ai_box = page.locator("text=/어떻게 여행하고 싶으신가요/").first
+                ai_box.click(force=True)
+                page.wait_for_timeout(1000) # 클릭 후 커서가 깜빡일 때까지 1초 대기
 
-                # 진짜 입력창 획득 및 텍스트 청소
-                search_input = page.locator("input").first
-                search_input.click(force=True)
-                search_input.fill("")
-
+                # [핵심] 다른 칸을 찾지 않고, 현재 커서가 있는 그 자리에 그대로 사람처럼 타이핑 시작!
                 search_query = "인천에서 출발하는 3박 이상 직항 특가 1년치 알아봐 줘"
-                search_input.type(search_query, delay=100)
+                print(f"-> 커서 위치에 바로 검색어 타이핑 중: {search_query}")
+                page.keyboard.type(search_query, delay=100)
                 page.wait_for_timeout(1000)
                 
-                # 🎯 [핵심 수정] 검색창(input) 내부에서만 엔터키를 딱 1번만 조심스럽게 누릅니다!
-                print("5. 검색창에서 엔터키 1회 입력!")
-                search_input.press("Enter")
+                # 엔터키를 눌러 검색 실행
+                print("5. 검색창에서 엔터키 입력!")
+                page.keyboard.press("Enter")
                 
                 print("-> 검색 결과 로딩 15초 대기...")
                 page.wait_for_timeout(15000)
             except Exception as e:
                 print("-> 검색창 타격 실패:", e)
 
-            # 🛑 [안전장치] 혹시라도 로봇이 실수로 필터창이나 팝업을 열었다면, ESC 키를 연타해서 무조건 다 닫아버립니다.
+            # 6. 혹시 열려있을지 모를 필터창이나 팝업을 ESC키로 모두 닫아버림 (화면 청소)
             print("6. 화면 정리 (ESC 연타)...")
             page.keyboard.press("Escape")
             page.wait_for_timeout(500)
@@ -83,14 +78,14 @@ def fetch_flight_deals():
             lines = [l.strip() for l in page_text.split("\n") if l.strip()]
             
             for i, line in enumerate(lines):
-                # 가격 데이터 판별
+                # 가격 데이터 판별 (원 또는 ₩ 포함 + 숫자 포함)
                 if ("원" in line or "₩" in line) and any(char.isdigit() for char in line):
                     try:
                         price = line
                         destination = lines[i-3] if i-3 >= 0 and len(lines[i-3]) < 15 else lines[i-2]
                         
-                        # 이상한 필터 텍스트들 완벽 차단
-                        if "로그인" in destination or "변경" in destination or "알아보기" in destination or "선택" in destination:
+                        # 메뉴 텍스트 등 쓰레기 데이터 걸러내기
+                        if "로그인" in destination or "변경" in destination or "알아보기" in destination or "선택" in destination or "일치하는" in destination:
                             continue
                             
                         discount = "할인 정보 없음"
@@ -148,7 +143,7 @@ def send_email(deals, screenshot_path, final_url):
         <html>
         <body style='font-family: Malgun Gothic, sans-serif; padding: 20px;'>
             <h2 style='color: #1a73e8; margin-bottom: 5px;'>📊 오늘의 AI 추천 직항 특가 내역</h2>
-            <p style='color: #666; margin-bottom: 20px;'>필터 창의 방해를 뚫고 1년치 인천 직항 특가를 찾아냈습니다.</p>
+            <p style='color: #666; margin-bottom: 20px;'>목표 타점에 정확히 타이핑하여 1년치 인천 직항 특가를 찾아냈습니다.</p>
             <table border='0' style='border-collapse: collapse; width: 100%; max-width: 700px; text-align: left; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border-radius: 8px; overflow: hidden;'>
                 <tr style='background-color: #1a73e8; color: white;'>
                     <th style='padding: 14px 16px;'>🗺️ 여행 목적지</th>
