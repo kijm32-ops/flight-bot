@@ -9,7 +9,6 @@ from playwright.sync_api import sync_playwright
 def fetch_flight_deals():
     deals = []
     screenshot_path = "google_flight_view.png"
-    # 깨끗한 기본 특가 페이지로 접속
     base_url = "https://www.google.com/travel/flights/deals?hl=ko&gl=KR&curr=KRW"
     
     try:
@@ -24,81 +23,90 @@ def fetch_flight_deals():
             )
             page = context.new_page()
             
-            print("2. 구글 플라이트 페이지로 이동 중...")
+            print("2. 구글 플라이트로 이동 중...")
             page.goto(base_url, timeout=60000, wait_until="networkidle")
-            page.wait_for_timeout(6000) 
+            page.wait_for_timeout(5000) 
 
-            # 3. 안내 팝업창 제거
-            popups = ["text=Got it", "text=확인", "button:has-text('Got it')", "button:has-text('확인')"]
-            for selector in popups:
+            # 안내 팝업 닫기
+            for selector in ["text=Got it", "text=확인", "button:has-text('Got it')"]:
                 try:
                     if page.locator(selector).is_visible():
                         page.locator(selector).click()
-                        page.wait_for_timeout(2000)
+                        page.wait_for_timeout(1000)
                         break
                 except:
                     continue
 
-            # 4. 출발지 꼬임을 막기 위해 '인천 출발'을 명확히 적어 타이핑합니다.
-            print("4. 검색창에 정밀 조건을 입력합니다...")
-            search_input = page.locator('input').first
-            search_input.click(timeout=5000)
-            
-            # 기존 텍스트를 싹 지우고 새로 입력
-            search_input.fill("")
-            search_query = "오늘부터 향후 1년까지 인천에서 출발하는 3박 이상의 항공편 직항 특가 알아봐 줘"
-            search_input.type(search_query, delay=100)
-            page.wait_for_timeout(2000)
-
-            # 5. 🎯 [정밀 타격] 파란색 돋보기 버튼을 직접 클릭합니다!
-            print("5. 파란색 돋보기 검색 버튼을 직접 클릭합니다!")
+            # 🎯 [핵심] 꽁꽁 숨겨진 AI 검색창 정확히 조준해서 열기
+            print("3. AI 검색창을 찾아 클릭합니다...")
             try:
-                # 파란색 검색 버튼의 요소(aria-label="검색" 또는 부모 button)를 찾아 클릭
-                search_button = page.locator("button[aria-label*='검색'], button:has(svg)").first
-                if search_button.is_visible():
-                    search_button.click()
+                # 1단계: "언제, 어디로..." 라고 적힌 가짜 버튼을 눌러서 진짜 입력창을 엽니다.
+                fake_box = page.locator("text='언제, 어디로, 어떻게 여행하고 싶으신가요?'").first
+                if fake_box.is_visible():
+                    fake_box.click()
+                    page.wait_for_timeout(1000)
                 else:
-                    # 마땅한 태그가 안 잡힐 경우 엔터키로 백업
-                    page.keyboard.press("Enter")
+                    page.locator("input").first.click()
+
+                # 2단계: 키보드로 꾹꾹 눌러쓰기
+                search_query = "인천에서 출발하는 3박 이상 직항 특가 1년치 알아봐 줘"
+                page.keyboard.type(search_query, delay=150)
+                page.wait_for_timeout(1000)
                 
-                print("-> 검색 반영 대기 (15초)...")
+                # 3단계: 엔터키 2번 연속 타격 (확인 사살)
+                page.keyboard.press("Enter")
+                page.wait_for_timeout(500)
+                page.keyboard.press("Enter")
+                
+                print("-> 검색 명령 하달 완료! 데이터가 뜰 때까지 15초 대기합니다...")
                 page.wait_for_timeout(15000)
             except Exception as e:
-                print("-> 버튼 클릭 실패, 엔터키로 대체합니다:", e)
-                page.keyboard.press("Enter")
-                page.wait_for_timeout(15000)
+                print("-> 검색창 타격 실패:", e)
 
-            # 최종 검색 결과 URL 확보
             final_url = page.url
 
-            print("📸 로봇의 시야를 캡처합니다...")
+            # 📸 사진이 완전히 저장될 때까지 기다려줍니다.
+            print("4. 화면 캡처 중...")
             page.screenshot(path=screenshot_path, full_page=False)
+            page.wait_for_timeout(3000) # 사진 파일이 구워질 시간 3초 부여!
 
-            print("6. 특가 정보 파싱 시작...")
+            print("5. 텍스트 파싱 (유연한 룰 적용) 시작...")
             page_text = page.locator("body").inner_text()
             lines = [l.strip() for l in page_text.split("\n") if l.strip()]
             
             for i, line in enumerate(lines):
-                if "평소 가격 대비" in line:
+                # '평소 가격 대비'라는 멘트가 없어도 '₩'나 '원'이 포함된 가격 데이터면 무조건 수집!
+                if ("원" in line or "₩" in line) and any(char.isdigit() for char in line):
                     try:
-                        destination = lines[i-2] if i-2 >= 0 else "특가 지역"
-                        price = lines[i-1] if i-1 >= 0 else "가격 정보"
+                        price = line
+                        # 가격 바로 위나 위위 줄에 도시 이름이 위치함
+                        destination = lines[i-3] if i-3 >= 0 and len(lines[i-3]) < 15 else lines[i-2]
                         
-                        if "원" in price or "₩" in price:
-                            if destination and not any(d['destination'] == destination for d in deals):
-                                deals.append({
-                                    "destination": destination,
-                                    "price": price,
-                                    "discount": line,
-                                    "link": final_url
-                                })
+                        # 이상한 버튼 텍스트 걸러내기
+                        if "로그인" in destination or "변경" in destination or "알아보기" in destination:
+                            continue
+                            
+                        # 할인 정보 찾기
+                        discount = "할인 정보 없음"
+                        if i+1 < len(lines) and ("대비" in lines[i+1] or "저렴" in lines[i+1]):
+                            discount = lines[i+1]
+                        elif i-1 >= 0 and ("대비" in lines[i-1] or "저렴" in lines[i-1]):
+                            discount = lines[i-1]
+
+                        if destination and not any(d['destination'] == destination for d in deals):
+                            deals.append({
+                                "destination": destination,
+                                "price": price,
+                                "discount": discount,
+                                "link": final_url
+                            })
                     except:
                         continue
 
             browser.close()
-            print(f"7. 크롤링 완료! 총 {len(deals)}개의 특가 정보를 추출했습니다.")
+            print(f"6. 크롤링 완료! 총 {len(deals)}개의 특가 수집.")
     except Exception as e:
-        print(f"❌ 크롤링 중 에러 발생: {e}")
+        print(f"❌ 크롤링 에러: {e}")
         
     return deals[:15], screenshot_path, final_url if 'final_url' in locals() else base_url
 
@@ -121,10 +129,10 @@ def send_email(deals, screenshot_path, final_url):
         <html>
         <body style='font-family: Malgun Gothic, sans-serif; padding: 20px; line-height: 1.6;'>
             <h3 style='color: #d93025;'>📢 구글 플라이트 특가 내역 수집 재시도</h3>
-            <p>파란색 돋보기 버튼을 클릭해 검색을 시도했습니다. 아래 스크린샷에서 검색 결과 격자가 정상적으로 떴는지 확인해 주세요.</p>
+            <p>특가 텍스트를 찾지 못했습니다. 이번엔 스크린샷이 깨지지 않았을 테니 봇이 뭘 보고 있었는지 확인해 보세요!</p>
             <p><a href='{final_url}' target='_blank' style='background-color: #1a73e8; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;'>현재 결과 페이지 열기</a></p>
             <br>
-            <h4>⬇ Preserved View</h4>
+            <h4>⬇ 로봇이 찍어온 현장 사진</h4>
             <img src="cid:robot_view" style="max-width:100%; border:1px solid #ccc;"/>
         </body>
         </html>
@@ -134,7 +142,7 @@ def send_email(deals, screenshot_path, final_url):
         <html>
         <body style='font-family: Malgun Gothic, sans-serif; padding: 20px;'>
             <h2 style='color: #1a73e8; margin-bottom: 5px;'>📊 오늘의 AI 추천 직항 특가 내역</h2>
-            <p style='color: #666; margin-bottom: 20px;'>돋보기 버튼을 직접 돌파하여 찾아낸 실시간 특가 리스트입니다.</p>
+            <p style='color: #666; margin-bottom: 20px;'>인천 출발 조건으로 로봇이 열심히 타자 쳐서 가져온 결과입니다.</p>
             <table border='0' style='border-collapse: collapse; width: 100%; max-width: 700px; text-align: left; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border-radius: 8px; overflow: hidden;'>
                 <tr style='background-color: #1a73e8; color: white;'>
                     <th style='padding: 14px 16px;'>🗺️ 여행 목적지</th>
@@ -164,7 +172,7 @@ def send_email(deals, screenshot_path, final_url):
     msg_html = MIMEText(html_content, 'html')
     msg.attach(msg_html)
 
-    if os.path.exists(screenshot_path):
+    if os.path.exists(screenshot_path) and os.path.getsize(screenshot_path) > 0:
         with open(screenshot_path, 'rb') as fp:
             msg_img = MIMEImage(fp.read())
             msg_img.add_header('Content-ID', '<robot_view>')
@@ -175,7 +183,7 @@ def send_email(deals, screenshot_path, final_url):
         with smtplib.SMTP_SSL('smtp.gmail.com', 465) as server:
             server.login(sender_email, sender_password)
             server.sendmail(sender_email, receiver_email, msg.as_string())
-        print("📬 물리적 클릭 버전 메일 발송 성공!")
+        print("📬 최종 완성 버전 메일 발송 성공!")
     except Exception as e:
         print(f"❌ 메일 발송 중 에러 발생: {e}")
 
