@@ -1,0 +1,31 @@
+name: Daily Flight Deal Scraper
+
+on:
+  schedule:
+    # UTC 기준 22:00 = 한국 시간(KST) 다음날 오전 7시입니다.
+    - cron: '0 22 * * *'
+  # 내가 원할 때 수동으로도 버튼을 눌러 실행할 수 있게 해주는 옵션입니다.
+  workflow_dispatch: 
+
+jobs:
+  run-bot:
+    runs-on: ubuntu-latest
+    steps:
+    - name: 코드를 복사해옵니다
+      uses: actions/checkout@v3
+
+    - name: 파이썬 파이프라인을 설치합니다
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
+
+    - name: 크롤링에 필요한 도구(Playwright)를 설치합니다
+      run: |
+        pip install playwright
+        playwright install --with-deps chromium
+
+    - name: 파이썬 스크립트를 실행하고 이메일을 보냅니다
+      env:
+        # 4단계 암호 금고에서 구글 앱 비밀번호를 꺼내 컴퓨터 환경변수에 주입합니다
+        GMAIL_PASSWORD: ${{ secrets.GMAIL_PASSWORD }}
+      run: python flight_scraper.py
