@@ -6,14 +6,17 @@ from email.mime.text import MIMEText
 from email.mime.image import MIMEImage
 from playwright.sync_api import sync_playwright
 
-def fetch_flight_deals():
+def fetch_flight_deals(target_url):
     deals = []
     screenshot_path = "google_flight_view.png"
-    base_url = "https://www.google.com/travel/flights/deals?hl=ko&gl=KR&curr=KRW"
     
+    # URL에 한국어 설정이 없으면 강제로 붙여줍니다 (미국 서버 우회용)
+    if "hl=ko" not in target_url:
+        target_url += "&hl=ko&gl=KR&curr=KRW"
+        
     try:
         with sync_playwright() as p:
-            print("1. 가상 브라우저를 실행합니다...")
+            print("1. 가상 브라우저를 실행합니다 (완벽한 한국인 패치)...")
             browser = p.chromium.launch(headless=True)
             context = browser.new_context(
                 viewport={"width": 1440, "height": 1200},
@@ -23,78 +26,40 @@ def fetch_flight_deals():
             )
             page = context.new_page()
             
-            print("2. 구글 플라이트로 이동 중...")
-            page.goto(base_url, timeout=60000, wait_until="networkidle")
-            page.wait_for_timeout(8000) 
+            print("2. 한창님이 주신 [완벽한 특가 URL]로 다이렉트 접속합니다!")
+            page.goto(target_url, timeout=90000, wait_until="networkidle")
+            
+            print("3. 검색 결과가 다 뜰 때까지 10초간 느긋하게 기다립니다...")
+            page.wait_for_timeout(10000) 
 
-            # 3. 팝업창 무자비하게 부수기
+            # 방해꾼 팝업창 정리
+            print("4. 화면 정리 중...")
             popups = ["text='확인'", "button:has-text('확인')", "text='Got it'"]
             for selector in popups:
                 try:
                     if page.locator(selector).is_visible():
                         page.locator(selector).click(force=True)
-                        page.wait_for_timeout(2000)
+                        page.wait_for_timeout(1000)
                         break
                 except:
                     pass
 
-            print("4. AI 검색창 정밀 타격 및 타이핑 시작...")
-            try:
-                # '어떻게 여행하고 싶으신가요' 문구가 있는 진짜 AI 껍데기를 찾아 클릭
-                ai_box = page.locator("text=/어떻게 여행하고 싶으신가요/").first
-                ai_box.click(force=True)
-                page.wait_for_timeout(2000) # 클릭 후 커서가 깜빡일 때까지 충분히 대기
-
-                # 타이핑 시작
-                search_query = "인천에서 출발하는 3박 이상 직항 특가 1년치 알아봐 줘"
-                print(f"-> 커서 위치에 바로 검색어 타이핑 중: {search_query}")
-                page.keyboard.type(search_query, delay=150)
-                page.wait_for_timeout(2000) # 타이핑 후 구글이 인식할 시간 넉넉히 대기
-
-                # 🎯 [핵심 수정] 구글 검색창의 이중 엔터 방어막 뚫기
-                print("5. 검색 실행 (엔터 더블클릭 & 돋보기 강제 클릭)!")
-                page.keyboard.press("Enter")
-                page.wait_for_timeout(1000)
-                page.keyboard.press("Enter") # 드롭다운 선택용이 아닌 진짜 실행용 두 번째 엔터
-                page.wait_for_timeout(1000)
-                
-                # 그래도 안 넘어갔을 경우를 대비해 숨겨진 '검색' 돋보기 버튼을 찾아 강제 클릭
-                try:
-                    page.locator("button[aria-label='검색']").last.click(timeout=2000)
-                except:
-                    pass
-
-                print("-> 검색 명령 하달 완료! 결과 로딩 15초 대기...")
-                page.wait_for_timeout(15000)
-            except Exception as e:
-                print("-> 검색창 타격 실패:", e)
-
-            # 6. 혹시 열려있을지 모를 필터창이나 팝업을 ESC키로 모두 닫아버림 (화면 청소)
-            print("6. 화면 정리 (ESC 연타)...")
-            page.keyboard.press("Escape")
-            page.wait_for_timeout(500)
-            page.keyboard.press("Escape")
-            page.wait_for_timeout(1000)
-
-            final_url = page.url
-
-            print("7. 깔끔해진 화면 캡처 중...")
+            print("📸 로봇의 시야를 캡처합니다...")
             page.screenshot(path=screenshot_path, full_page=False)
-            page.wait_for_timeout(2000) 
+            page.wait_for_timeout(2000)
 
-            print("8. 텍스트 파싱 시작...")
+            print("5. 텍스트 파싱 시작...")
             page_text = page.locator("body").inner_text()
             lines = [l.strip() for l in page_text.split("\n") if l.strip()]
             
             for i, line in enumerate(lines):
-                # 가격 데이터 판별 (원 또는 ₩ 포함 + 숫자 포함)
                 if ("원" in line or "₩" in line) and any(char.isdigit() for char in line):
                     try:
                         price = line
                         destination = lines[i-3] if i-3 >= 0 and len(lines[i-3]) < 15 else lines[i-2]
                         
-                        # 메뉴 텍스트 등 쓰레기 데이터 걸러내기
-                        if "로그인" in destination or "변경" in destination or "알아보기" in destination or "선택" in destination or "일치하는" in destination:
+                        # 쓸데없는 버튼 텍스트 필터링
+                        if any(word in destination for word in ["로그인", "변경", "알아보기", "선택", "일치하는", "특가", "필터"]):
                             continue
                             
                         discount = "할인 정보 없음"
@@ -108,19 +73,19 @@ def fetch_flight_deals():
                                 "destination": destination,
                                 "price": price,
                                 "discount": discount,
-                                "link": final_url
+                                "link": target_url
                             })
                     except:
                         continue
 
             browser.close()
-            print(f"9. 크롤링 완료! 총 {len(deals)}개의 진짜 특가 수집.")
+            print(f"6. 크롤링 완료! 총 {len(deals)}개의 특가 수집.")
     except Exception as e:
         print(f"❌ 크롤링 에러: {e}")
         
-    return deals[:15], screenshot_path, final_url if 'final_url' in locals() else base_url
+    return deals[:15], screenshot_path
 
-def send_email(deals, screenshot_path, final_url):
+def send_email(deals, screenshot_path, target_url):
     sender_email = "kijm32@gmail.com"
     receiver_email = "kijm32@gmail.com"
     sender_password = os.environ.get("GMAIL_PASSWORD")
@@ -139,8 +104,8 @@ def send_email(deals, screenshot_path, final_url):
         <html>
         <body style='font-family: Malgun Gothic, sans-serif; padding: 20px; line-height: 1.6;'>
             <h3 style='color: #d93025;'>📢 구글 플라이트 특가 내역 없음</h3>
-            <p>화면을 정리하고 검색을 마쳤으나, 현재 조건에 맞는 특가가 없습니다. 봇의 시야를 확인해 보세요!</p>
-            <p><a href='{final_url}' target='_blank' style='background-color: #1a73e8; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;'>현재 결과 페이지 열기</a></p>
+            <p>원본 URL로 접속했으나 현재 특가 카드가 화면에 없습니다. 사진을 확인해 주세요!</p>
+            <p><a href='{target_url}' target='_blank' style='background-color: #1a73e8; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;'>현재 결과 페이지 열기</a></p>
             <br>
             <h4>⬇ 로봇이 찍어온 현장 사진</h4>
             <img src="cid:robot_view" style="max-width:100%; border:1px solid #ccc;"/>
@@ -152,7 +117,7 @@ def send_email(deals, screenshot_path, final_url):
         <html>
         <body style='font-family: Malgun Gothic, sans-serif; padding: 20px;'>
             <h2 style='color: #1a73e8; margin-bottom: 5px;'>📊 오늘의 AI 추천 직항 특가 내역</h2>
-            <p style='color: #666; margin-bottom: 20px;'>목표 타점에 정확히 타이핑하여 1년치 인천 직항 특가를 찾아냈습니다.</p>
+            <p style='color: #666; margin-bottom: 20px;'>초심으로 돌아가 원본 URL에서 완벽하게 파싱한 결과입니다!</p>
             <table border='0' style='border-collapse: collapse; width: 100%; max-width: 700px; text-align: left; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border-radius: 8px; overflow: hidden;'>
                 <tr style='background-color: #1a73e8; color: white;'>
                     <th style='padding: 14px 16px;'>🗺️ 여행 목적지</th>
@@ -167,7 +132,7 @@ def send_email(deals, screenshot_path, final_url):
                     <td style='padding: 14px 16px; font-weight: bold; color: #333;'>{deal['destination']}</td>
                     <td style='padding: 14px 16px; color: #d93025; font-weight: bold;'>{deal['price']}</td>
                     <td style='padding: 14px 16px; color: #188038; font-size: 14px;'>{deal['discount']}</td>
-                    <td style='padding: 14px 16px; text-align: center;'><a href='{final_url}' target='_blank' style='background-color: #f1f3f4; color: #1a73e8; padding: 6px 12px; text-decoration: none; border-radius: 4px; font-size: 13px; font-weight: bold;'>전체 확인</a></td>
+                    <td style='padding: 14px 16px; text-align: center;'><a href='{target_url}' target='_blank' style='background-color: #f1f3f4; color: #1a73e8; padding: 6px 12px; text-decoration: none; border-radius: 4px; font-size: 13px; font-weight: bold;'>전체 확인</a></td>
                 </tr>
             """
         html_content += """
@@ -198,5 +163,8 @@ def send_email(deals, screenshot_path, final_url):
         print(f"❌ 메일 발송 중 에러 발생: {e}")
 
 if __name__ == "__main__":
-    flight_data, img_path, final_url = fetch_flight_deals()
-    send_email(flight_data, img_path, final_url)
+    # 한창님이 처음에 주셨던 완벽한 '원본 URL'을 다시 부활시켰습니다!
+    FLIGHT_URL = "https://www.google.com/travel/flights/deals?tfs=CBwQBhrRAxIKMjAyNi0wNy0yOCgAagwIAxIIL20vMGhzcWZyDAgDEggvbS8wN2Rma3IMCAMSCC9tLzBkcXl3cgwIAxIIL20vMGdxa2RyDQgDEgkvbS8wZ3A1bDZyDQgDEgkvbS8wMzV4eXpyDQgDEgkvbS8wZ3A2XzByDQgDEgkvbS8wZ3A2cm5yDAgDEggvbS8wZnRreHIMCAMSCC9tLzA0Ym54cgwIAxIIL20vMDNoNjRyDAgDEggvbS8wNHRocHIMCAMSCC9tLzBmbjJncg0IAxIJL20vMDFqYjdncg0IAxIJL20vMDFocjU4cg0IAxIJL20vMDI2eXFmcg0IAxIJL20vMDQ0Y2p2cgwIAxIIL20vMGZuZmZyDAgDEggvbS8waG40aHINCAMSCS9tLzAxcF9seXINCAMSCS9tLzAxOTVwZHINCAMSCS9tLzAxeXF3Z3IMCAMSCC9tLzA2dDJ0cgwIAxIIL20vMDQ5ZDFyDQgDEgkvbS8wMV9nN2ZyDwgDEgsvZy8xMjFoeGgxanIMCAMSCC9tLzAzNHRscg0IAxIJL20vMDFjZm01cgwIAxIIL20vMGhxa2dyDAgDEggvbS8wZnRwOHINCAMSCS9tLzBnZ2RsehrRAxIKMjAyNi0wOC0wMSgAagwIAxIIL20vMDdkZmtqDAgDEggvbS8wZHF5d2oMCAMSCC9tLzBncWtkag0IAxIJL20vMGdwNWw2ag0IAxIJL20vMDM1eHl6ag0IAxIJL20vMGdwNl8wag0IAxIJL20vMGdwNnJuagwIAxIIL20vMGZ0a3hqDAgDEggvbS8wNGJueGoMCAMSCC9tLzAzaDY0agwIAxIIL20vMDR0aHBqDAgDEggvbS8wZm4yZ2oNCAMSCS9tLzAxaEoxN2dKag0IAxIJL20vMDFocjU4ag0IAxIJL20vMDI2eXFmaA0IAxIJL20vMDQ0Y2p2agwIAxIIL20vMGZuZmZqDAgDEggvbS8waHNxZkABSAFwAYIBCwj___________8BmAEB2gEiCiASGAoKMjAyNi0wNy0xNBIKMjAyNy0wNS0yMyoECAMQDQ&q=%EC%98%A4%EB%8A%98%EB%B6%80%ED%84%B0%20%ED%96%A5%ED%9B%84%201%EB%85%84%20%EA%B9%8C%EC%A7%80%20%EB%8C%80%ED%95%9C%EB%AF%BC%EA%B5%AD%EC%97%90%EC%84%9C%20%EC%B6%9C%EB%B0%9C%ED%95%98%EB%8A%94%203%EB%B0%95%20%EC%9D%B4%EC%83%81%EC%9D%98%20%ED%95%AD%EA%B3%B5%ED%8E%B8%20%EC%A7%81%ED%95%AD%2C%20%ED%8A%B9%EA%B0%80%20%EC%95%8C%EC%95%84%EB%B4%90%20%EC%A4%84%EB%9E%98&ved=0CAMQusIPahcKEwjQrZyOhM2VAxUAAAAAHQAAAAAQfQ&uact=3"
+    
+    flight_data, img_path = fetch_flight_deals(FLIGHT_URL)
+    send_email(flight_data, img_path, FLIGHT_URL)
