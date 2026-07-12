@@ -25,68 +25,68 @@ def fetch_flight_deals():
             
             print("2. 구글 플라이트로 이동 중...")
             page.goto(base_url, timeout=60000, wait_until="networkidle")
-            page.wait_for_timeout(5000) 
+            
+            # 🛑 [핵심 수정] 팝업창이 스멀스멀 나타날 때까지 최대 10초까지 진득하게 기다립니다.
+            print("3. 눈치 없는 AI 팝업창이 뜰 때까지 잠복 대기 중...")
+            page.wait_for_timeout(8000) 
 
-            # 안내 팝업 닫기
-            for selector in ["text=Got it", "text=확인", "button:has-text('Got it')"]:
+            # 파란색 '확인' 버튼을 찾아 무조건 격파합니다.
+            print("4. 팝업창 폭파 작전 시작...")
+            popups = ["text='확인'", "button:has-text('확인')", "text='Got it'"]
+            for selector in popups:
                 try:
                     if page.locator(selector).is_visible():
-                        page.locator(selector).click()
-                        page.wait_for_timeout(1000)
+                        print(f"-> 팝업 발견! [{selector}] 버튼을 눌러 부숩니다.")
+                        page.locator(selector).click(force=True) # force=True로 강제 클릭
+                        page.wait_for_timeout(2000)
                         break
-                except:
-                    continue
+                except Exception as e:
+                    pass
 
-            # 🎯 [핵심] 꽁꽁 숨겨진 AI 검색창 정확히 조준해서 열기
-            print("3. AI 검색창을 찾아 클릭합니다...")
+            print("5. AI 검색창을 찾아 정밀 타격합니다...")
             try:
-                # 1단계: "언제, 어디로..." 라고 적힌 가짜 버튼을 눌러서 진짜 입력창을 엽니다.
+                # 가짜 껍데기 버튼을 찾아 누릅니다.
                 fake_box = page.locator("text='언제, 어디로, 어떻게 여행하고 싶으신가요?'").first
                 if fake_box.is_visible():
-                    fake_box.click()
+                    fake_box.click(force=True)
                     page.wait_for_timeout(1000)
                 else:
-                    page.locator("input").first.click()
+                    page.locator("input").first.click(force=True)
 
-                # 2단계: 키보드로 꾹꾹 눌러쓰기
+                # 한 땀 한 땀 타자를 칩니다.
                 search_query = "인천에서 출발하는 3박 이상 직항 특가 1년치 알아봐 줘"
+                print(f"-> 검색어 입력 중: {search_query}")
                 page.keyboard.type(search_query, delay=150)
                 page.wait_for_timeout(1000)
                 
-                # 3단계: 엔터키 2번 연속 타격 (확인 사살)
+                # 확실하게 엔터키를 때려 넣습니다.
+                print("-> 쾅! 엔터키를 눌렀습니다. 15초 대기합니다.")
                 page.keyboard.press("Enter")
                 page.wait_for_timeout(500)
                 page.keyboard.press("Enter")
-                
-                print("-> 검색 명령 하달 완료! 데이터가 뜰 때까지 15초 대기합니다...")
                 page.wait_for_timeout(15000)
             except Exception as e:
                 print("-> 검색창 타격 실패:", e)
 
             final_url = page.url
 
-            # 📸 사진이 완전히 저장될 때까지 기다려줍니다.
-            print("4. 화면 캡처 중...")
+            print("6. 화면 캡처 중...")
             page.screenshot(path=screenshot_path, full_page=False)
-            page.wait_for_timeout(3000) # 사진 파일이 구워질 시간 3초 부여!
+            page.wait_for_timeout(3000) 
 
-            print("5. 텍스트 파싱 (유연한 룰 적용) 시작...")
+            print("7. 텍스트 파싱 시작...")
             page_text = page.locator("body").inner_text()
             lines = [l.strip() for l in page_text.split("\n") if l.strip()]
             
             for i, line in enumerate(lines):
-                # '평소 가격 대비'라는 멘트가 없어도 '₩'나 '원'이 포함된 가격 데이터면 무조건 수집!
                 if ("원" in line or "₩" in line) and any(char.isdigit() for char in line):
                     try:
                         price = line
-                        # 가격 바로 위나 위위 줄에 도시 이름이 위치함
                         destination = lines[i-3] if i-3 >= 0 and len(lines[i-3]) < 15 else lines[i-2]
                         
-                        # 이상한 버튼 텍스트 걸러내기
                         if "로그인" in destination or "변경" in destination or "알아보기" in destination:
                             continue
                             
-                        # 할인 정보 찾기
                         discount = "할인 정보 없음"
                         if i+1 < len(lines) and ("대비" in lines[i+1] or "저렴" in lines[i+1]):
                             discount = lines[i+1]
@@ -104,7 +104,7 @@ def fetch_flight_deals():
                         continue
 
             browser.close()
-            print(f"6. 크롤링 완료! 총 {len(deals)}개의 특가 수집.")
+            print(f"8. 크롤링 완료! 총 {len(deals)}개의 특가 수집.")
     except Exception as e:
         print(f"❌ 크롤링 에러: {e}")
         
@@ -128,8 +128,8 @@ def send_email(deals, screenshot_path, final_url):
         html_content = f"""
         <html>
         <body style='font-family: Malgun Gothic, sans-serif; padding: 20px; line-height: 1.6;'>
-            <h3 style='color: #d93025;'>📢 구글 플라이트 특가 내역 수집 재시도</h3>
-            <p>특가 텍스트를 찾지 못했습니다. 이번엔 스크린샷이 깨지지 않았을 테니 봇이 뭘 보고 있었는지 확인해 보세요!</p>
+            <h3 style='color: #d93025;'>📢 구글 플라이트 특가 내역 없음</h3>
+            <p>팝업창을 부수고 진입했으나 조건에 맞는 특가가 안 떴습니다. 봇이 임무를 완수했는지 사진을 확인해 주세요!</p>
             <p><a href='{final_url}' target='_blank' style='background-color: #1a73e8; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;'>현재 결과 페이지 열기</a></p>
             <br>
             <h4>⬇ 로봇이 찍어온 현장 사진</h4>
@@ -142,7 +142,7 @@ def send_email(deals, screenshot_path, final_url):
         <html>
         <body style='font-family: Malgun Gothic, sans-serif; padding: 20px;'>
             <h2 style='color: #1a73e8; margin-bottom: 5px;'>📊 오늘의 AI 추천 직항 특가 내역</h2>
-            <p style='color: #666; margin-bottom: 20px;'>인천 출발 조건으로 로봇이 열심히 타자 쳐서 가져온 결과입니다.</p>
+            <p style='color: #666; margin-bottom: 20px;'>방해물을 모두 뚫고 로봇이 캐온 실시간 1년치 직항 특가 리스트입니다.</p>
             <table border='0' style='border-collapse: collapse; width: 100%; max-width: 700px; text-align: left; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border-radius: 8px; overflow: hidden;'>
                 <tr style='background-color: #1a73e8; color: white;'>
                     <th style='padding: 14px 16px;'>🗺️ 여행 목적지</th>
