@@ -1,6 +1,6 @@
 - name: 특가 수집 스크립트 실행
         env:
           SERPAPI_KEY: ${{ secrets.SERPAPI_KEY }}
-          GMAIL_USER: <ACTUAL_EMAIL_ADDRESS> # 여기에 본인 이메일 주소 입력 (예: kijm32@gmail.com)
+          GMAIL_USER: <kijm32@gmail.com> # 여기에 본인 이메일 주소 입력 (예: kijm32@gmail.com)
           GMAIL_PASSWORD: ${{ secrets.GMAIL_PASSWORD }}
         run: python flight_scraper.py
