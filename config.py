@@ -5,20 +5,19 @@ SERPAPI_KEY = os.environ.get("SERPAPI_KEY")
 GMAIL_USER = os.environ.get("GMAIL_USER")
 GMAIL_PASSWORD = os.environ.get("GMAIL_PASSWORD")
 
-# [Issue 1 & 3 해결] 접근성 좋은 공항 다중 선택 및 유동적 날짜 계산
-ORIGINS = "ICN,CJJ,GMP,YNY"  # 인천, 청주, 김포, 양양을 한 번에 스캔
+# [수정 1] 출발지 최적화: 서울(SEL - 인천/김포 자동 포함)과 청주(CJJ)만 타겟팅
+ORIGINS = "SEL,CJJ" 
 
-# 오늘 기준 향후 30일 이내의 기간 자동 설정
-today = datetime.now()
-future_30d = today + timedelta(days=30)
-DATE_RANGE = f"{today.strftime('%Y-%m-%d')},{future_30d.strftime('%Y-%m-%d')}"
+# [수정 2] 날짜 최적화: 시차 꼬임을 방지하기 위해 무조건 '내일'부터 30일간 검색
+tomorrow = datetime.now() + timedelta(days=1)
+future_30d = tomorrow + timedelta(days=30)
+DATE_RANGE = f"{tomorrow.strftime('%Y-%m-%d')},{future_30d.strftime('%Y-%m-%d')}"
 
-# SerpApi google_flights_deals 전용 파라미터 세팅
 SEARCH_PARAMS = {
     "engine": "google_flights_deals",
     "departure_id": ORIGINS,
     "outbound_date": DATE_RANGE,
-    "trip_length": "3,14", # 3박 ~ 14박 사이의 모든 일정 탐색
+    "trip_length": "3,14", # 3박 ~ 14박 사이
     "currency": "KRW",
     "hl": "ko",
     "gl": "kr"
