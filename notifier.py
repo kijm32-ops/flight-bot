@@ -32,10 +32,17 @@ def send_email(deals: List[Flight]) -> None:
                 </tr>
         """
         for deal in deals:
+            trip_nights = (deal.return_date - deal.depart_date).days
             html_content += f"""
                 <tr style='border-bottom: 1px solid #eee; text-align: center;'>
-                    <td style='padding: 10px; font-weight: bold;'>{deal.origin} ➔ {deal.destination}</td>
-                    <td style='padding: 10px;'>{deal.depart_date} ~ {deal.return_date}</td>
+                    <td style='padding: 10px; font-weight: bold;'>
+                        {deal.origin} ➔ {deal.destination_name}
+                        <br><span style='font-size: 12px; color: gray;'>({deal.destination_country})</span>
+                    </td>
+                    <td style='padding: 10px;'>
+                        {deal.depart_date} ~ {deal.return_date}
+                        <br><span style='font-size: 12px; color: gray;'>({trip_nights}박 {trip_nights+1}일)</span>
+                    </td>
                     <td style='padding: 10px; color: #d93025; font-weight: bold;'>
                         {deal.price:,}원<br>
                         <span style='font-size: 12px; color: gray;'>(-{deal.discount_percentage}%)</span>
