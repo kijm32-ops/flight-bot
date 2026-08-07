@@ -23,7 +23,11 @@ def fetch_raw_flight_deals(api_key: str, base_params: Dict[str, Any], origin: st
         data = res.json()
 
         logging.info(f"[{origin}] 응답 키 목록: {list(data.keys())}")  # 임시 디버그 로그
-        return data.get("deals", [])
+        deals = data.get("deals", [])
+        logging.info(f"[{origin}] deals 개수: {len(deals)}")
+        if deals:
+            logging.info(f"[{origin}] 첫 항목 샘플: {deals[0]}")
+        return deals
     except requests.exceptions.RequestException as e:
         logging.error(f"[{origin}] ❌ API 호출 에러: {e}")
         raise APIFetchError(f"API Fetch Failed for {origin}: {e}")
