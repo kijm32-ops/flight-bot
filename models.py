@@ -4,7 +4,9 @@ from datetime import date
 @dataclass(frozen=True)
 class Flight:
     origin: str                  # 출발 공항 코드 (예: ICN)
-    destination: str             # 도착 공항 코드
+    destination: str             # 도착 공항 코드/ID
+    destination_name: str        # 도착 도시명 (예: 제주시)
+    destination_country: str     # 도착 국가 (예: 대한민국)
     depart_date: date            # 출발일
     return_date: date            # 귀국일
     price: int                   # 현재 특가 가격
