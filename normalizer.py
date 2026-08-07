@@ -14,7 +14,7 @@ def normalize_and_deduplicate(origin: str, raw_deals: list) -> List[Flight]:
 
     for deal in raw_deals:
         try:
-            depart_date = _parse_date(deal.get("departure_date", ""))
+            depart_date = _parse_date(deal.get("outbound_date", ""))
             return_date = _parse_date(deal.get("return_date", ""))
             
             if not depart_date or not return_date:
@@ -33,7 +33,7 @@ def normalize_and_deduplicate(origin: str, raw_deals: list) -> List[Flight]:
                 airline=deal.get("airline", "Unknown"),
                 duration=deal.get("duration", 0),
                 stops=deal.get("stops", 0),
-                booking_link=deal.get("link", "")
+                booking_link=deal.get("flight_link", "")
             )
 
             dedup_key = (flight.origin, flight.destination, str(flight.depart_date), str(flight.return_date))
