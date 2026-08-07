@@ -21,7 +21,7 @@ def normalize_and_deduplicate(origin: str, raw_deals: list) -> List[Flight]:
 
             # 체류 기간 필터: 1~7일(당일치기 ~ 짧은 휴가)만 허용
             trip_days = (return_date - depart_date).days
-            if not (1 <= trip_days <= 7):
+            if not (2 <= trip_days <= 7):
                 continue
 
             price = deal.get("price", 0)
