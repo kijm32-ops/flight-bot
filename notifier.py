@@ -6,7 +6,7 @@ import requests
 from typing import List
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
-from config import GMAIL_USER, GMAIL_PASSWORD
+from config import GMAIL_USER, GMAIL_PASSWORD, PAGE_URL
 from models import Flight
 
 
@@ -67,7 +67,7 @@ def send_email(deals: List[Flight]) -> None:
 
 
 def send_kakao_message(deals: List[Flight]) -> None:
-    """카카오톡 '나에게 보내기'로 특가 요약 알림 발송"""
+    """카카오톡 '나에게 보내기'로 특가 요약 알림 발송 (전체 목록은 웹페이지로 연결)"""
     rest_api_key = os.environ.get("KAKAO_REST_API_KEY")
     refresh_token = os.environ.get("KAKAO_REFRESH_TOKEN")
 
@@ -78,7 +78,6 @@ def send_kakao_message(deals: List[Flight]) -> None:
     if not deals:
         return
 
-    # 1단계: Refresh Token으로 새 Access Token 발급
     try:
         token_res = requests.post(
             "https://kauth.kakao.com/oauth/token",
@@ -94,7 +93,6 @@ def send_kakao_message(deals: List[Flight]) -> None:
         logging.error(f"❌ 카카오 Access Token 갱신 실패: {e}")
         return
 
-    # 2단계: 상위 3건만 요약해서 메시지 구성
     top_deals = deals[:3]
     lines = [f"✈️ 오늘의 특가 항공권 {len(deals)}건 발견!\n"]
     for d in top_deals:
@@ -103,18 +101,19 @@ def send_kakao_message(deals: List[Flight]) -> None:
             f"{d.origin}→{d.destination_name}({d.destination_country}) "
             f"{d.price:,}원 (-{d.discount_percentage}%) {nights}박{nights+1}일"
         )
+    lines.append("\n👇 전체 목록 및 공유는 아래에서 확인하세요.")
     message_text = "\n".join(lines)
 
     template_object = {
         "object_type": "text",
         "text": message_text,
         "link": {
-            "web_url": top_deals[0].booking_link,
-            "mobile_web_url": top_deals[0].booking_link,
+            "web_url": PAGE_URL,
+            "mobile_web_url": PAGE_URL,
         },
+        "button_title": "전체 특가 보기",
     }
 
-    # 3단계: 나에게 보내기 API 호출
     try:
         send_res = requests.post(
             "https://kapi.kakao.com/v2/api/talk/memo/default/send",
