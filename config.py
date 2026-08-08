@@ -4,6 +4,10 @@ from datetime import datetime, timedelta
 SERPAPI_KEY = os.environ.get("SERPAPI_KEY")
 GMAIL_USER = os.environ.get("GMAIL_USER")
 GMAIL_PASSWORD = os.environ.get("GMAIL_PASSWORD")
+KAKAO_JS_KEY = os.environ.get("KAKAO_JS_KEY")
+
+# 특가 리포트 웹페이지 주소 (GitHub Pages)
+PAGE_URL = "https://kijm32-ops.github.io/flight-bot/"
 
 # Phase 3: 다중 출발지 배열 확장
 TARGET_ORIGINS = ["ICN", "CJJ", "GMP", "YNY"]
@@ -27,7 +31,6 @@ FAR_DATE_RANGE = f"{far_start.strftime('%Y-%m-%d')},{far_end.strftime('%Y-%m-%d'
 
 DATE_RANGES = [NEAR_DATE_RANGE, FAR_DATE_RANGE]
 
-# 공통 파라미터 (outbound_date는 실행 시 구간별로 채워짐)
 BASE_SEARCH_PARAMS = {
     "engine": "google_flights_deals",
     "trip_length": "3,7",
