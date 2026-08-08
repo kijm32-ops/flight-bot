@@ -1,11 +1,14 @@
 import smtplib
 import logging
-import sys
+import os
+import json
+import requests
 from typing import List
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from config import GMAIL_USER, GMAIL_PASSWORD
 from models import Flight
+
 
 def send_email(deals: List[Flight]) -> None:
     if not GMAIL_USER or not GMAIL_PASSWORD:
@@ -61,3 +64,64 @@ def send_email(deals: List[Flight]) -> None:
         logging.info("📬 PTIS 리포트 메일 발송 성공!")
     except Exception as e:
         logging.error(f"❌ 메일 발송 에러: {e}")
+
+
+def send_kakao_message(deals: List[Flight]) -> None:
+    """카카오톡 '나에게 보내기'로 특가 요약 알림 발송"""
+    rest_api_key = os.environ.get("KAKAO_REST_API_KEY")
+    refresh_token = os.environ.get("KAKAO_REFRESH_TOKEN")
+
+    if not rest_api_key or not refresh_token:
+        logging.warning("⚠️ 카카오 API 환경변수가 없어 카카오톡 발송을 건너뜁니다.")
+        return
+
+    if not deals:
+        return
+
+    # 1단계: Refresh Token으로 새 Access Token 발급
+    try:
+        token_res = requests.post(
+            "https://kauth.kakao.com/oauth/token",
+            data={
+                "grant_type": "refresh_token",
+                "client_id": rest_api_key,
+                "refresh_token": refresh_token,
+            },
+        )
+        token_res.raise_for_status()
+        access_token = token_res.json().get("access_token")
+    except Exception as e:
+        logging.error(f"❌ 카카오 Access Token 갱신 실패: {e}")
+        return
+
+    # 2단계: 상위 3건만 요약해서 메시지 구성
+    top_deals = deals[:3]
+    lines = [f"✈️ 오늘의 특가 항공권 {len(deals)}건 발견!\n"]
+    for d in top_deals:
+        nights = (d.return_date - d.depart_date).days
+        lines.append(
+            f"{d.origin}→{d.destination_name}({d.destination_country}) "
+            f"{d.price:,}원 (-{d.discount_percentage}%) {nights}박{nights+1}일"
+        )
+    message_text = "\n".join(lines)
+
+    template_object = {
+        "object_type": "text",
+        "text": message_text,
+        "link": {
+            "web_url": top_deals[0].booking_link,
+            "mobile_web_url": top_deals[0].booking_link,
+        },
+    }
+
+    # 3단계: 나에게 보내기 API 호출
+    try:
+        send_res = requests.post(
+            "https://kapi.kakao.com/v2/api/talk/memo/default/send",
+            headers={"Authorization": f"Bearer {access_token}"},
+            data={"template_object": json.dumps(template_object)},
+        )
+        send_res.raise_for_status()
+        logging.info("💬 카카오톡 알림 발송 성공!")
+    except Exception as e:
+        logging.error(f"❌ 카카오톡 발송 에러: {e}")
