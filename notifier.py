@@ -78,6 +78,7 @@ def send_kakao_message(deals: List[Flight]) -> None:
     if not deals:
         return
 
+    # 1단계: Refresh Token으로 새 Access Token 발급
     try:
         token_res = requests.post(
             "https://kauth.kakao.com/oauth/token",
@@ -93,6 +94,7 @@ def send_kakao_message(deals: List[Flight]) -> None:
         logging.error(f"❌ 카카오 Access Token 갱신 실패: {e}")
         return
 
+    # 2단계: 상위 3건 요약 + 전체 목록 페이지 링크 구성
     top_deals = deals[:3]
     lines = [f"✈️ 오늘의 특가 항공권 {len(deals)}건 발견!\n"]
     for d in top_deals:
@@ -114,6 +116,7 @@ def send_kakao_message(deals: List[Flight]) -> None:
         "button_title": "전체 특가 보기",
     }
 
+    # 3단계: 나에게 보내기 API 호출
     try:
         send_res = requests.post(
             "https://kapi.kakao.com/v2/api/talk/memo/default/send",
