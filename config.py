@@ -11,6 +11,9 @@ TARGET_ORIGINS = ["ICN", "CJJ", "GMP", "YNY"]
 # 최소 할인율 기준 (이 값 미만인 특가는 제외)
 MIN_DISCOUNT_PERCENTAGE = 25
 
+# 국내 목적지는 이 출발지에서 뜬 것만 허용 (청주/김포/인천 접근성 기준, 양양 제외)
+DOMESTIC_ALLOWED_ORIGINS = ["CJJ", "GMP", "ICN"]
+
 # 근거리/원거리 2단계 날짜 구간 (무료 요금제 250회/월 한도 안에서 운영)
 tomorrow = datetime.now() + timedelta(days=1)
 
@@ -27,7 +30,7 @@ DATE_RANGES = [NEAR_DATE_RANGE, FAR_DATE_RANGE]
 # 공통 파라미터 (outbound_date는 실행 시 구간별로 채워짐)
 BASE_SEARCH_PARAMS = {
     "engine": "google_flights_deals",
-    "trip_length": "2,7",
+    "trip_length": "3,7",
     "currency": "KRW",
     "hl": "ko",
     "gl": "kr"
