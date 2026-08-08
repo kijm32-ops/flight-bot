@@ -1,6 +1,7 @@
 from typing import List, Dict, Tuple
 from datetime import datetime
 from models import Flight
+from config import MIN_DISCOUNT_PERCENTAGE
 
 def _parse_date(date_str: str):
     try:
@@ -19,9 +20,14 @@ def normalize_and_deduplicate(origin: str, raw_deals: list) -> List[Flight]:
             if not depart_date or not return_date:
                 continue
 
-            # 체류 기간 필터: 1~7일(당일치기 ~ 짧은 휴가)만 허용
+            # 체류 기간 필터: 2~7일(2박 이상 ~ 짧은 휴가)만 허용
             trip_days = (return_date - depart_date).days
             if not (2 <= trip_days <= 7):
+                continue
+
+            discount_percentage = deal.get("discount_percentage", 0)
+            # 최소 할인율 필터: 애매한 특가(0%, 10% 등) 제외
+            if discount_percentage < MIN_DISCOUNT_PERCENTAGE:
                 continue
 
             price = deal.get("price", 0)
@@ -35,7 +41,7 @@ def normalize_and_deduplicate(origin: str, raw_deals: list) -> List[Flight]:
                 return_date=return_date,
                 price=price,
                 average_price=deal.get("average_price", 0),
-                discount_percentage=deal.get("discount_percentage", 0),
+                discount_percentage=discount_percentage,
                 airline=deal.get("airline", "Unknown"),
                 duration=deal.get("duration", 0),
                 stops=deal.get("stops", 0),
