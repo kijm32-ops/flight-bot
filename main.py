@@ -2,17 +2,17 @@ import logging
 import sys
 import concurrent.futures
 from typing import List
-from config import SERPAPI_KEY, BASE_SEARCH_PARAMS, TARGET_ORIGINS, DATE_RANGES
+from config import SERPAPI_KEY, BASE_SEARCH_PARAMS, TARGET_ORIGINS, DATE_RANGES, KAKAO_JS_KEY
 from search import fetch_raw_flight_deals
 from normalizer import normalize_and_deduplicate
 from notifier import send_email, send_kakao_message
+from report_generator import generate_report_html
 from models import Flight
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(message)s')
 
 
 def process_origin_range(origin: str, date_range: str) -> List[Flight]:
-    """개별 스레드에서 실행되는 파이프라인 워커 (출발지 + 날짜구간 조합)"""
     try:
         search_params = {**BASE_SEARCH_PARAMS, "outbound_date": date_range}
         raw_deals = fetch_raw_flight_deals(SERPAPI_KEY, search_params, origin)
@@ -54,6 +54,9 @@ def run_system():
     all_final_flights.sort(key=lambda x: x.price)
 
     logging.info(f"🎉 스크래핑 종료! 총 {len(all_final_flights)}개의 최적화된 항공권 수집 완료.")
+
+    # 결과 유무와 상관없이 페이지는 항상 최신 상태로 갱신
+    generate_report_html(all_final_flights, KAKAO_JS_KEY)
 
     if all_final_flights:
         send_email(all_final_flights)
