@@ -13,6 +13,7 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(message)s')
 
 
 def process_origin_range(origin: str, date_range: str) -> List[Flight]:
+    """개별 스레드에서 실행되는 파이프라인 워커 (출발지 + 날짜구간 조합)"""
     try:
         search_params = {**BASE_SEARCH_PARAMS, "outbound_date": date_range}
         raw_deals = fetch_raw_flight_deals(SERPAPI_KEY, search_params, origin)
