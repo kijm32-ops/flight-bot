@@ -1,7 +1,7 @@
 from typing import List, Dict, Tuple
 from datetime import datetime
 from models import Flight
-from config import MIN_DISCOUNT_PERCENTAGE
+from config import MIN_DISCOUNT_PERCENTAGE, DOMESTIC_ALLOWED_ORIGINS
 
 def _parse_date(date_str: str):
     try:
@@ -20,14 +20,18 @@ def normalize_and_deduplicate(origin: str, raw_deals: list) -> List[Flight]:
             if not depart_date or not return_date:
                 continue
 
-            # 체류 기간 필터: 2~7일(2박 이상 ~ 짧은 휴가)만 허용
+            # 체류 기간 필터: 3~7일(3박 이상 ~ 짧은 휴가)만 허용
             trip_days = (return_date - depart_date).days
-            if not (2 <= trip_days <= 7):
+            if not (3 <= trip_days <= 7):
                 continue
 
             discount_percentage = deal.get("discount_percentage", 0)
-            # 최소 할인율 필터: 애매한 특가(0%, 10% 등) 제외
             if discount_percentage < MIN_DISCOUNT_PERCENTAGE:
+                continue
+
+            destination_country = deal.get("country", "")
+            # 국내 목적지는 원주 접근성 좋은 출발지(청주/양양)에서만 허용
+            if destination_country == "대한민국" and origin not in DOMESTIC_ALLOWED_ORIGINS:
                 continue
 
             price = deal.get("price", 0)
@@ -36,7 +40,7 @@ def normalize_and_deduplicate(origin: str, raw_deals: list) -> List[Flight]:
                 origin=origin,
                 destination=deal.get("destination_id", "UNKNOWN"),
                 destination_name=deal.get("name", "알 수 없음"),
-                destination_country=deal.get("country", ""),
+                destination_country=destination_country,
                 depart_date=depart_date,
                 return_date=return_date,
                 price=price,
@@ -48,9 +52,8 @@ def normalize_and_deduplicate(origin: str, raw_deals: list) -> List[Flight]:
                 booking_link=deal.get("flight_link", "")
             )
             dedup_key = (flight.origin, flight.destination, str(flight.depart_date), str(flight.return_date))
-            # 키가 없거나 기존 가격보다 더 싸면 덮어쓰기
             if dedup_key not in best_flights or price < best_flights[dedup_key].price:
                 best_flights[dedup_key] = flight
         except Exception:
-            continue # 손상된 개별 데이터는 무시하고 계속 진행
+            continue
     return list(best_flights.values())
