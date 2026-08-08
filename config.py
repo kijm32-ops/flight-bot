@@ -8,19 +8,26 @@ GMAIL_PASSWORD = os.environ.get("GMAIL_PASSWORD")
 # Phase 3: 다중 출발지 배열 확장
 TARGET_ORIGINS = ["ICN", "CJJ", "GMP", "YNY"]
 
-# 검색 범위: 내일부터 약 210일 후(다음 해 2월 말경)까지
-tomorrow = datetime.now() + timedelta(days=1)
-future_horizon = tomorrow + timedelta(days=210)
-DATE_RANGE = f"{tomorrow.strftime('%Y-%m-%d')},{future_horizon.strftime('%Y-%m-%d')}"
-
 # 최소 할인율 기준 (이 값 미만인 특가는 제외)
-MIN_DISCOUNT_PERCENTAGE = 20
+MIN_DISCOUNT_PERCENTAGE = 25
 
-# 출발지(departure_id)는 스레드별로 동적 할당되므로 공통 파라미터에서 제외합니다.
+# 근거리/원거리 2단계 날짜 구간 (무료 요금제 250회/월 한도 안에서 운영)
+tomorrow = datetime.now() + timedelta(days=1)
+
+near_start = tomorrow
+near_end = tomorrow + timedelta(days=60)
+NEAR_DATE_RANGE = f"{near_start.strftime('%Y-%m-%d')},{near_end.strftime('%Y-%m-%d')}"
+
+far_start = tomorrow + timedelta(days=90)
+far_end = tomorrow + timedelta(days=210)
+FAR_DATE_RANGE = f"{far_start.strftime('%Y-%m-%d')},{far_end.strftime('%Y-%m-%d')}"
+
+DATE_RANGES = [NEAR_DATE_RANGE, FAR_DATE_RANGE]
+
+# 공통 파라미터 (outbound_date는 실행 시 구간별로 채워짐)
 BASE_SEARCH_PARAMS = {
     "engine": "google_flights_deals",
-    "outbound_date": DATE_RANGE,
-    "trip_length": "2,7",   # 2박~7박(짧은 휴가)로 범위 유지
+    "trip_length": "2,7",
     "currency": "KRW",
     "hl": "ko",
     "gl": "kr"
