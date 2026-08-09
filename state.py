@@ -33,15 +33,25 @@ def update_route_history(state: dict, flights: list) -> set:
     history = state.setdefault("route_history", {})
     low_price_keys = set()
 
-    for flight in flights:
-        route_key = f"{flight.origin}->{flight.destination_name}"
-        entries = history.get(route_key, [])
-
-        # 30일 이전 데이터는 정리
-        entries = [
+    # 오늘 검색되지 않은 노선을 포함해 전체 이력에서 30일 지난 데이터 정리
+    routes_to_delete = []
+    for route_key, entries in history.items():
+        pruned = [
             e for e in entries
             if datetime.strptime(e["date"], "%Y-%m-%d") >= cutoff
         ]
+        if pruned:
+            history[route_key] = pruned
+        else:
+            routes_to_delete.append(route_key)
+
+    for route_key in routes_to_delete:
+        del history[route_key]
+
+    # 이번에 검색된 항공권 반영
+    for flight in flights:
+        route_key = f"{flight.origin}->{flight.destination_name}"
+        entries = history.get(route_key, [])
 
         previous_min = min((e["price"] for e in entries), default=None)
 
