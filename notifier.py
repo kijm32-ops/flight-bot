@@ -96,24 +96,35 @@ def send_kakao_message(deals: List[Flight]) -> None:
 
     # 2단계: 상위 3건 요약 + 전체 목록 페이지 링크 구성
     top_deals = deals[:3]
-    lines = [f"✈️ 오늘의 특가 항공권 {len(deals)}건 발견!\n"]
+    summary_lines = []
     for d in top_deals:
         nights = (d.return_date - d.depart_date).days
-        lines.append(
-            f"{d.origin}→{d.destination_name}({d.destination_country}) "
-            f"{d.price:,}원 (-{d.discount_percentage}%) {nights}박{nights+1}일"
+        summary_lines.append(
+            f"{d.origin}→{d.destination_name} {d.price:,}원(-{d.discount_percentage}%) {nights}박{nights+1}일"
         )
-    lines.append("\n👇 전체 목록 및 공유는 아래에서 확인하세요.")
-    message_text = "\n".join(lines)
+    description_text = "\n".join(summary_lines)
 
+    # feed 타입: 실제로 클릭 가능한 버튼(buttons)이 정식으로 지원되는 템플릿
     template_object = {
-        "object_type": "text",
-        "text": message_text,
-        "link": {
-            "web_url": PAGE_URL,
-            "mobile_web_url": PAGE_URL,
+        "object_type": "feed",
+        "content": {
+            "title": f"✈️ 오늘의 특가 항공권 {len(deals)}건 발견!",
+            "description": description_text,
+            "image_url": "https://developers.kakao.com/assets/img/about/logos/kakaolink/kakaolink_btn_medium.png",
+            "link": {
+                "web_url": PAGE_URL,
+                "mobile_web_url": PAGE_URL,
+            },
         },
-        "button_title": "전체 특가 보기",
+        "buttons": [
+            {
+                "title": "전체 특가 보기",
+                "link": {
+                    "web_url": PAGE_URL,
+                    "mobile_web_url": PAGE_URL,
+                },
+            }
+        ],
     }
 
     # 3단계: 나에게 보내기 API 호출
