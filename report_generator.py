@@ -1,13 +1,14 @@
 import os
 import logging
-from typing import List
+from typing import List, Set, Tuple
 from models import Flight
 
 OUTPUT_DIR = "public"
 OUTPUT_FILE = os.path.join(OUTPUT_DIR, "index.html")
 
 
-def generate_report_html(deals: List[Flight], js_key: str) -> None:
+def generate_report_html(deals: List[Flight], js_key: str, low_price_keys: Set[Tuple[str, str, str, str]] = None) -> None:
+    low_price_keys = low_price_keys or set()
     os.makedirs(OUTPUT_DIR, exist_ok=True)
 
     if not deals:
@@ -16,6 +17,8 @@ def generate_report_html(deals: List[Flight], js_key: str) -> None:
         rows_html = ""
         for deal in deals:
             trip_nights = (deal.return_date - deal.depart_date).days
+            dedup_key = (deal.origin, deal.destination, str(deal.depart_date), str(deal.return_date))
+            badge = "<br><span class='badge'>🔥 30일 최저가</span>" if dedup_key in low_price_keys else ""
             rows_html += f"""
             <tr>
                 <td>
@@ -29,6 +32,7 @@ def generate_report_html(deals: List[Flight], js_key: str) -> None:
                 <td class='price'>
                     {deal.price:,}원<br>
                     <span class='sub'>(-{deal.discount_percentage}%)</span>
+                    {badge}
                 </td>
                 <td><a href="{deal.booking_link}" target="_blank" rel="noopener">확인</a></td>
             </tr>
@@ -49,6 +53,10 @@ def generate_report_html(deals: List[Flight], js_key: str) -> None:
   td {{ padding: 10px; text-align: center; border-bottom: 1px solid #eee; }}
   .sub {{ font-size: 12px; color: gray; }}
   .price {{ color: #d93025; font-weight: bold; }}
+  .badge {{
+    display:inline-block; font-size: 11px; color:#d93025; background:#ffe4e1;
+    padding: 2px 6px; border-radius: 4px; margin-top: 4px;
+  }}
   #shareBtn {{
     display: inline-block; margin-bottom: 16px; padding: 10px 16px;
     background-color: #FEE500; color: #191919; border: none; border-radius: 6px;
