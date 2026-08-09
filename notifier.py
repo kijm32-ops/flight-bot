@@ -3,22 +3,47 @@ import logging
 import os
 import json
 import requests
-from typing import List
+from typing import List, Set, Tuple
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from config import GMAIL_USER, GMAIL_PASSWORD, PAGE_URL
 from models import Flight
 
 
-def send_email(deals: List[Flight]) -> None:
+def _send_raw_email(subject: str, html_content: str) -> None:
+    """공통 메일 발송 로직 (일반 리포트, 경고 메일 모두 사용)"""
     if not GMAIL_USER or not GMAIL_PASSWORD:
         logging.error("❌ 메일 계정 환경변수가 없습니다.")
         return
 
     msg = MIMEMultipart()
-    msg['Subject'] = f"✈️ [PTIS] 오늘의 실시간 특가 리포트 ({len(deals)}건)"
+    msg['Subject'] = subject
     msg['From'] = GMAIL_USER
     msg['To'] = GMAIL_USER
+    msg.attach(MIMEText(html_content, 'html'))
+
+    try:
+        with smtplib.SMTP_SSL('smtp.gmail.com', 465) as server:
+            server.login(GMAIL_USER, GMAIL_PASSWORD)
+            server.sendmail(GMAIL_USER, GMAIL_USER, msg.as_string())
+        logging.info(f"📬 메일 발송 성공: {subject}")
+    except Exception as e:
+        logging.error(f"❌ 메일 발송 에러: {e}")
+
+
+def send_warning_email(subject: str, body_text: str) -> None:
+    """시스템 경고용 간단 메일 (카카오 발송 실패, API 한도 임박 등)"""
+    html_content = f"""
+    <html><body style='font-family: Malgun Gothic, sans-serif; padding: 20px;'>
+        <h3 style='color: #d93025;'>⚠️ PTIS 시스템 경고</h3>
+        <p>{body_text}</p>
+    </body></html>
+    """
+    _send_raw_email(subject, html_content)
+
+
+def send_email(deals: List[Flight], low_price_keys: Set[Tuple[str, str, str, str]] = None) -> None:
+    low_price_keys = low_price_keys or set()
 
     if not deals:
         html_content = "<h3>📢 오늘의 특가 항공권 내역</h3><p>현재 조건에 부합하는 특가 항공권이 없습니다.</p>"
@@ -36,6 +61,12 @@ def send_email(deals: List[Flight]) -> None:
         """
         for deal in deals:
             trip_nights = (deal.return_date - deal.depart_date).days
+            dedup_key = (deal.origin, deal.destination, str(deal.depart_date), str(deal.return_date))
+            badge = (
+                "<br><span style='font-size:11px;color:#d93025;background:#ffe4e1;"
+                "padding:2px 6px;border-radius:4px;'>🔥 30일 최저가</span>"
+                if dedup_key in low_price_keys else ""
+            )
             html_content += f"""
                 <tr style='border-bottom: 1px solid #eee; text-align: center;'>
                     <td style='padding: 10px; font-weight: bold;'>
@@ -49,34 +80,30 @@ def send_email(deals: List[Flight]) -> None:
                     <td style='padding: 10px; color: #d93025; font-weight: bold;'>
                         {deal.price:,}원<br>
                         <span style='font-size: 12px; color: gray;'>(-{deal.discount_percentage}%)</span>
+                        {badge}
                     </td>
                     <td style='padding: 10px;'><a href='{deal.booking_link}' target='_blank'>확인</a></td>
                 </tr>
             """
         html_content += "</table></body></html>"
 
-    msg.attach(MIMEText(html_content, 'html'))
-
-    try:
-        with smtplib.SMTP_SSL('smtp.gmail.com', 465) as server:
-            server.login(GMAIL_USER, GMAIL_PASSWORD)
-            server.sendmail(GMAIL_USER, GMAIL_USER, msg.as_string())
-        logging.info("📬 PTIS 리포트 메일 발송 성공!")
-    except Exception as e:
-        logging.error(f"❌ 메일 발송 에러: {e}")
+    _send_raw_email(f"✈️ [PTIS] 오늘의 실시간 특가 리포트 ({len(deals)}건)", html_content)
 
 
-def send_kakao_message(deals: List[Flight]) -> None:
-    """카카오톡 '나에게 보내기'로 특가 요약 알림 발송 (전체 목록은 웹페이지로 연결)"""
+def send_kakao_message(deals: List[Flight]) -> bool:
+    """
+    카카오톡 '나에게 보내기'로 특가 요약 알림 발송.
+    성공 여부를 True/False로 반환한다 (연속 실패 감지에 사용).
+    """
     rest_api_key = os.environ.get("KAKAO_REST_API_KEY")
     refresh_token = os.environ.get("KAKAO_REFRESH_TOKEN")
 
     if not rest_api_key or not refresh_token:
         logging.warning("⚠️ 카카오 API 환경변수가 없어 카카오톡 발송을 건너뜁니다.")
-        return
+        return False
 
     if not deals:
-        return
+        return True  # 보낼 게 없는 것은 실패가 아님
 
     # 1단계: Refresh Token으로 새 Access Token 발급
     try:
@@ -92,7 +119,7 @@ def send_kakao_message(deals: List[Flight]) -> None:
         access_token = token_res.json().get("access_token")
     except Exception as e:
         logging.error(f"❌ 카카오 Access Token 갱신 실패: {e}")
-        return
+        return False
 
     # 2단계: 상위 3건 요약 + 전체 목록 페이지 링크 구성
     top_deals = deals[:3]
@@ -104,7 +131,6 @@ def send_kakao_message(deals: List[Flight]) -> None:
         )
     description_text = "\n".join(summary_lines)
 
-    # feed 타입: 실제로 클릭 가능한 버튼(buttons)이 정식으로 지원되는 템플릿
     template_object = {
         "object_type": "feed",
         "content": {
@@ -136,5 +162,7 @@ def send_kakao_message(deals: List[Flight]) -> None:
         )
         send_res.raise_for_status()
         logging.info("💬 카카오톡 알림 발송 성공!")
+        return True
     except Exception as e:
         logging.error(f"❌ 카카오톡 발송 에러: {e}")
+        return False
