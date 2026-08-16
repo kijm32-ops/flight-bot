@@ -10,6 +10,46 @@ from config import GMAIL_USER, GMAIL_PASSWORD, PAGE_URL
 from models import Flight
 
 
+def _short_name(deal: Flight) -> str:
+    """
+    destination_name에 붙은 'ICN 출발 ...' 경고 문구를 떼어낸 짧은 도시명.
+    카카오톡 요약처럼 길이가 빠듯한 곳에서 사용한다.
+    """
+    return deal.destination_name.split(" ⚠️ ")[0]
+
+
+def _grade_badge_html(deal: Flight) -> str:
+    """메일용 등급 배지 (인라인 스타일 — 메일 클라이언트는 <style> 태그를 자주 무시함)"""
+    if not deal.value_grade or deal.value_grade == "unknown":
+        return ""
+    colors = {
+        "🔥 초특가": ("#b3261e", "#fce8e6"),
+        "✨ 특가": ("#b06000", "#fef7e0"),
+        "👍 괜찮음": ("#1e6b3a", "#e6f4ea"),
+    }
+    fg, bg = colors.get(deal.value_grade, ("#1e6b3a", "#e6f4ea"))
+    return (
+        f"<br><span style='display:inline-block;font-size:11px;font-weight:bold;"
+        f"color:{fg};background:{bg};padding:2px 7px;border-radius:10px;"
+        f"margin-top:5px;'>{deal.value_grade}</span>"
+    )
+
+
+def _alt_dates_html(deal: Flight) -> str:
+    """메일용 대안 날짜 목록 (<details>는 메일에서 동작하지 않으므로 평문으로 펼쳐서 표시)"""
+    if not deal.alt_dates:
+        return ""
+    lines = "".join(
+        f"<div>{depart} ~ {ret} · {price:,}원</div>"
+        for depart, ret, price in deal.alt_dates
+    )
+    return (
+        f"<div style='margin-top:6px;font-size:11px;color:#5f6368;"
+        f"border-top:1px dashed #ddd;padding-top:5px;'>"
+        f"<span style='color:#1a73e8;'>다른 날짜</span>{lines}</div>"
+    )
+
+
 def _send_raw_email(subject: str, html_content: str) -> None:
     """공통 메일 발송 로직 (일반 리포트, 경고 메일 모두 사용)"""
     if not GMAIL_USER or not GMAIL_PASSWORD:
@@ -51,6 +91,9 @@ def send_email(deals: List[Flight], low_price_keys: Set[Tuple[str, str, str, str
         html_content = """
         <html><body style='font-family: Malgun Gothic, sans-serif; padding: 20px;'>
             <h2 style='color: #1a73e8;'>📊 오늘의 실시간 직항 특가</h2>
+            <p style='font-size:12px;color:#5f6368;margin-top:-8px;'>
+                등급은 권역별 기준가 대비 가격입니다. 🔥 초특가 ≤70% · ✨ 특가 ≤85% · 👍 괜찮음 ≤100%
+            </p>
             <table border='0' style='border-collapse: collapse; width: 100%; max-width: 750px;'>
                 <tr style='background-color: #1a73e8; color: white;'>
                     <th style='padding: 10px;'>노선</th>
@@ -67,15 +110,20 @@ def send_email(deals: List[Flight], low_price_keys: Set[Tuple[str, str, str, str
                 "padding:2px 6px;border-radius:4px;'>🔥 30일 최저가</span>"
                 if dedup_key in low_price_keys else ""
             )
+            grade_badge = _grade_badge_html(deal)
+            alt_html = _alt_dates_html(deal)
+
             html_content += f"""
                 <tr style='border-bottom: 1px solid #eee; text-align: center;'>
                     <td style='padding: 10px; font-weight: bold;'>
                         {deal.origin} ➔ {deal.destination_name}
                         <br><span style='font-size: 12px; color: gray;'>({deal.destination_country})</span>
+                        {grade_badge}
                     </td>
                     <td style='padding: 10px;'>
                         {deal.depart_date} ~ {deal.return_date}
                         <br><span style='font-size: 12px; color: gray;'>({trip_nights}박 {trip_nights+1}일)</span>
+                        {alt_html}
                     </td>
                     <td style='padding: 10px; color: #d93025; font-weight: bold;'>
                         {deal.price:,}원<br>
@@ -122,12 +170,15 @@ def send_kakao_message(deals: List[Flight]) -> bool:
         return False
 
     # 2단계: 상위 3건 요약 + 전체 목록 페이지 링크 구성
+    # (main.py에서 value_ratio 오름차순 정렬되므로 상위 3건 = 가성비 최상위)
     top_deals = deals[:3]
     summary_lines = []
     for d in top_deals:
         nights = (d.return_date - d.depart_date).days
+        grade = d.value_grade.split(" ")[0] if d.value_grade and d.value_grade != "unknown" else ""
         summary_lines.append(
-            f"{d.origin}→{d.destination_name} {d.price:,}원(-{d.discount_percentage}%) {nights}박{nights+1}일"
+            f"{grade}{d.origin}→{_short_name(d)} {d.price:,}원 "
+            f"{d.depart_date.strftime('%m/%d')} {nights}박{nights+1}일"
         )
     description_text = "\n".join(summary_lines)
 
