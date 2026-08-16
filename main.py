@@ -9,6 +9,7 @@ from notifier import send_email, send_kakao_message, send_warning_email
 from report_generator import generate_report_html
 from state import load_state, save_state, update_route_history, record_api_calls, record_kakao_result
 from models import Flight
+from origin_compare import annotate_origin_alternatives
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(message)s')
 
@@ -57,6 +58,9 @@ def run_system():
                 all_final_flights.extend(result_flights)
             except Exception as exc:
                 logging.error(f"[{origin} / {date_range}] 스레드 예외 발생: {exc}")
+
+    # 지방 출발편 중 ICN이 더 저렴하면 경고 문구 부착
+    all_final_flights = annotate_origin_alternatives(all_final_flights)
 
     all_final_flights.sort(key=lambda x: x.price)
 
