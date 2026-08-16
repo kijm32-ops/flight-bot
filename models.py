@@ -1,5 +1,7 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import date
+from typing import List, Tuple
+
 
 @dataclass(frozen=True)
 class Flight:
@@ -16,3 +18,7 @@ class Flight:
     duration: int                # 비행 시간 (분 단위)
     stops: int                   # 경유 횟수 (직항은 0)
     booking_link: str            # 예약 링크
+    value_ratio: float = 0.0     # 권역 기준가 대비 비율 (낮을수록 특가)
+    value_grade: str = ""        # "🔥 초특가" / "✨ 특가" / "👍 괜찮음" / "보통"
+    alt_dates: List[Tuple[str, str, int]] = field(default_factory=list)
+    # 같은 목적지의 다른 저렴한 날짜 조합: (출발일, 귀국일, 가격)
