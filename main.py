@@ -62,7 +62,7 @@ def run_system():
     # 지방 출발편 중 ICN이 더 저렴하면 경고 문구 부착
     all_final_flights = annotate_origin_alternatives(all_final_flights)
 
-    all_final_flights.sort(key=lambda x: x.price)
+    all_final_flights.sort(key=lambda x: (x.value_ratio, x.price))
 
     logging.info(f"🎉 스크래핑 종료! 총 {len(all_final_flights)}개의 최적화된 항공권 수집 완료.")
 
