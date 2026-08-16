@@ -1,5 +1,6 @@
 from typing import List, Dict, Tuple
 from datetime import datetime
+from dataclasses import replace
 from models import Flight
 from config import (
     MIN_DISCOUNT_PERCENTAGE,
@@ -84,6 +85,7 @@ def collapse_by_destination(flights: List[Flight], keep_alts: int = 3) -> List[F
     """
     목적지별로 최저가 1건만 대표로 남기고,
     나머지 날짜 조합은 alt_dates에 (출발일, 귀국일, 가격)로 첨부한다.
+    Flight가 frozen dataclass이므로 dataclasses.replace()로 새 객체를 만든다.
     """
     buckets: Dict[Tuple[str, str], List[Flight]] = {}
     for f in flights:
@@ -94,8 +96,10 @@ def collapse_by_destination(flights: List[Flight], keep_alts: int = 3) -> List[F
         group.sort(key=lambda f: f.price)
         best = group[0]
         rest = group[1:keep_alts + 1]
-        best.alt_dates = [
+        alt_dates = [
             (str(f.depart_date), str(f.return_date), f.price) for f in rest
         ]
-        result.append(best)
+        # frozen dataclass라 mutation 대신 replace로 새 인스턴스 생성
+        best_with_alts = replace(best, alt_dates=alt_dates)
+        result.append(best_with_alts)
     return result
