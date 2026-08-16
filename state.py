@@ -33,7 +33,6 @@ def update_route_history(state: dict, flights: list) -> set:
     history = state.setdefault("route_history", {})
     low_price_keys = set()
 
-    # 오늘 검색되지 않은 노선을 포함해 전체 이력에서 30일 지난 데이터 정리
     routes_to_delete = []
     for route_key, entries in history.items():
         pruned = [
@@ -44,39 +43,45 @@ def update_route_history(state: dict, flights: list) -> set:
             history[route_key] = pruned
         else:
             routes_to_delete.append(route_key)
-
     for route_key in routes_to_delete:
         del history[route_key]
 
-    # 이번에 검색된 항공권 반영
     for flight in flights:
         route_key = f"{flight.origin}->{flight.destination_name}"
         entries = history.get(route_key, [])
-
         previous_min = min((e["price"] for e in entries), default=None)
-
         if previous_min is not None and flight.price <= previous_min:
             dedup_key = (
                 flight.origin, flight.destination,
                 str(flight.depart_date), str(flight.return_date)
             )
             low_price_keys.add(dedup_key)
-
         entries.append({"date": today, "price": flight.price})
         history[route_key] = entries
 
     return low_price_keys
 
 
+def peek_api_usage(state: dict) -> int:
+    """
+    호출 '전에' 이번 달 누적 사용량을 확인한다 (증가시키지 않음).
+    월이 바뀌었으면 여기서 리셋한다.
+    """
+    month = datetime.now().strftime("%Y-%m")
+    usage = state.setdefault("api_usage", {"month": month, "count": 0})
+    if usage.get("month") != month:
+        usage["month"] = month
+        usage["count"] = 0
+    return usage["count"]
+
+
 def record_api_calls(state: dict, count: int) -> int:
     """이번 달 API 호출 누적 횟수를 기록하고 반환한다. 월이 바뀌면 리셋."""
     month = datetime.now().strftime("%Y-%m")
     usage = state.setdefault("api_usage", {"month": month, "count": 0})
-
     if usage.get("month") != month:
         usage["month"] = month
         usage["count"] = 0
-
     usage["count"] += count
     return usage["count"]
 
@@ -89,6 +94,5 @@ def record_kakao_result(state: dict, success: bool) -> bool:
     if success:
         state["kakao_consecutive_failures"] = 0
         return False
-
     state["kakao_consecutive_failures"] = state.get("kakao_consecutive_failures", 0) + 1
     return state["kakao_consecutive_failures"] >= 3
