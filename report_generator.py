@@ -6,6 +6,37 @@ from models import Flight
 OUTPUT_DIR = "public"
 OUTPUT_FILE = os.path.join(OUTPUT_DIR, "index.html")
 
+# value_grade 문자열 → CSS 클래스 매핑
+GRADE_CLASS = {
+    "🔥 초특가": "grade-super",
+    "✨ 특가": "grade-good",
+    "👍 괜찮음": "grade-ok",
+}
+
+
+def _grade_badge(deal: Flight) -> str:
+    """권역 기준가 대비 등급 배지 HTML"""
+    if not deal.value_grade or deal.value_grade == "unknown":
+        return ""
+    cls = GRADE_CLASS.get(deal.value_grade, "grade-ok")
+    ratio_text = f"기준가 대비 {int(deal.value_ratio * 100)}%"
+    return f"<span class='grade {cls}' title='{ratio_text}'>{deal.value_grade}</span>"
+
+
+def _alt_dates_html(deal: Flight) -> str:
+    """같은 목적지의 다른 저렴한 날짜 조합"""
+    if not deal.alt_dates:
+        return ""
+    items = ""
+    for depart, ret, price in deal.alt_dates:
+        items += f"<li>{depart} ~ {ret} · {price:,}원</li>"
+    return f"""
+        <details class='alt'>
+            <summary>다른 날짜 {len(deal.alt_dates)}건</summary>
+            <ul>{items}</ul>
+        </details>
+    """
+
 
 def generate_report_html(deals: List[Flight], js_key: str, low_price_keys: Set[Tuple[str, str, str, str]] = None) -> None:
     low_price_keys = low_price_keys or set()
@@ -19,15 +50,20 @@ def generate_report_html(deals: List[Flight], js_key: str, low_price_keys: Set[T
             trip_nights = (deal.return_date - deal.depart_date).days
             dedup_key = (deal.origin, deal.destination, str(deal.depart_date), str(deal.return_date))
             badge = "<br><span class='badge'>🔥 30일 최저가</span>" if dedup_key in low_price_keys else ""
+            grade_badge = _grade_badge(deal)
+            alt_html = _alt_dates_html(deal)
+
             rows_html += f"""
             <tr>
                 <td>
                     {deal.origin} ➔ {deal.destination_name}
                     <br><span class='sub'>({deal.destination_country})</span>
+                    {f"<br>{grade_badge}" if grade_badge else ""}
                 </td>
                 <td>
                     {deal.depart_date} ~ {deal.return_date}
                     <br><span class='sub'>({trip_nights}박 {trip_nights+1}일)</span>
+                    {alt_html}
                 </td>
                 <td class='price'>
                     {deal.price:,}원<br>
@@ -57,6 +93,25 @@ def generate_report_html(deals: List[Flight], js_key: str, low_price_keys: Set[T
     display:inline-block; font-size: 11px; color:#d93025; background:#ffe4e1;
     padding: 2px 6px; border-radius: 4px; margin-top: 4px;
   }}
+  .grade {{
+    display:inline-block; font-size: 11px; font-weight: bold;
+    padding: 2px 7px; border-radius: 10px; margin-top: 5px;
+  }}
+  .grade-super {{ color:#b3261e; background:#fce8e6; }}
+  .grade-good  {{ color:#b06000; background:#fef7e0; }}
+  .grade-ok    {{ color:#1e6b3a; background:#e6f4ea; }}
+  .alt {{ margin-top: 6px; font-size: 12px; }}
+  .alt summary {{
+    cursor: pointer; color: #1a73e8; list-style: none;
+    display: inline-block; padding: 2px 6px;
+    border: 1px solid #d2e3fc; border-radius: 4px; background: #f0f6ff;
+  }}
+  .alt summary::-webkit-details-marker {{ display: none; }}
+  .alt ul {{
+    list-style: none; padding: 6px 0 0 0; margin: 0;
+    color: #5f6368; text-align: center;
+  }}
+  .alt li {{ padding: 2px 0; }}
   #shareBtn {{
     display: inline-block; margin-bottom: 16px; padding: 10px 16px;
     background-color: #FEE500; color: #191919; border: none; border-radius: 6px;
