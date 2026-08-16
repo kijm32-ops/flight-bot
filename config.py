@@ -1,5 +1,5 @@
 import os
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
 SERPAPI_KEY = os.environ.get("SERPAPI_KEY")
 GMAIL_USER = os.environ.get("GMAIL_USER")
@@ -13,8 +13,8 @@ TARGET_ORIGINS = ["ICN", "CJJ", "GMP"]
 DOMESTIC_ALLOWED_ORIGINS = ["CJJ", "GMP", "ICN"]
 
 # ── SerpApi 무료 티어 예산 관리 ──────────────────────
-SERPAPI_MONTHLY_LIMIT = 250      # 무료 요금제 한도
-SERPAPI_SAFE_BUDGET = 235        # 재시도/수동실행 대비 15회 예비분 확보
+SERPAPI_MONTHLY_LIMIT = 250
+SERPAPI_SAFE_BUDGET = 235        # 재시도/수동실행 대비 15회 예비분
 API_QUOTA_WARNING_THRESHOLD = 200
 # ────────────────────────────────────────────────────
 
@@ -48,7 +48,26 @@ TIER_TRIP_DAYS = {
 DEFAULT_TRIP_DAYS = (3, 7)
 # ────────────────────────────────────────────────────
 
-tomorrow = datetime.now() + timedelta(days=1)
+# ── 요일 판정 (GitHub Actions는 UTC로 동작하므로 KST 고정) ──
+KST = timezone(timedelta(hours=9))
+
+
+def _now_kst() -> datetime:
+    return datetime.now(KST)
+
+
+def is_deep_scan_day() -> bool:
+    """
+    주 1회 심층 검색 실행 여부.
+    - 기본: 한국 시간 토요일(weekday() == 5)
+    - FORCE_DEEP_SCAN=1 환경변수로 강제 실행 가능 (테스트/수동 트리거용)
+    """
+    if os.environ.get("FORCE_DEEP_SCAN") == "1":
+        return True
+    return _now_kst().weekday() == 5
+
+
+tomorrow = _now_kst() + timedelta(days=1)
 
 
 def _range(start_offset: int, end_offset: int) -> str:
@@ -59,27 +78,32 @@ def _range(start_offset: int, end_offset: int) -> str:
 
 # 프로필 정의: {이름: (outbound_date 범위, trip_length)}
 PROFILES = {
-    "near": (_range(0, 60),   "2,7"),    # 근거리 임박
-    "mid":  (_range(45, 150), "3,9"),    # 중거리
-    "far":  (_range(90, 240), "7,14"),   # 장거리 (유럽/대양주)
+    "near":  (_range(0, 60),    "2,7"),    # 근거리 임박
+    "mid":   (_range(45, 150),  "3,9"),    # 중거리
+    "far":   (_range(90, 240),  "7,14"),   # 장거리 (유럽/대양주)
+    "deep":  (_range(240, 330), "7,16"),   # 심층: 8~11개월 후 장거리 (주 1회)
 }
 
-# 출발지별로 실제 의미 있는 프로필만 배정 (호출 절감의 핵심)
-# GMP 국제선은 하네다/간사이/베이징/타이베이 수준, CJJ는 장거리 직항 없음
+# 출발지별로 실제 의미 있는 프로필만 배정
 ORIGIN_PROFILES = {
-    "ICN": ["near", "mid", "far"],
+    "ICN": ["near", "mid", "far", "deep"],
     "CJJ": ["near", "mid"],
     "GMP": ["near"],
 }
 
-# 예산 부족 시 뒤쪽부터 잘라냄 (앞이 우선순위 높음)
-TASK_PRIORITY = [
+# 매일 실행되는 작업 (우선순위 순 — 예산 부족 시 뒤에서부터 잘림)
+DAILY_TASK_PRIORITY = [
     ("ICN", "near"),
     ("ICN", "mid"),
     ("CJJ", "near"),
     ("ICN", "far"),
     ("CJJ", "mid"),
     ("GMP", "near"),
+]
+
+# 심층 검색일에만 추가되는 작업 (일반 작업보다 후순위)
+DEEP_TASK_PRIORITY = [
+    ("ICN", "deep"),
 ]
 
 BASE_SEARCH_PARAMS = {
