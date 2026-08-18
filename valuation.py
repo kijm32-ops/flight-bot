@@ -1,9 +1,9 @@
 # valuation.py
-from typing import Optional
+from typing import Optional, Tuple
+from config import TIER_TRIP_DAYS, DEFAULT_TRIP_DAYS
 
-# 권역별 "이 정도면 싸다" 기준가 (1인 왕복, KRW)
 TIER_BASELINE = {
-    "domestic":   60_000,
+    "domestic":   45_000,   # 60,000 → 45,000 (제주 5만원대는 평범한 가격)
     "jp_near":   150_000,
     "jp_mid":    200_000,
     "cn_near":   150_000,
@@ -14,62 +14,58 @@ TIER_BASELINE = {
     "mongolia":  350_000,
     "guam":      350_000,
     "oceania":   800_000,
-    "longhaul":  900_000,
+    "europe":    900_000,
+    "namerica": 1_000_000,
+    "longhaul": 1_000_000,
 }
 
+# 1순위: 공항 IATA 코드 (destination_id가 코드 형태일 때만 맞음)
 AIRPORT_TIER = {
-    # 국내
     "CJU": "domestic", "PUS": "domestic", "USN": "domestic",
     "RSU": "domestic", "KWJ": "domestic", "TAE": "domestic",
-    # 일본 근거리
     "FUK": "jp_near", "KIX": "jp_near", "KKJ": "jp_near", "HSG": "jp_near",
     "YGJ": "jp_near", "TAK": "jp_near", "OIT": "jp_near", "KMJ": "jp_near",
     "KOJ": "jp_near", "HIJ": "jp_near", "UBJ": "jp_near", "IZO": "jp_near",
-    # 일본 중거리
     "NRT": "jp_mid", "HND": "jp_mid", "NGO": "jp_mid", "CTS": "jp_mid",
     "KMQ": "jp_mid", "MYJ": "jp_mid", "KMI": "jp_mid", "NGS": "jp_mid",
     "OKA": "jp_mid", "SDJ": "jp_mid", "TOY": "jp_mid", "AOJ": "jp_mid",
-    # 중국
     "DLC": "cn_near", "TAO": "cn_near", "YNJ": "cn_near", "SHE": "cn_near",
     "PVG": "cn_mid", "PEK": "cn_mid", "PKX": "cn_mid", "CAN": "cn_mid",
     "XIY": "cn_mid", "CTU": "cn_mid",
-    # 대만/홍콩/마카오
     "TPE": "tw_hk", "RMQ": "tw_hk", "KHH": "tw_hk", "HKG": "tw_hk", "MFM": "tw_hk",
-    # 동남아 근거리
     "DAD": "sea_near", "CXR": "sea_near", "HAN": "sea_near", "SGN": "sea_near",
     "PQC": "sea_near", "BKK": "sea_near", "DMK": "sea_near", "CRK": "sea_near",
-    "CEB": "sea_near", "MNL": "sea_near", "KLO": "sea_near",
-    # 동남아 원거리
+    "CEB": "sea_near", "MNL": "sea_near", "KLO": "sea_near", "CNX": "sea_near",
     "DPS": "sea_far", "SIN": "sea_far", "BKI": "sea_far", "KUL": "sea_far",
     "BWN": "sea_far", "HKT": "sea_far", "PEN": "sea_far",
-    # 기타
     "ULN": "mongolia", "GUM": "guam", "SPN": "guam",
     "BNE": "oceania", "SYD": "oceania", "MEL": "oceania", "AKL": "oceania",
+    "WAW": "europe", "WRO": "europe", "KRK": "europe", "GDN": "europe",
+    "FCO": "europe", "MXP": "europe", "VCE": "europe", "NAP": "europe",
+    "CDG": "europe", "ORY": "europe", "LHR": "europe", "LGW": "europe",
+    "FRA": "europe", "MUC": "europe", "BER": "europe", "AMS": "europe",
+    "BCN": "europe", "MAD": "europe", "LIS": "europe", "OPO": "europe",
+    "VIE": "europe", "PRG": "europe", "BUD": "europe", "ZRH": "europe",
+    "IST": "europe", "ATH": "europe", "CPH": "europe", "ARN": "europe",
+    "HEL": "europe", "OSL": "europe", "DUB": "europe", "BRU": "europe",
+    "LAX": "namerica", "SFO": "namerica", "SEA": "namerica", "JFK": "namerica",
+    "EWR": "namerica", "ORD": "namerica", "IAD": "namerica", "BOS": "namerica",
+    "YVR": "namerica", "YYZ": "namerica", "HNL": "namerica", "LAS": "namerica",
 }
 
-COUNTRY_TIER = {
-    "대한민국": "domestic", "일본": "jp_mid", "중국": "cn_mid",
-    "대만": "tw_hk", "홍콩": "tw_hk", "베트남": "sea_near",
-    "태국": "sea_near", "필리핀": "sea_near", "말레이시아": "sea_far",
-    "싱가포르": "sea_far", "인도네시아": "sea_far", "브루나이": "sea_far",
-    "몽골": "mongolia", "오스트레일리아": "oceania", "뉴질랜드": "oceania",
-}
-
-def resolve_tier(destination_id: str, country: str) -> str:
-    return (AIRPORT_TIER.get(destination_id)
-            or COUNTRY_TIER.get(country)
-            or "longhaul")
-
-def value_ratio(price: int, destination_id: str, country: str) -> Optional[float]:
-    """1.0 = 권역 기준가와 동일. 낮을수록 특가."""
-    if not price:
-        return None
-    baseline = TIER_BASELINE[resolve_tier(destination_id, country)]
-    return round(price / baseline, 3)
-
-def grade(ratio: Optional[float]) -> str:
-    if ratio is None:      return "unknown"
-    if ratio <= 0.70:      return "🔥 초특가"
-    if ratio <= 0.85:      return "✨ 특가"
-    if ratio <= 1.00:      return "👍 괜찮음"
-    return "보통"
+# 2순위: 리포트에 실제로 찍히는 한글 도시명. destination_id 형식이 무엇이든
+# 이 매핑이 화면과 100% 일치하므로 가장 신뢰도가 높다.
+CITY_NAME_TIER = {
+    # 일본 근거리
+    "후쿠오카시": "jp_near", "오사카시": "jp_near", "기타큐슈시": "jp_near",
+    "사가시": "jp_near", "요나고시": "jp_near", "다카마쓰시": "jp_near",
+    "히로시마시": "jp_near", "마쓰야마시": "jp_near", "오이타시": "jp_near",
+    "구마모토시": "jp_near", "가고시마시": "jp_near", "우베시": "jp_near",
+    "이즈모시": "jp_near",
+    # 일본 중거리
+    "도쿄도": "jp_mid", "나고야시": "jp_mid", "삿포로시": "jp_mid",
+    "오키나와시": "jp_mid", "시즈오카시": "jp_mid", "미야자키시": "jp_mid",
+    "나가사키시": "jp_mid", "고마쓰시": "jp_mid", "센다이시": "jp_mid",
+    "마쓰야마시": "jp_mid", "도야마시": "jp_mid", "아오모리시": "jp_mid",
+    # 중국
+    "다롄
