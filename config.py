@@ -19,7 +19,7 @@ API_QUOTA_WARNING_THRESHOLD = 200
 # ────────────────────────────────────────────────────
 
 # ── 특가 판정 기준 ──────────────────────────────────
-MAX_VALUE_RATIO = 1.05
+MAX_VALUE_RATIO = 1.0
 ALERT_VALUE_RATIO = 0.85
 MIN_DISCOUNT_PERCENTAGE = 20
 DISCOUNT_BYPASS_RATIO = 0.75
