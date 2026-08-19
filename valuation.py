@@ -3,7 +3,7 @@ from typing import Optional, Tuple
 from config import TIER_TRIP_DAYS, DEFAULT_TRIP_DAYS
 
 TIER_BASELINE = {
-    "domestic":   45_000,   # 60,000 → 45,000 (제주 5만원대는 평범한 가격)
+    "domestic":   45_000,
     "jp_near":   150_000,
     "jp_mid":    200_000,
     "cn_near":   150_000,
@@ -19,7 +19,6 @@ TIER_BASELINE = {
     "longhaul": 1_000_000,
 }
 
-# 1순위: 공항 IATA 코드 (destination_id가 코드 형태일 때만 맞음)
 AIRPORT_TIER = {
     "CJU": "domestic", "PUS": "domestic", "USN": "domestic",
     "RSU": "domestic", "KWJ": "domestic", "TAE": "domestic",
@@ -53,19 +52,22 @@ AIRPORT_TIER = {
     "YVR": "namerica", "YYZ": "namerica", "HNL": "namerica", "LAS": "namerica",
 }
 
-# 2순위: 리포트에 실제로 찍히는 한글 도시명. destination_id 형식이 무엇이든
-# 이 매핑이 화면과 100% 일치하므로 가장 신뢰도가 높다.
 CITY_NAME_TIER = {
-    # 일본 근거리
     "후쿠오카시": "jp_near", "오사카시": "jp_near", "기타큐슈시": "jp_near",
     "사가시": "jp_near", "요나고시": "jp_near", "다카마쓰시": "jp_near",
     "히로시마시": "jp_near", "마쓰야마시": "jp_near", "오이타시": "jp_near",
     "구마모토시": "jp_near", "가고시마시": "jp_near", "우베시": "jp_near",
     "이즈모시": "jp_near",
-    # 일본 중거리
     "도쿄도": "jp_mid", "나고야시": "jp_mid", "삿포로시": "jp_mid",
     "오키나와시": "jp_mid", "시즈오카시": "jp_mid", "미야자키시": "jp_mid",
     "나가사키시": "jp_mid", "고마쓰시": "jp_mid", "센다이시": "jp_mid",
-    "마쓰야마시": "jp_mid", "도야마시": "jp_mid", "아오모리시": "jp_mid",
-    # 중국
-    "다롄
+    "도야마시": "jp_mid", "아오모리시": "jp_mid",
+    "다롄시": "cn_near", "칭다오시": "cn_near",
+    "옌지시": "cn_near", "선양시": "cn_near",
+    "상하이": "cn_mid", "베이징시": "cn_mid", "선전시": "cn_mid",
+    "광저우시": "cn_mid", "시안시": "cn_mid", "청두시": "cn_mid",
+    "타이베이": "tw_hk", "가오슝시": "tw_hk", "타이중시": "tw_hk",
+    "홍콩": "tw_hk", "마카오": "tw_hk",
+    "다낭": "sea_near", "하노이": "sea_near", "호치민시": "sea_near",
+    "푸꾸옥": "sea_near", "나트랑": "sea_near", "방콕": "sea_near",
+    "치앙마이":
