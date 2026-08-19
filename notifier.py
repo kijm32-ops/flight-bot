@@ -10,6 +10,20 @@ from config import GMAIL_USER, GMAIL_PASSWORD, PAGE_URL
 from models import Flight
 
 
+# ─────────────────────────────────────────────────────────────
+# 카카오톡 카드 대표 이미지
+#
+# 카카오 서버가 이 URL을 직접 가져가므로 로그인 없이 열리는 공개 주소여야 한다.
+# 이미지를 교체할 때는 파일명의 v1 → v2 처럼 버전을 올릴 것.
+# 카카오가 URL 단위로 이미지를 캐싱해서, 같은 이름으로 덮어쓰면 옛 이미지가 계속 나온다.
+# ─────────────────────────────────────────────────────────────
+KAKAO_CARD_IMAGE = (
+    "https://raw.githubusercontent.com/kijm32-ops/flight-bot/main/assets/kakao_card_v1.png"
+)
+KAKAO_CARD_IMAGE_WIDTH = 800
+KAKAO_CARD_IMAGE_HEIGHT = 400
+
+
 def _short_name(deal: Flight) -> str:
     """
     destination_name에 붙은 'ICN 출발 ...' 경고 문구를 떼어낸 짧은 도시명.
@@ -187,7 +201,9 @@ def send_kakao_message(deals: List[Flight]) -> bool:
         "content": {
             "title": f"✈️ 오늘의 특가 항공권 {len(deals)}건 발견!",
             "description": description_text,
-            "image_url": "https://developers.kakao.com/assets/img/about/logos/kakaolink/kakaolink_btn_medium.png",
+            "image_url": KAKAO_CARD_IMAGE,
+            "image_width": KAKAO_CARD_IMAGE_WIDTH,
+            "image_height": KAKAO_CARD_IMAGE_HEIGHT,
             "link": {
                 "web_url": PAGE_URL,
                 "mobile_web_url": PAGE_URL,
