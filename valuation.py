@@ -5,18 +5,18 @@ import re
 TIER_TRIP_DAYS = {
     "domestic": (2, 7), "jp_near": (2, 7), "jp_mid": (3, 7),
     "cn_near": (2, 7), "cn_mid": (3, 7), "tw_hk": (3, 7),
-    "sea_near": (4, 9), "sea_far": (5, 10), "mongolia": (4, 8),
-    "guam": (4, 8), "oceania": (7, 14), "europe": (7, 14),
-    "namerica": (7, 14), "longhaul": (7, 14),
+    "sea_near": (4, 9), "sea_mid": (4, 10), "sea_far": (5, 12),
+    "mongolia": (4, 8), "guam": (4, 8), "oceania": (7, 14),
+    "europe": (7, 14), "namerica": (7, 14), "longhaul": (7, 14),
 }
 DEFAULT_TRIP_DAYS = (3, 7)
 
 TIER_BASELINE = {
     "domestic": 45000, "jp_near": 150000, "jp_mid": 200000,
     "cn_near": 150000, "cn_mid": 220000, "tw_hk": 200000,
-    "sea_near": 250000, "sea_far": 400000, "mongolia": 350000,
-    "guam": 350000, "oceania": 800000, "europe": 900000,
-    "namerica": 1000000, "longhaul": 1000000,
+    "sea_near": 250000, "sea_mid": 260000, "sea_far": 420000,
+    "mongolia": 350000, "guam": 350000, "oceania": 800000,
+    "europe": 900000, "namerica": 1000000, "longhaul": 1000000,
 }
 
 AIRPORT_TIER = {
@@ -34,8 +34,8 @@ AIRPORT_TIER = {
     "MFM": "tw_hk", "DAD": "sea_near", "CXR": "sea_near", "HAN": "sea_near",
     "SGN": "sea_near", "PQC": "sea_near", "BKK": "sea_near", "DMK": "sea_near",
     "CRK": "sea_near", "CEB": "sea_near", "MNL": "sea_near", "KLO": "sea_near",
-    "CNX": "sea_near", "DPS": "sea_far", "SIN": "sea_far", "BKI": "sea_far",
-    "KUL": "sea_far", "BWN": "sea_far", "HKT": "sea_far", "PEN": "sea_far",
+    "CNX": "sea_near", "DPS": "sea_far", "SIN": "sea_far", "BKI": "sea_mid",
+    "KUL": "sea_mid", "BWN": "sea_mid", "HKT": "sea_mid", "PEN": "sea_mid",
     "ULN": "mongolia", "GUM": "guam", "SPN": "guam", "BNE": "oceania",
     "SYD": "oceania", "MEL": "oceania", "AKL": "oceania", "WAW": "europe",
     "WRO": "europe", "KRK": "europe", "GDN": "europe", "FCO": "europe",
@@ -106,11 +106,11 @@ CITY_NAME_TIER = {
     "\uBE0C\uB9AC\uC988\uBC88": "oceania", "\uC2DC\uB4DC\uB2C8": "oceania",
     "\uC624\uD074\uB79C\uB4DC": "oceania", "\uCF00\uC5B8\uC2A4": "oceania",
     "\uD06C\uB77C\uC774\uC2A4\uD2B8\uCC98\uCE58": "oceania", "\uD37C\uC2A4": "oceania",
-    "\uB374\uD30C\uC0AC\uB974": "sea_far", "\uB791\uCE74\uC704": "sea_far",
-    "\uBC18\uB2E4\uB974\uC138\uB9AC\uBCA0\uAC00\uC644": "sea_far", "\uBC1C\uB9AC": "sea_far",
-    "\uC2F1\uAC00\uD3EC\uB974": "sea_far", "\uC870\uD638\uB974\uBC14\uB8E8": "sea_far",
-    "\uCF54\uD0C0\uD0A4\uB098\uBC1C\uB8E8": "sea_far", "\uCFE0\uC54C\uB77C\uB8F8\uD478\uB974": "sea_far",
-    "\uD398\uB0AD": "sea_far", "\uD478\uCF13": "sea_far",
+    "\uB374\uD30C\uC0AC\uB974": "sea_far", "\uBC1C\uB9AC": "sea_far",
+    "\uC2F1\uAC00\uD3EC\uB974": "sea_far", "\uB791\uCE74\uC704": "sea_mid",
+    "\uBC18\uB2E4\uB974\uC138\uB9AC\uBCA0\uAC00\uC644": "sea_mid", "\uC870\uD638\uB974\uBC14\uB8E8": "sea_mid",
+    "\uCF54\uD0C0\uD0A4\uB098\uBC1C\uB8E8": "sea_mid", "\uCFE0\uC54C\uB77C\uB8F8\uD478\uB974": "sea_mid",
+    "\uD398\uB0AD": "sea_mid", "\uD478\uCF13": "sea_mid",
     "\uB098\uD2B8\uB791": "sea_near", "\uB2E4\uB0AD": "sea_near",
     "\uB2EC\uB78F": "sea_near", "\uB9C8\uB2D0\uB77C": "sea_near",
     "\uBC29\uCF55": "sea_near", "\uBCF4\uB77C\uCE74\uC774": "sea_near",
@@ -151,11 +151,10 @@ COUNTRY_TIER = {
 }
 
 def normalize_name(s):
-    """Strip all whitespace so "\uB2E4\uB840 \uC2DC" and "\uB2E4\uB840\uC2DC" match."""
+    """Strip all whitespace so spacing variants match."""
     return re.sub(r"\s+", "", s or "")
 
 
-# Pre-normalized lookup built once at import time
 _CITY_LOOKUP = {normalize_name(k): val for k, val in CITY_NAME_TIER.items()}
 
 
