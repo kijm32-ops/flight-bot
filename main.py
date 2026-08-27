@@ -18,6 +18,7 @@ from state import (
 )
 from models import Flight
 from origin_compare import annotate_origin_alternatives
+from exposure import record_exposure, apply_exposure_penalty
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(message)s')
 
@@ -135,7 +136,12 @@ def run_system():
 
     all_final_flights = merge_and_collapse(all_final_flights)
     all_final_flights = annotate_origin_alternatives(all_final_flights)
+
+    # Sort by value, then demote destinations shown repeatedly in recent days.
+    # Nothing is removed - a deal that dropped sharply keeps its top spot.
     all_final_flights.sort(key=lambda x: (x.value_ratio, x.price))
+    all_final_flights = apply_exposure_penalty(state, all_final_flights)
+    record_exposure(state, all_final_flights)
 
     logging.info(f"Done. {len(all_final_flights)} deals collected.")
 
