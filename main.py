@@ -19,6 +19,9 @@ from state import (
 from models import Flight
 from origin_compare import annotate_origin_alternatives
 from exposure import record_exposure, apply_exposure_penalty
+from selection import (
+    strict_collapse, apply_caps, sort_by_score, apply_quota, assign_grades,
+)
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(message)s')
 
@@ -72,6 +75,9 @@ def merge_and_collapse(flights: List[Flight]) -> List[Flight]:
     Merge results from all profiles:
     1) drop exact duplicates (same origin/dest/dates), keeping cheapest
     2) re-collapse per destination so MAX_PER_DESTINATION is enforced globally
+
+    NOTE: this stage is still origin-aware. Cross-origin duplicates
+    (GMP/CJJ -> same city) are resolved later in selection.strict_collapse().
     """
     seen: Dict[Tuple[str, str, str, str], Flight] = {}
     for f in flights:
@@ -137,10 +143,21 @@ def run_system():
     all_final_flights = merge_and_collapse(all_final_flights)
     all_final_flights = annotate_origin_alternatives(all_final_flights)
 
-    # Sort by value, then demote destinations shown repeatedly in recent days.
-    # Nothing is removed - a deal that dropped sharply keeps its top spot.
-    all_final_flights.sort(key=lambda x: (x.value_ratio, x.price))
+    # --- selection pipeline -------------------------------------------------
+    # 1) one row per destination, regardless of origin (must run before grading)
+    all_final_flights = strict_collapse(all_final_flights)
+    # 2) hard ceiling per tier: too expensive to ever book, however big the cut
+    all_final_flights = apply_caps(all_final_flights)
+    # 3) rank by baseline discount on the access-cost-inclusive price
+    all_final_flights = sort_by_score(all_final_flights)
+    # 4) demote destinations shown repeatedly in recent days
     all_final_flights = apply_exposure_penalty(state, all_final_flights)
+    # 5) tier quota so one category cannot take over the report
+    all_final_flights = apply_quota(all_final_flights)
+    # 6) grade relative to this run, not against a fixed threshold
+    all_final_flights = assign_grades(all_final_flights)
+    # ------------------------------------------------------------------------
+
     record_exposure(state, all_final_flights)
 
     logging.info(f"Done. {len(all_final_flights)} deals collected.")
