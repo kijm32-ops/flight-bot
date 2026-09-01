@@ -55,12 +55,16 @@ def build_tasks(remaining_budget: int, deep_scan: bool) -> List[Tuple[str, str]]
 def process_profile(origin: str, profile_name: str) -> Tuple[List[Flight], Counter]:
     stats: Counter = Counter()
     try:
-        date_range, trip_length = PROFILES[profile_name]
+        date_range, trip_length, max_price = PROFILES[profile_name]
         search_params = {
             **BASE_SEARCH_PARAMS,
             "outbound_date": date_range,
             "trip_length": trip_length,
         }
+        # 응답 건수에 상한이 있는 것으로 보여, 어차피 TIER_HARD_CAP 에 걸릴
+        # 고가 노선이 슬롯을 차지하지 않도록 서버 쪽에서 미리 잘라낸다.
+        if max_price:
+            search_params["max_price"] = max_price
         raw_deals = fetch_raw_flight_deals(SERPAPI_KEY, search_params, origin)
         if not raw_deals:
             logging.info(f"[{origin} / {profile_name}] no raw deals returned.")
