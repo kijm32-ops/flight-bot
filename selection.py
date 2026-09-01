@@ -12,16 +12,15 @@ import logging
 from dataclasses import replace
 from typing import Dict, List
 
+from config import (
+    ACCESS_COST, ACCESS_COST_DEFAULT, TIER_HARD_CAP, HARD_CAP_DEFAULT,
+)
 from models import Flight
 from valuation import TIER_BASELINE, normalize_name, resolve_tier
 
 # ---------------------------------------------------------------------------
-# 1. 접근비용
+# 1. 접근비용  (값은 config.ACCESS_COST 가 단일 출처)
 # ---------------------------------------------------------------------------
-
-# 집 -> 공항 왕복 실비 + 시간가치.
-ACCESS_COST = {"ICN": 0, "GMP": 0, "CJJ": 25_000}
-ACCESS_COST_DEFAULT = 0
 
 
 def access_cost(flight: Flight) -> int:
@@ -47,27 +46,10 @@ def effective_ratio(flight: Flight) -> float:
 
 
 # ---------------------------------------------------------------------------
-# 2. tier별 절대 상한 (value_ratio 무관 하드컷)
+# 2. tier별 절대 상한  (값은 config.TIER_HARD_CAP 가 단일 출처)
 # ---------------------------------------------------------------------------
-
-TIER_HARD_CAP = {
-    "domestic": 60_000,
-    "jp_near": 200_000,
-    "jp_mid": 260_000,
-    "cn_near": 200_000,
-    "cn_mid": 280_000,
-    "tw_hk": 250_000,
-    "sea_near": 300_000,
-    "sea_mid": 330_000,
-    "sea_far": 480_000,
-    "mongolia": 330_000,
-    "guam": 400_000,
-    "oceania": 650_000,
-    "europe": 650_000,
-    "namerica": 650_000,
-    "longhaul": 650_000,
-}
-HARD_CAP_DEFAULT = 650_000
+# normalizer 가 이미 같은 상한으로 걸러내므로 여기서는 안전망 역할이다.
+# 이월 풀처럼 normalizer 를 거치지 않는 경로가 생길 때를 대비해 남겨둔다.
 
 
 def apply_caps(flights: List[Flight]) -> List[Flight]:
