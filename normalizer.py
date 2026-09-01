@@ -9,13 +9,16 @@ from models import Flight
 from config import (
     MIN_DISCOUNT_PERCENTAGE,
     DOMESTIC_ALLOWED_ORIGINS,
-    MAX_VALUE_RATIO,
     DISCOUNT_BYPASS_RATIO,
     MAX_PER_DESTINATION,
     KEEP_ALT_DATES,
     TRIP_DAYS_MAX_SLACK,
+    ACCESS_COST,
+    ACCESS_COST_DEFAULT,
+    TIER_HARD_CAP,
+    HARD_CAP_DEFAULT,
 )
-from valuation import value_ratio, grade, trip_days_range
+from valuation import value_ratio, grade, trip_days_range, resolve_tier
 
 UNKNOWN_NAME = "\uc54c \uc218 \uc5c6\uc74c"          # "알 수 없음"
 KOREA = "\ub300\ud55c\ubbfc\uad6d"                    # "대한민국"
@@ -25,7 +28,7 @@ STAGE_RAW = "raw"
 STAGE_BAD_DATE = "drop_bad_date"
 STAGE_TRIP_MIN = "drop_trip_too_short"
 STAGE_TRIP_MAX = "drop_trip_too_long"
-STAGE_RATIO = "drop_over_ratio"
+STAGE_CAP = "drop_over_cap"
 STAGE_DISCOUNT = "drop_low_discount"
 STAGE_DOMESTIC = "drop_domestic_origin"
 STAGE_ERROR = "drop_exception"
@@ -51,6 +54,7 @@ def normalize_and_deduplicate(
     if stats is None:
         stats = Counter()
 
+    access = ACCESS_COST.get(origin, ACCESS_COST_DEFAULT)
     best_flights: Dict[Tuple[str, str, str, str], Flight] = {}
     stats[STAGE_RAW] += len(raw_deals)
 
@@ -82,12 +86,18 @@ def normalize_and_deduplicate(
                 stats[STAGE_TRIP_MAX] += 1
                 continue
 
-            # -- gate 2: price vs regional baseline ---------------------------
-            # MAX_VALUE_RATIO 는 이제 느슨한 안전망이다.
-            # 실질적인 컷은 selection.TIER_HARD_CAP 이 담당한다.
+            # -- gate 2: absolute price ceiling -------------------------------
+            # 접근비용을 더한 실질 지불액으로 판정한다.
+            # 이전의 MAX_VALUE_RATIO 게이트를 대체한다. ratio 는 tier 마다
+            # 상한 대비 배율이 제각각(0.65~1.33)이라 일관된 컷이 되지 못했다.
+            tier = resolve_tier(destination_id, destination_country, destination_name)
+            if (price + access) > TIER_HARD_CAP.get(tier, HARD_CAP_DEFAULT):
+                stats[STAGE_CAP] += 1
+                continue
+
             ratio = value_ratio(price, destination_id, destination_country, destination_name)
-            if ratio is None or ratio > MAX_VALUE_RATIO:
-                stats[STAGE_RATIO] += 1
+            if ratio is None:
+                stats[STAGE_CAP] += 1
                 continue
 
             # -- gate 3: discount, waived when already cheap ------------------
@@ -165,6 +175,6 @@ def format_funnel(stats: Counter) -> str:
     """로그 한 줄로 깔때기 요약."""
     order = [
         STAGE_RAW, STAGE_BAD_DATE, STAGE_TRIP_MIN, STAGE_TRIP_MAX,
-        STAGE_RATIO, STAGE_DISCOUNT, STAGE_DOMESTIC, STAGE_ERROR, STAGE_QUALIFIED,
+        STAGE_CAP, STAGE_DISCOUNT, STAGE_DOMESTIC, STAGE_ERROR, STAGE_QUALIFIED,
     ]
     return " | ".join(f"{k}={stats.get(k, 0)}" for k in order)
