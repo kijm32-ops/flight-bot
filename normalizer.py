@@ -1,4 +1,8 @@
-from typing import List, Dict, Tuple
+# normalizer.py
+# NOTE: All Korean text uses unicode escapes (\uXXXX) to survive copy-paste.
+
+from collections import Counter
+from typing import List, Dict, Tuple, Optional
 from datetime import datetime
 from dataclasses import replace
 from models import Flight
@@ -9,8 +13,23 @@ from config import (
     DISCOUNT_BYPASS_RATIO,
     MAX_PER_DESTINATION,
     KEEP_ALT_DATES,
+    TRIP_DAYS_MAX_SLACK,
 )
 from valuation import value_ratio, grade, trip_days_range
+
+UNKNOWN_NAME = "\uc54c \uc218 \uc5c6\uc74c"          # "알 수 없음"
+KOREA = "\ub300\ud55c\ubbfc\uad6d"                    # "대한민국"
+
+# 깔때기 계측 단계 이름
+STAGE_RAW = "raw"
+STAGE_BAD_DATE = "drop_bad_date"
+STAGE_TRIP_MIN = "drop_trip_too_short"
+STAGE_TRIP_MAX = "drop_trip_too_long"
+STAGE_RATIO = "drop_over_ratio"
+STAGE_DISCOUNT = "drop_low_discount"
+STAGE_DOMESTIC = "drop_domestic_origin"
+STAGE_ERROR = "drop_exception"
+STAGE_QUALIFIED = "qualified"
 
 
 def _parse_date(date_str: str):
@@ -20,39 +39,65 @@ def _parse_date(date_str: str):
         return None
 
 
-def normalize_and_deduplicate(origin: str, raw_deals: list) -> List[Flight]:
+def normalize_and_deduplicate(
+    origin: str,
+    raw_deals: list,
+    stats: Optional[Counter] = None,
+) -> List[Flight]:
+    """
+    stats 를 넘기면 각 게이트에서 몇 건이 떨어졌는지 기록한다.
+    어느 단계가 병목인지 로그로 확인할 수 있어야 튜닝이 추측이 아니게 된다.
+    """
+    if stats is None:
+        stats = Counter()
+
     best_flights: Dict[Tuple[str, str, str, str], Flight] = {}
+    stats[STAGE_RAW] += len(raw_deals)
 
     for deal in raw_deals:
         try:
             depart_date = _parse_date(deal.get("outbound_date", ""))
             return_date = _parse_date(deal.get("return_date", ""))
             if not depart_date or not return_date:
+                stats[STAGE_BAD_DATE] += 1
                 continue
 
             price = deal.get("price", 0)
             destination_id = deal.get("destination_id", "UNKNOWN")
-            destination_name = deal.get("name", "알 수 없음")
+            destination_name = deal.get("name", UNKNOWN_NAME)
             destination_country = deal.get("country", "")
 
-            # ── 게이트 1: 권역별 체류일수 (name 기반 매칭 포함) ──
+            # -- gate 1: trip length ------------------------------------------
+            # 하한은 그대로 지킨다. 유럽 3박은 실제로 말이 안 되니까.
+            # 상한은 SLACK 만큼 풀어준다. far/deep 프로필이 trip_length 7~16 으로
+            # 검색하기 때문에, 상한을 엄격히 걸면 근거리 결과가 거의 전멸한다.
             trip_days = (return_date - depart_date).days
-            min_days, max_days = trip_days_range(destination_id, destination_country, destination_name)
-            if not (min_days <= trip_days <= max_days):
+            min_days, max_days = trip_days_range(
+                destination_id, destination_country, destination_name
+            )
+            if trip_days < min_days:
+                stats[STAGE_TRIP_MIN] += 1
+                continue
+            if trip_days > max_days + TRIP_DAYS_MAX_SLACK:
+                stats[STAGE_TRIP_MAX] += 1
                 continue
 
-            # ── 게이트 2: 권역 기준가 대비 비율 ──
+            # -- gate 2: price vs regional baseline ---------------------------
+            # MAX_VALUE_RATIO 는 이제 느슨한 안전망이다.
+            # 실질적인 컷은 selection.TIER_HARD_CAP 이 담당한다.
             ratio = value_ratio(price, destination_id, destination_country, destination_name)
             if ratio is None or ratio > MAX_VALUE_RATIO:
+                stats[STAGE_RATIO] += 1
                 continue
 
-            # ── 게이트 3: 할인율. 단, 이미 충분히 싸면 면제 ──
+            # -- gate 3: discount, waived when already cheap ------------------
             discount_percentage = deal.get("discount_percentage", 0)
             if ratio > DISCOUNT_BYPASS_RATIO and discount_percentage < MIN_DISCOUNT_PERCENTAGE:
+                stats[STAGE_DISCOUNT] += 1
                 continue
 
-            # 국내 목적지는 접근성 좋은 출발지에서만 허용
-            if destination_country == "대한민국" and origin not in DOMESTIC_ALLOWED_ORIGINS:
+            if destination_country == KOREA and origin not in DOMESTIC_ALLOWED_ORIGINS:
+                stats[STAGE_DOMESTIC] += 1
                 continue
 
             flight = Flight(
@@ -73,15 +118,20 @@ def normalize_and_deduplicate(origin: str, raw_deals: list) -> List[Flight]:
                 value_grade=grade(ratio),
             )
 
-            # dedup 키는 그대로 destination_id 포함 (동일 날짜 중복 제거용)
-            dedup_key = (flight.origin, flight.destination, str(flight.depart_date), str(flight.return_date))
+            dedup_key = (
+                flight.origin, flight.destination,
+                str(flight.depart_date), str(flight.return_date),
+            )
             if dedup_key not in best_flights or price < best_flights[dedup_key].price:
                 best_flights[dedup_key] = flight
 
         except Exception:
+            stats[STAGE_ERROR] += 1
             continue
 
-    return collapse_by_destination(list(best_flights.values()))
+    qualified = list(best_flights.values())
+    stats[STAGE_QUALIFIED] += len(qualified)
+    return collapse_by_destination(qualified)
 
 
 def collapse_by_destination(
@@ -90,8 +140,9 @@ def collapse_by_destination(
     keep_alts: int = KEEP_ALT_DATES,
 ) -> List[Flight]:
     """
-    목적지별로 저렴한 순 max_per_dest건을 노출하고 나머지는 alt_dates로 접는다.
-    destination_id가 신뢰할 수 없는 값일 수 있어 (origin, destination_name)으로 묶는다.
+    목적지별 저렴한 순 max_per_dest 건만 노출하고 나머지는 alt_dates 로 접는다.
+    destination_id 는 신뢰할 수 없어 (origin, destination_name) 으로 묶는다.
+    출발지를 가로지르는 중복은 selection.strict_collapse() 가 처리한다.
     """
     buckets: Dict[Tuple[str, str], List[Flight]] = {}
     for f in flights:
@@ -103,10 +154,17 @@ def collapse_by_destination(
         shown = group[:max_per_dest]
         rest = group[max_per_dest:max_per_dest + keep_alts]
 
-        alt_dates = [
-            (str(f.depart_date), str(f.return_date), f.price) for f in rest
-        ]
+        alt_dates = [(str(f.depart_date), str(f.return_date), f.price) for f in rest]
         result.append(replace(shown[0], alt_dates=alt_dates))
         result.extend(shown[1:])
 
     return result
+
+
+def format_funnel(stats: Counter) -> str:
+    """로그 한 줄로 깔때기 요약."""
+    order = [
+        STAGE_RAW, STAGE_BAD_DATE, STAGE_TRIP_MIN, STAGE_TRIP_MAX,
+        STAGE_RATIO, STAGE_DISCOUNT, STAGE_DOMESTIC, STAGE_ERROR, STAGE_QUALIFIED,
+    ]
+    return " | ".join(f"{k}={stats.get(k, 0)}" for k in order)
