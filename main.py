@@ -1,6 +1,7 @@
 import logging
 import sys
 import concurrent.futures
+from collections import Counter
 from typing import List, Tuple, Dict
 from config import (
     SERPAPI_KEY, BASE_SEARCH_PARAMS, KAKAO_JS_KEY,
@@ -9,7 +10,7 @@ from config import (
     SERPAPI_SAFE_BUDGET, SERPAPI_MONTHLY_LIMIT, API_QUOTA_WARNING_THRESHOLD,
 )
 from search import fetch_raw_flight_deals
-from normalizer import normalize_and_deduplicate, collapse_by_destination
+from normalizer import normalize_and_deduplicate, collapse_by_destination, format_funnel
 from notifier import send_email, send_kakao_message, send_warning_email
 from report_generator import generate_report_html
 from state import (
@@ -21,6 +22,7 @@ from origin_compare import annotate_origin_alternatives
 from exposure import record_exposure, apply_exposure_penalty
 from selection import (
     strict_collapse, apply_caps, sort_by_score, apply_quota, assign_grades,
+    TOTAL_SLOTS,
 )
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(message)s')
@@ -50,7 +52,8 @@ def build_tasks(remaining_budget: int, deep_scan: bool) -> List[Tuple[str, str]]
     return trimmed
 
 
-def process_profile(origin: str, profile_name: str) -> List[Flight]:
+def process_profile(origin: str, profile_name: str) -> Tuple[List[Flight], Counter]:
+    stats: Counter = Counter()
     try:
         date_range, trip_length = PROFILES[profile_name]
         search_params = {
@@ -60,14 +63,18 @@ def process_profile(origin: str, profile_name: str) -> List[Flight]:
         }
         raw_deals = fetch_raw_flight_deals(SERPAPI_KEY, search_params, origin)
         if not raw_deals:
-            return []
+            logging.info(f"[{origin} / {profile_name}] no raw deals returned.")
+            return [], stats
 
-        flights = normalize_and_deduplicate(origin, raw_deals)
-        logging.info(f"[{origin} / {profile_name}] {len(flights)} normalized.")
-        return flights
+        flights = normalize_and_deduplicate(origin, raw_deals, stats)
+        logging.info(
+            f"[{origin} / {profile_name}] {len(flights)} normalized. "
+            f"funnel: {format_funnel(stats)}"
+        )
+        return flights, stats
     except Exception as e:
         logging.error(f"[{origin} / {profile_name}] FAILED: {e}")
-        return []
+        return [], stats
 
 
 def merge_and_collapse(flights: List[Flight]) -> List[Flight]:
@@ -127,6 +134,7 @@ def run_system():
 
     logging.info(f"Start {len(tasks)} tasks: " + ", ".join(f"{o}/{p}" for o, p in tasks))
     all_final_flights: List[Flight] = []
+    funnel: Counter = Counter()
 
     with concurrent.futures.ThreadPoolExecutor(max_workers=len(tasks)) as executor:
         future_to_task = {
@@ -136,9 +144,13 @@ def run_system():
         for future in concurrent.futures.as_completed(future_to_task):
             origin, profile = future_to_task[future]
             try:
-                all_final_flights.extend(future.result())
+                flights, stats = future.result()
+                all_final_flights.extend(flights)
+                funnel.update(stats)
             except Exception as exc:
                 logging.error(f"[{origin} / {profile}] thread error: {exc}")
+
+    logging.info("FUNNEL (all tasks): " + format_funnel(funnel))
 
     all_final_flights = merge_and_collapse(all_final_flights)
     all_final_flights = annotate_origin_alternatives(all_final_flights)
@@ -157,6 +169,12 @@ def run_system():
     # 6) grade relative to this run, not against a fixed threshold
     all_final_flights = assign_grades(all_final_flights)
     # ------------------------------------------------------------------------
+
+    logging.info(
+        "SLOTS: %d/%d filled. If this is well under 20, the bottleneck is "
+        "upstream (raw yield or gates), not the quota.",
+        len(all_final_flights), TOTAL_SLOTS,
+    )
 
     record_exposure(state, all_final_flights)
 
