@@ -1,0 +1,56 @@
+name: Kakao Smoke Test
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  send-test-message:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Send Kakao test message
+        env:
+          KAKAO_REST_API_KEY: ${{ secrets.KAKAO_REST_API_KEY }}
+          KAKAO_REFRESH_TOKEN: ${{ secrets.KAKAO_REFRESH_TOKEN }}
+        run: |
+          python - <<'PY'
+          from datetime import date, timedelta
+
+          from models import Flight
+          from notifier import send_kakao_message
+
+          depart_date = date.today() + timedelta(days=30)
+          deal = Flight(
+              origin="ICN",
+              destination="TEST",
+              destination_name="Kakao test",
+              destination_country="Test",
+              depart_date=depart_date,
+              return_date=depart_date + timedelta(days=3),
+              price=100000,
+              average_price=200000,
+              discount_percentage=50,
+              airline="TEST",
+              duration=60,
+              stops=0,
+              booking_link="https://kijm32-ops.github.io/flight-bot/",
+              value_ratio=0.5,
+              value_grade="TEST",
+          )
+
+          if not send_kakao_message([deal]):
+              raise SystemExit("Kakao smoke test failed")
+          PY
