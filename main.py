@@ -14,14 +14,14 @@ from normalizer import normalize_and_deduplicate, collapse_by_destination, forma
 from notifier import send_email, send_kakao_message, send_warning_email
 from report_generator import generate_report_html
 from state import (
-    load_state, save_state, update_route_history,
+    load_state, save_state, update_route_history, refresh_carryover_pool,
     peek_api_usage, record_api_calls, record_kakao_result,
 )
 from models import Flight
+from carryover import select_with_carryover
 from origin_compare import annotate_origin_alternatives
-from exposure import record_exposure, apply_exposure_penalty
+from exposure import record_exposure
 from selection import (
-    strict_collapse, apply_caps, sort_by_score, apply_quota, assign_grades,
     TOTAL_SLOTS,
 )
 
@@ -132,6 +132,7 @@ def run_system():
             f"(\uBB34\uB8CC \uD55C\uB3C4 {SERPAPI_MONTHLY_LIMIT}\uD68C) "
             f"\uB2E4\uC74C \uB2EC 1\uC77C\uC5D0 \uC790\uB3D9\uC73C\uB85C \uC7AC\uAC1C\uB429\uB2C8\uB2E4."
         )
+        refresh_carryover_pool(state, [])
         generate_report_html([], KAKAO_JS_KEY, set())
         save_state(state)
         return
@@ -156,23 +157,11 @@ def run_system():
 
     logging.info("FUNNEL (all tasks): " + format_funnel(funnel))
 
+    carried = refresh_carryover_pool(state, all_final_flights)
     all_final_flights = merge_and_collapse(all_final_flights)
     all_final_flights = annotate_origin_alternatives(all_final_flights)
 
-    # --- selection pipeline -------------------------------------------------
-    # 1) one row per destination, regardless of origin (must run before grading)
-    all_final_flights = strict_collapse(all_final_flights)
-    # 2) hard ceiling per tier: too expensive to ever book, however big the cut
-    all_final_flights = apply_caps(all_final_flights)
-    # 3) rank by baseline discount on the access-cost-inclusive price
-    all_final_flights = sort_by_score(all_final_flights)
-    # 4) demote destinations shown repeatedly in recent days
-    all_final_flights = apply_exposure_penalty(state, all_final_flights)
-    # 5) tier quota so one category cannot take over the report
-    all_final_flights = apply_quota(all_final_flights)
-    # 6) grade relative to this run, not against a fixed threshold
-    all_final_flights = assign_grades(all_final_flights)
-    # ------------------------------------------------------------------------
+    all_final_flights = select_with_carryover(state, all_final_flights, carried)
 
     logging.info(
         "SLOTS: %d/%d filled. If this is well under 20, the bottleneck is "
@@ -184,7 +173,7 @@ def run_system():
 
     logging.info(f"Done. {len(all_final_flights)} deals collected.")
 
-    low_price_keys = update_route_history(state, all_final_flights)
+    low_price_keys = update_route_history(state, [f for f in all_final_flights if not f.is_carryover])
     if low_price_keys:
         logging.info(f"30-day lows: {len(low_price_keys)}")
 

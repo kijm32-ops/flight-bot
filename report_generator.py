@@ -52,6 +52,7 @@ def generate_report_html(deals: List[Flight], js_key: str, low_price_keys: Set[T
             badge = "<br><span class='badge'>🔥 30일 최저가</span>" if dedup_key in low_price_keys else ""
             grade_badge = _grade_badge(deal)
             alt_html = _alt_dates_html(deal)
+            carryover_html = f"<br><small>{deal.carryover_label}</small>" if deal.is_carryover else ""
 
             rows_html += f"""
             <tr>
@@ -69,6 +70,7 @@ def generate_report_html(deals: List[Flight], js_key: str, low_price_keys: Set[T
                     {deal.price:,}원<br>
                     <span class='sub'>(-{deal.discount_percentage}%)</span>
                     {badge}
+                    {carryover_html}
                 </td>
                 <td><a href="{deal.booking_link}" target="_blank" rel="noopener">확인</a></td>
             </tr>
@@ -79,7 +81,7 @@ def generate_report_html(deals: List[Flight], js_key: str, low_price_keys: Set[T
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PTIS 오늘의 실시간 특가</title>
+<title>PTIS \uc624\ub298\uc758 \ud2b9\uac00</title>
 <script src="https://t1.kakaocdn.net/kakao_js_sdk/2.7.2/kakao.min.js"></script>
 <style>
   body {{ font-family: 'Malgun Gothic', sans-serif; padding: 20px; max-width: 800px; margin: 0 auto; background:#f7f8fa; }}
@@ -120,7 +122,7 @@ def generate_report_html(deals: List[Flight], js_key: str, low_price_keys: Set[T
 </style>
 </head>
 <body>
-  <h2>📊 오늘의 실시간 직항 특가 ({len(deals)}건)</h2>
+  <h2>\U0001f4ca \uc624\ub298\uc758 \uc9c1\ud56d \ud2b9\uac00 ({len(deals)}\uac74)</h2>
   <button id="shareBtn">💬 카카오톡으로 공유하기</button>
   <table>
     <tr>
@@ -135,8 +137,8 @@ def generate_report_html(deals: List[Flight], js_key: str, low_price_keys: Set[T
       Kakao.Share.sendDefault({{
         objectType: 'feed',
         content: {{
-          title: '✈️ 오늘의 실시간 특가 항공권 ({len(deals)}건)',
-          description: '지금 확인해보세요! 실시간 특가 리포트',
+          title: '\u2708\ufe0f \uc624\ub298\uc758 \ud2b9\uac00 \ud56d\uacf5\uad8c ({len(deals)}\uac74)',
+          description: '\ucd5c\uadfc \uac80\uc0c9 \ud2b9\uac00 \ub9ac\ud3ec\ud2b8 \xb7 \uc774\uc6d4 \uac00\uaca9\uc740 \uc7ac\ud655\uc778 \ud544\uc694',
           imageUrl: 'https://developers.kakao.com/assets/img/about/logos/kakaolink/kakaolink_btn_medium.png',
           link: {{
             mobileWebUrl: window.location.href,

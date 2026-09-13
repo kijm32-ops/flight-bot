@@ -104,9 +104,9 @@ def send_email(deals: List[Flight], low_price_keys: Set[Tuple[str, str, str, str
     else:
         html_content = """
         <html><body style='font-family: Malgun Gothic, sans-serif; padding: 20px;'>
-            <h2 style='color: #1a73e8;'>📊 오늘의 실시간 직항 특가</h2>
+            <h2 style='color: #1a73e8;'>\U0001f4ca \uc624\ub298\uc758 \uc9c1\ud56d \ud2b9\uac00</h2>
             <p style='font-size:12px;color:#5f6368;margin-top:-8px;'>
-                등급은 권역별 기준가 대비 가격입니다. 🔥 초특가 ≤70% · ✨ 특가 ≤85% · 👍 괜찮음 ≤100%
+                \ub4f1\uae09\uc740 \uc774\ubc88 \ub9ac\ud3ec\ud2b8\uc758 \ud45c\uc2dc \uc21c\uc704 \uae30\uc900\uc785\ub2c8\ub2e4. \uc624\ub298 \uac80\uc0c9 \uacb0\uacfc\ub97c \uc6b0\uc120 \ud45c\uc2dc\ud569\ub2c8\ub2e4.
             </p>
             <table border='0' style='border-collapse: collapse; width: 100%; max-width: 750px;'>
                 <tr style='background-color: #1a73e8; color: white;'>
@@ -126,6 +126,7 @@ def send_email(deals: List[Flight], low_price_keys: Set[Tuple[str, str, str, str
             )
             grade_badge = _grade_badge_html(deal)
             alt_html = _alt_dates_html(deal)
+            carryover_html = f"<br><small>{deal.carryover_label}</small>" if deal.is_carryover else ""
 
             html_content += f"""
                 <tr style='border-bottom: 1px solid #eee; text-align: center;'>
@@ -143,13 +144,14 @@ def send_email(deals: List[Flight], low_price_keys: Set[Tuple[str, str, str, str
                         {deal.price:,}원<br>
                         <span style='font-size: 12px; color: gray;'>(-{deal.discount_percentage}%)</span>
                         {badge}
+                    {carryover_html}
                     </td>
                     <td style='padding: 10px;'><a href='{deal.booking_link}' target='_blank'>확인</a></td>
                 </tr>
             """
         html_content += "</table></body></html>"
 
-    _send_raw_email(f"✈️ [PTIS] 오늘의 실시간 특가 리포트 ({len(deals)}건)", html_content)
+    _send_raw_email(f"\u2708\ufe0f [PTIS] \uc624\ub298\uc758 \ud2b9\uac00 \ub9ac\ud3ec\ud2b8 ({len(deals)}\uac74)", html_content)
 
 
 def send_kakao_message(deals: List[Flight]) -> bool:
@@ -192,6 +194,7 @@ def send_kakao_message(deals: List[Flight]) -> bool:
         grade = d.value_grade.split(" ")[0] if d.value_grade and d.value_grade != "unknown" else ""
         summary_lines.append(
             f"{grade}{d.origin}→{_short_name(d)} {d.price:,}원 "
+            f"{d.carryover_label} "
             f"{d.depart_date.strftime('%m/%d')} {nights}박{nights+1}일"
         )
     description_text = "\n".join(summary_lines)

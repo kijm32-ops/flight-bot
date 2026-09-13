@@ -1,5 +1,5 @@
 from dataclasses import dataclass, field
-from datetime import date
+from datetime import date, datetime
 from typing import List, Tuple
 
 
@@ -22,3 +22,13 @@ class Flight:
     value_grade: str = ""        # "🔥 초특가" / "✨ 특가" / "👍 괜찮음" / "보통"
     alt_dates: List[Tuple[str, str, int]] = field(default_factory=list)
     # 같은 목적지의 다른 저렴한 날짜 조합: (출발일, 귀국일, 가격)
+
+    last_confirmed_at: datetime = None
+    is_carryover: bool = False
+
+    @property
+    def carryover_label(self) -> str:
+        if not self.is_carryover or self.last_confirmed_at is None:
+            return ""
+        return (f"\uc774\uc6d4 / \ub9c8\uc9c0\ub9c9 \ud655\uc778 {self.last_confirmed_at:%m/%d %H:%M} KST"
+                " / \uac00\uaca9 \uc7ac\ud655\uc778 \ud544\uc694")

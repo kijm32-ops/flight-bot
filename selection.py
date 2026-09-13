@@ -165,20 +165,25 @@ def group_of(flight: Flight) -> str:
     return TIER_GROUP.get(tier_of(flight), GROUP_DEFAULT)
 
 
-def apply_quota(flights: List[Flight]) -> List[Flight]:
+def apply_quota(flights: List[Flight], reserved: List[Flight] = None) -> List[Flight]:
     """입력 순서(점수 + 노출 감점 반영)를 그대로 유지한 채 쿼터만 적용한다."""
+    reserved = reserved or []
+    capacity = max(0, TOTAL_SLOTS - len(reserved))
     remaining = dict(SLOT_QUOTA)
+    for f in reserved:
+        g = group_of(f)
+        remaining[g] = max(0, remaining.get(g, 0) - 1)
     picked_idx, leftover_idx = [], []
 
     for i, f in enumerate(flights):
         g = group_of(f)
-        if remaining.get(g, 0) > 0:
+        if remaining.get(g, 0) > 0 and len(picked_idx) < capacity:
             remaining[g] -= 1
             picked_idx.append(i)
         else:
             leftover_idx.append(i)
 
-    free = WILDCARD_SLOTS + sum(remaining.values())
+    free = capacity - len(picked_idx)
     if free > 0:
         picked_idx.extend(leftover_idx[:free])
 
