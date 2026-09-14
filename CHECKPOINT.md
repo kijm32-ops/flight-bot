@@ -6,6 +6,8 @@
 - Current task: PTIS Personal Template v1
 - Source baseline: `69988414061cc4c778a7840e53929338e1e05bff`
 - Deployment: pushed to `main` as `5411298` on 2026-09-14.
+- Repository settings: Template Repository enabled; GitHub Pages is live from
+  GitHub Actions at `https://kijm32-ops.github.io/flight-bot/`.
 
 ## Completed
 
@@ -37,12 +39,11 @@
 
 ## Remaining Work
 
-1. Mark the GitHub repository as a Template Repository in its web settings.
-2. Complete OAuth with a real Kakao app and run **Kakao Setup Verification**.
-3. Enable GitHub Pages in the copied template repository and run the daily workflow.
+1. Complete OAuth with a real Kakao app and run **Kakao Setup Verification**.
+2. Add the required GitHub Secrets, then run the daily workflow.
 
 ## Resume Point
 
-- Start from GitHub repository settings to mark the repository as a template, then
-  follow the real Kakao setup steps in `README.md`. Do not change collection,
-  valuation, selection, normalization, or `data/state.json` without a new task.
+- Follow the real Kakao setup steps in `README.md`, starting with the Kakao
+  Developers app. Do not change collection, valuation, selection, normalization,
+  or `data/state.json` without a new task.
