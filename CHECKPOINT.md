@@ -2,7 +2,7 @@
 
 ## Status
 
-- Current state: OAUTH CONNECTED; KAKAO DELIVERY VERIFICATION PENDING
+- Current state: KAKAO DELIVERY VERIFIED
 - Current task: PTIS Personal Template v1
 - Source baseline: `69988414061cc4c778a7840e53929338e1e05bff`
 - Deployment: pushed to `main` as `5411298` on 2026-09-14.
@@ -22,6 +22,8 @@
 - Documented template installation; Gmail remains optional.
 - Stored the real Kakao Refresh Token only as encrypted `data/kakao_auth.json`.
   The encryption key and Kakao Login Client Secret are GitHub Actions secrets.
+- Ran **Kakao Setup Verification** on `main` successfully (GitHub Actions run
+  `34840765911`, 14 seconds). The `send-test-message` job succeeded.
 
 ## Changed Files
 
@@ -43,12 +45,12 @@
 
 ## Remaining Work
 
-1. Commit the encrypted `data/kakao_auth.json` file to `main`.
-2. Manually run **Kakao Setup Verification** and confirm delivery to My Chatroom.
-3. Review the first scheduled daily workflow after it runs.
+1. Review the first scheduled daily workflow after it runs.
+2. Optionally remove the legacy `KAKAO_REFRESH_TOKEN` repository secret only
+   after the next scheduled delivery succeeds.
 
 ## Resume Point
 
-- Start the **Kakao Setup Verification** workflow after the encrypted OAuth file
-  is pushed. Do not change collection, valuation, selection, normalization, or
-  `data/state.json` without a new task.
+- Review the next **Daily Flight Deal Scraper** workflow. Do not change
+  collection, valuation, selection, normalization, or `data/state.json` without
+  a new task.
