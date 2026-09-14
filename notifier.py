@@ -6,7 +6,11 @@ import requests
 from typing import List, Set, Tuple
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
-from config import GMAIL_USER, GMAIL_PASSWORD, PAGE_URL
+from config import (
+    GMAIL_USER, GMAIL_PASSWORD, KAKAO_CARD_IMAGE_URL, KAKAO_CLIENT_SECRET,
+    KAKAO_REST_API_KEY, KAKAO_TOKEN_ENCRYPTION_KEY, PAGE_URL,
+)
+from kakao_auth import KakaoAuthError, load_refresh_token, store_refresh_token
 from models import Flight
 
 
@@ -17,9 +21,6 @@ from models import Flight
 # 이미지를 교체할 때는 파일명의 v1 → v2 처럼 버전을 올릴 것.
 # 카카오가 URL 단위로 이미지를 캐싱해서, 같은 이름으로 덮어쓰면 옛 이미지가 계속 나온다.
 # ─────────────────────────────────────────────────────────────
-KAKAO_CARD_IMAGE = (
-    "https://raw.githubusercontent.com/kijm32-ops/flight-bot/main/assets/kakao_card_v1.png"
-)
 KAKAO_CARD_IMAGE_WIDTH = 800
 KAKAO_CARD_IMAGE_HEIGHT = 400
 
@@ -154,33 +155,56 @@ def send_email(deals: List[Flight], low_price_keys: Set[Tuple[str, str, str, str
     _send_raw_email(f"\u2708\ufe0f [PTIS] \uc624\ub298\uc758 \ud2b9\uac00 \ub9ac\ud3ec\ud2b8 ({len(deals)}\uac74)", html_content)
 
 
+def refresh_kakao_access_token() -> str:
+    """Refresh the access token and persist an optional Kakao token rotation first."""
+    if not KAKAO_REST_API_KEY or not KAKAO_TOKEN_ENCRYPTION_KEY:
+        raise KakaoAuthError("Kakao REST API key and encryption key are required.")
+
+    refresh_token = load_refresh_token(KAKAO_TOKEN_ENCRYPTION_KEY)
+    if not refresh_token:
+        raise KakaoAuthError("Run setup_kakao.py before enabling Kakao delivery.")
+
+    request_data = {
+        "grant_type": "refresh_token",
+        "client_id": KAKAO_REST_API_KEY,
+        "refresh_token": refresh_token,
+    }
+    if KAKAO_CLIENT_SECRET:
+        request_data["client_secret"] = KAKAO_CLIENT_SECRET
+
+    token_res = requests.post(
+        "https://kauth.kakao.com/oauth/token", data=request_data, timeout=15
+    )
+    token_res.raise_for_status()
+    token_payload = token_res.json()
+    access_token = token_payload.get("access_token")
+    if not isinstance(access_token, str) or not access_token:
+        raise KakaoAuthError("Kakao token response did not include an access token.")
+
+    rotated_token = token_payload.get("refresh_token")
+    if rotated_token is not None:
+        if not isinstance(rotated_token, str) or not rotated_token:
+            raise KakaoAuthError("Kakao returned an invalid rotated refresh token.")
+        store_refresh_token(rotated_token, KAKAO_TOKEN_ENCRYPTION_KEY)
+        logging.info("Kakao refresh token rotation persisted.")
+    return access_token
+
+
 def send_kakao_message(deals: List[Flight]) -> bool:
     """
     카카오톡 '나에게 보내기'로 특가 요약 알림 발송.
     성공 여부를 True/False로 반환한다 (연속 실패 감지에 사용).
     """
-    rest_api_key = os.environ.get("KAKAO_REST_API_KEY")
-    refresh_token = os.environ.get("KAKAO_REFRESH_TOKEN")
-
-    if not rest_api_key or not refresh_token:
-        logging.warning("⚠️ 카카오 API 환경변수가 없어 카카오톡 발송을 건너뜁니다.")
-        return False
-
     if not deals:
         return True  # 보낼 게 없는 것은 실패가 아님
 
+    if not PAGE_URL or not KAKAO_CARD_IMAGE_URL:
+        logging.error("Kakao delivery needs GitHub repository context or PTIS URL overrides.")
+        return False
+
     # 1단계: Refresh Token으로 새 Access Token 발급
     try:
-        token_res = requests.post(
-            "https://kauth.kakao.com/oauth/token",
-            data={
-                "grant_type": "refresh_token",
-                "client_id": rest_api_key,
-                "refresh_token": refresh_token,
-            },
-        )
-        token_res.raise_for_status()
-        access_token = token_res.json().get("access_token")
+        access_token = refresh_kakao_access_token()
     except Exception as e:
         logging.error(f"❌ 카카오 Access Token 갱신 실패: {e}")
         return False
@@ -204,7 +228,7 @@ def send_kakao_message(deals: List[Flight]) -> bool:
         "content": {
             "title": f"✈️ 오늘의 특가 항공권 {len(deals)}건 발견!",
             "description": description_text,
-            "image_url": KAKAO_CARD_IMAGE,
+            "image_url": KAKAO_CARD_IMAGE_URL,
             "image_width": KAKAO_CARD_IMAGE_WIDTH,
             "image_height": KAKAO_CARD_IMAGE_HEIGHT,
             "link": {
@@ -229,8 +253,12 @@ def send_kakao_message(deals: List[Flight]) -> bool:
             "https://kapi.kakao.com/v2/api/talk/memo/default/send",
             headers={"Authorization": f"Bearer {access_token}"},
             data={"template_object": json.dumps(template_object)},
+            timeout=15,
         )
         send_res.raise_for_status()
+        if send_res.json().get("result_code") != 0:
+            logging.error("Kakao message API did not return result_code 0.")
+            return False
         logging.info("💬 카카오톡 알림 발송 성공!")
         return True
     except Exception as e:

@@ -197,8 +197,8 @@ def run_system():
             send_warning_email(
                 "\u26A0\uFE0F [PTIS] \uCE74\uCE74\uC624\uD1A1 \uBC1C\uC1A1 3\uD68C \uC5F0\uC18D \uC2E4\uD328",
                 "\uCE74\uCE74\uC624\uD1A1 \uC54C\uB9BC\uC774 3\uD68C \uC5F0\uC18D \uBC1C\uC1A1\uC5D0 "
-                "\uC2E4\uD328\uD588\uC2B5\uB2C8\uB2E4. KAKAO_REFRESH_TOKEN \uB9CC\uB8CC \uAC00\uB2A5\uC131\uC744 "
-                "\uD655\uC778\uD574\uC8FC\uC138\uC694."
+                "\uC2E4\uD328\uD588\uC2B5\uB2C8\uB2E4. Kakao OAuth \uAD8C\uD55C\uACFC \uC554\uD638\uD654\uB41C "
+                "\uD1A0\uD070 \uC124\uC815\uC744 \uD655\uC778\uD574\uC8FC\uC138\uC694."
             )
     else:
         logging.warning("No deals to send.")

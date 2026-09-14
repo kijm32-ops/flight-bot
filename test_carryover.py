@@ -159,14 +159,20 @@ class CarryoverTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp, patch.object(report, "OUTPUT_DIR", tmp), \
              patch.object(report, "OUTPUT_FILE", str(Path(tmp)/"index.html")):
             report.generate_report_html([old], "")
-            self.assertIn(old.carryover_label, Path(tmp, "index.html").read_text())
+            self.assertIn(old.carryover_label, Path(tmp, "index.html").read_text(encoding="utf-8"))
         with patch.object(notifier, "_send_raw_email") as email:
             notifier.send_email([old])
             self.assertIn(old.carryover_label, email.call_args.args[1])
-        response = Mock()
-        response.json.return_value = {"access_token": "test"}
-        with patch.dict("os.environ", {"KAKAO_REST_API_KEY": "test", "KAKAO_REFRESH_TOKEN": "test"}), \
-             patch.object(notifier.requests, "post", return_value=response) as post:
+        token_response = Mock()
+        token_response.json.return_value = {"access_token": "test"}
+        message_response = Mock()
+        message_response.json.return_value = {"result_code": 0}
+        with patch.object(notifier, "KAKAO_REST_API_KEY", "test"), \
+             patch.object(notifier, "KAKAO_TOKEN_ENCRYPTION_KEY", "test-key"), \
+             patch.object(notifier, "PAGE_URL", "https://owner.github.io/repo/"), \
+             patch.object(notifier, "KAKAO_CARD_IMAGE_URL", "https://example.com/card.png"), \
+             patch.object(notifier, "load_refresh_token", return_value="test"), \
+             patch.object(notifier.requests, "post", side_effect=[token_response, message_response]) as post:
             self.assertTrue(notifier.send_kakao_message([old]))
             payload = json.loads(post.call_args.kwargs["data"]["template_object"])
             self.assertIn(old.carryover_label, payload["content"]["description"])

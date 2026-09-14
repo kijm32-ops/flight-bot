@@ -5,8 +5,34 @@ SERPAPI_KEY = os.environ.get("SERPAPI_KEY")
 GMAIL_USER = os.environ.get("GMAIL_USER")
 GMAIL_PASSWORD = os.environ.get("GMAIL_PASSWORD")
 KAKAO_JS_KEY = os.environ.get("KAKAO_JS_KEY")
+KAKAO_REST_API_KEY = os.environ.get("KAKAO_REST_API_KEY")
+KAKAO_CLIENT_SECRET = os.environ.get("KAKAO_CLIENT_SECRET")
+KAKAO_TOKEN_ENCRYPTION_KEY = os.environ.get("KAKAO_TOKEN_ENCRYPTION_KEY")
 
-PAGE_URL = "https://kijm32-ops.github.io/flight-bot/"
+
+def _github_pages_url() -> str:
+    repository = os.environ.get("GITHUB_REPOSITORY", "")
+    owner, separator, name = repository.partition("/")
+    if not separator or not owner or not name:
+        return ""
+    return f"https://{owner}.github.io/{name}/"
+
+
+def _kakao_card_image_url() -> str:
+    explicit_url = os.environ.get("PTIS_KAKAO_CARD_IMAGE_URL")
+    if explicit_url:
+        return explicit_url
+    repository = os.environ.get("GITHUB_REPOSITORY", "")
+    revision = os.environ.get("GITHUB_SHA") or os.environ.get("GITHUB_REF_NAME")
+    if repository and revision:
+        return f"https://raw.githubusercontent.com/{repository}/{revision}/assets/kakao_card_v1.png"
+    return ""
+
+
+# Deployment URLs have one source: GitHub Actions repository context. PTIS_PAGE_URL
+# and PTIS_KAKAO_CARD_IMAGE_URL are explicit overrides for custom domains or local tests.
+PAGE_URL = os.environ.get("PTIS_PAGE_URL") or _github_pages_url()
+KAKAO_CARD_IMAGE_URL = _kakao_card_image_url()
 
 # 양양(YNY) 제외 — 국제선 노선이 거의 없어 호출 대비 수확이 없음
 TARGET_ORIGINS = ["ICN", "CJJ", "GMP"]
