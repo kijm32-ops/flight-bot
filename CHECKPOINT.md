@@ -5,6 +5,7 @@
 - Current state: IMPLEMENTED AND VALIDATED LOCALLY
 - Current task: PTIS Personal Template v1
 - Source baseline: `69988414061cc4c778a7840e53929338e1e05bff`
+- Deployment: pushed to `main` as `5411298` on 2026-09-14.
 
 ## Completed
 
@@ -36,11 +37,12 @@
 
 ## Remaining Work
 
-1. Push the implementation to the target GitHub repository.
+1. Mark the GitHub repository as a Template Repository in its web settings.
 2. Complete OAuth with a real Kakao app and run **Kakao Setup Verification**.
 3. Enable GitHub Pages in the copied template repository and run the daily workflow.
 
 ## Resume Point
 
-- Start from the real Kakao setup steps in `README.md`; do not change collection,
+- Start from GitHub repository settings to mark the repository as a template, then
+  follow the real Kakao setup steps in `README.md`. Do not change collection,
   valuation, selection, normalization, or `data/state.json` without a new task.
