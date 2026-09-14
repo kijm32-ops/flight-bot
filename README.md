@@ -13,7 +13,53 @@ be decrypted without the `KAKAO_TOKEN_ENCRYPTION_KEY` GitHub secret. Do not comm
 that secret, your Kakao client secret, or a plaintext refresh token. Restrict write
 access to the repository because writers can alter a workflow that reads secrets.
 
-## Install in about 10 minutes
+## Recommended: guided setup in about 10 minutes
+
+Use this path when installing PTIS for one person. It registers the required
+GitHub Actions secrets, opens Kakao OAuth, commits only the encrypted refresh
+token, and can run the real My Chatroom verification in one guided session.
+
+Prerequisites:
+
+- Python 3.11 or newer
+- Git
+- [GitHub CLI](https://cli.github.com/) signed in with `gh auth login`
+- A clean local clone made from this template
+
+First create your repository with **Use this template**, clone it, and run:
+
+```bash
+python -m pip install -r requirements.txt
+python install_ptis.py
+```
+
+The assistant shows the exact Kakao Redirect URI and Pages domain for your
+GitHub account. After you finish the Kakao Developers settings, it asks for the
+SerpAPI key, Kakao REST API key, and Kakao Login Client Secret using hidden
+prompts. Secret values are kept in process memory, passed to `gh secret set`
+through standard input, and are never written to a plaintext config file or
+included in command-line arguments.
+
+You personally approve Kakao access once in the browser. The assistant then:
+
+1. creates a fresh token-encryption key and saves all required repository secrets;
+2. obtains and encrypts the Kakao Refresh Token;
+3. commits and pushes only `data/kakao_auth.json`;
+4. opens the GitHub Pages setting;
+5. optionally runs **Kakao Setup Verification** and waits for its result.
+
+If the template copy initially contains an unreadable `data/kakao_auth.json`, that
+is expected: it was encrypted for a different installation. The assistant replaces
+it using a new encryption key unique to your repository.
+
+GitHub and Kakao intentionally require their own login/consent steps, so those
+buttons cannot be bypassed safely. Everything between those required approvals is
+handled by the assistant.
+
+## Manual setup fallback
+
+Use the steps below if GitHub CLI is unavailable or if you prefer to configure
+each item yourself.
 
 1. Click **Use this template** on GitHub and create your own repository. Keep the
    default branch as `main`. Enable GitHub Pages with **GitHub Actions** as its

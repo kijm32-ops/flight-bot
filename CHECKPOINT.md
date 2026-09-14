@@ -2,8 +2,8 @@
 
 ## Status
 
-- Current state: KAKAO DELIVERY VERIFIED
-- Current task: PTIS Personal Template v1
+- Current state: GUIDED SETUP IMPLEMENTED AND LOCALLY VALIDATED
+- Current task: PTIS Personal Template v1.1 Setup Assistant
 - Source baseline: `69988414061cc4c778a7840e53929338e1e05bff`
 - Deployment: pushed to `main` as `5411298` on 2026-09-14.
 - Repository settings: Template Repository enabled; GitHub Pages is live from
@@ -24,11 +24,15 @@
   The encryption key and Kakao Login Client Secret are GitHub Actions secrets.
 - Ran **Kakao Setup Verification** on `main` successfully (GitHub Actions run
   `34840765911`, 14 seconds). The `send-test-message` job succeeded.
+- Added `install_ptis.py`, a one-command guided path for GitHub Secret setup,
+  Kakao OAuth, encrypted-token commit/push, and optional delivery verification.
+- Kept the manual README procedure as a fallback when GitHub CLI is unavailable.
 
 ## Changed Files
 
 - `config.py`, `notifier.py`, `main.py`, `requirements.txt`
 - `kakao_auth.py`, `setup_kakao.py`, `test_kakao_auth.py`
+- `install_ptis.py`, `test_install_ptis.py`
 - `.github/workflows/schedule.yml`, `.github/workflows/kakao-setup-test.yml`
 - `README.md`, `test_carryover.py`, `TASK.md`, `CHECKPOINT.md`
 - Removed `.github/workflows/kakao-smoke-test.yml` (superseded by encrypted-setup verification).
@@ -42,15 +46,21 @@
 - YAML parsed for every workflow: passed.
 - Repository-derived Pages/card URL assertion: passed.
 - `git diff --check`: passed.
+- Full Python compile and `python -m unittest`: passed, 27 tests.
+- Setup-assistant repository parsing, dirty-worktree guard, and secret-via-stdin
+  tests: passed.
+- GitHub CLI command shapes verified against the current official CLI manual.
 
 ## Remaining Work
 
-1. Review the first scheduled daily workflow after it runs.
-2. Optionally remove the legacy `KAKAO_REFRESH_TOKEN` repository secret only
+1. Run the guided installer end-to-end on a clean third-party template clone with
+   GitHub CLI installed; this host does not currently have `gh` installed.
+2. Review the first scheduled daily workflow after it runs.
+3. Optionally remove the legacy `KAKAO_REFRESH_TOKEN` repository secret only
    after the next scheduled delivery succeeds.
 
 ## Resume Point
 
-- Review the next **Daily Flight Deal Scraper** workflow. Do not change
-  collection, valuation, selection, normalization, or `data/state.json` without
-  a new task.
+- Push the v1.1 setup-assistant files, then exercise `python install_ptis.py` from
+  a clean template copy on a host with GitHub CLI. Do not change collection,
+  valuation, selection, normalization, or `data/state.json` without a new task.

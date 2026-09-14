@@ -1,9 +1,12 @@
-# PTIS Personal Template v1
+# PTIS Personal Template v1.1 Setup Assistant
 
 ## Objective
 
 Enable a person to install PTIS from their own GitHub repository, SerpAPI account,
 and Kakao Developers app, then run unattended Kakao "send to me" notifications.
+
+Add a guided one-command setup path so a non-developer can complete the repository
+secrets, Kakao OAuth, encrypted-token commit, and delivery verification in one run.
 
 ## Session Scope
 
@@ -13,6 +16,9 @@ and Kakao Developers app, then run unattended Kakao "send to me" notifications.
   and focused tests.
 - Preserve the SerpAPI collection, normalization, valuation, selection, and state
   behavior. Do not edit `data/state.json`.
+- Add a cross-platform Python setup assistant that uses an authenticated GitHub CLI
+  without placing secret values in command-line arguments.
+- Keep the existing manual README path as a fallback.
 
 ## Usage Estimate
 
@@ -21,6 +27,8 @@ and Kakao Developers app, then run unattended Kakao "send to me" notifications.
 - Kakao: one local OAuth authorization and one optional smoke-test message during
   installation; regular execution still refreshes one access token only when there
   are deals to send.
+- Setup assistant: 0 additional SerpAPI calls, 4 GitHub Secret writes, one encrypted
+  token commit/push, and one user-confirmed Kakao setup-test message.
 
 ## Assumptions Verified
 
@@ -36,6 +44,7 @@ and Kakao Developers app, then run unattended Kakao "send to me" notifications.
 - Python compile and unit tests, including mocked refresh/rotation paths.
 - YAML parse for every workflow.
 - Import smoke checks for the existing main path.
+- Focused setup-assistant tests with mocked GitHub CLI and git processes.
 - `git diff --check`.
 
 ## Completion Criteria
@@ -44,3 +53,5 @@ and Kakao Developers app, then run unattended Kakao "send to me" notifications.
 - A rotated token is encrypted and atomically persisted before message delivery.
 - A user can obtain `talk_message` consent through the documented local OAuth path
   and then run an authenticated GitHub Actions smoke test.
+- A clean template clone can run `python install_ptis.py` and complete the same
+  steps without manually constructing shell environment variables or git commands.
