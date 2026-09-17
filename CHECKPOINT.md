@@ -2,65 +2,70 @@
 
 ## Status
 
-- Current state: GUIDED SETUP IMPLEMENTED AND LOCALLY VALIDATED
-- Current task: PTIS Personal Template v1.1 Setup Assistant
-- Source baseline: `69988414061cc4c778a7840e53929338e1e05bff`
-- Deployment: pushed to `main` as `5411298` on 2026-09-14.
-- Repository settings: Template Repository enabled; GitHub Pages is live from
-  GitHub Actions at `https://kijm32-ops.github.io/flight-bot/`.
-- Kakao app: Login Client Secret enabled, `talk_message` consent configured, and
-  the Pages web domain / local OAuth callback are registered.
+- Current state: V1.2 HARDENING IMPLEMENTED ON FEATURE BRANCH, VALIDATION IN PROGRESS
+- Current task: PTIS Personal Template v1.2 First-user Hardening
+- Source baseline: `fe8ed27307ce8891c07423bc4d4a30a718cf3e23`
+- Feature branch: `ptis-v1.2-first-user-hardening`
+- SerpAPI usage added by this task: 0 calls
 
-## Completed
+## Real Third-party Validation Completed Before v1.2
 
-- Read operating documents, cloned and verified source commit
-  `69988414061cc4c778a7840e53929338e1e05bff`, and recorded the task harness.
-- Replaced account-specific deployment URLs with repository-derived configuration.
-- Added encrypted refresh-token storage, Client Secret support, and atomic rotation.
-- Added local OAuth setup with `talk_message` scope verification and a manual Actions
-  workflow that sends a real Kakao "My Chatroom" setup-test message.
-- Documented template installation; Gmail remains optional.
-- Stored the real Kakao Refresh Token only as encrypted `data/kakao_auth.json`.
-  The encryption key and Kakao Login Client Secret are GitHub Actions secrets.
-- Ran **Kakao Setup Verification** on `main` successfully (GitHub Actions run
-  `34840765911`, 14 seconds). The `send-test-message` job succeeded.
-- Added `install_ptis.py`, a one-command guided path for GitHub Secret setup,
-  Kakao OAuth, encrypted-token commit/push, and optional delivery verification.
-- Kept the manual README procedure as a fallback when GitHub CLI is unavailable.
+The first real guided installation was completed on `Victoryun0919/flight-bot`.
+Observed sequence and outcome:
 
-## Changed Files
+- Git/GitHub CLI installation was present but PATH registration required repair.
+- Initial installer run was blocked by installer-generated `__pycache__` because
+  the template had no `.gitignore`.
+- Kakao OAuth browser consent/callback succeeded.
+- The first token exchange returned HTTP 401 with insufficient diagnostics.
+- After correcting/reissuing the Kakao Client Secret, OAuth and encrypted token
+  creation succeeded.
+- Git commit then failed with `unable to auto-detect email address` on the new PC.
+- After repository-local Git identity configuration, `data/kakao_auth.json` was
+  committed and pushed.
+- Kakao Setup Verification succeeded and the target user confirmed the message in
+  KakaoTalk My Chatroom.
+- The copied repository was also confirmed to contain source-instance historical
+  `data/state.json`, demonstrating template runtime-state contamination.
 
-- `config.py`, `notifier.py`, `main.py`, `requirements.txt`
-- `kakao_auth.py`, `setup_kakao.py`, `test_kakao_auth.py`
-- `install_ptis.py`, `test_install_ptis.py`
-- `.github/workflows/schedule.yml`, `.github/workflows/kakao-setup-test.yml`
-- `README.md`, `test_carryover.py`, `TASK.md`, `CHECKPOINT.md`
-- Removed `.github/workflows/kakao-smoke-test.yml` (superseded by encrypted-setup verification).
+## v1.2 Changes
 
-## Validation Performed
+- Added Python/local environment ignores to prevent installer-created cache files
+  from tripping the clean-worktree guard.
+- Added GitHub-authenticated repository-local Git identity bootstrap using an
+  ID-based GitHub `noreply` commit address.
+- Added inherited runtime-state detection/reset for new installations and
+  `--preserve-state` for explicit reconfiguration.
+- Added pre-commit rollback for state/auth files and push-failure commit rollback.
+- Moved repository Secret writes until after local Kakao OAuth succeeds.
+- Added OAuth retry/change-credentials flow that keeps the SerpAPI key in memory.
+- Added safe Kakao token endpoint error details without logging secret request data.
+- Added `--doctor`, preflight status, setup completion summary, and Pages status check.
+- Added `setup_windows.ps1` for the Windows prerequisite/PATH/bootstrap path.
+- Added pull-request validation workflow and focused installer/Kakao tests.
+- Updated README installation/troubleshooting instructions.
 
-- `python -m py_compile` for every Python file: passed.
-- `python -m unittest`: passed, 22 tests.
-- Mocked encrypted store, wrong-key rejection, Client Secret request, rotation
-  persistence, and successful message result-code paths: passed.
-- YAML parsed for every workflow: passed.
-- Repository-derived Pages/card URL assertion: passed.
-- `git diff --check`: passed.
-- Full Python compile and `python -m unittest`: passed, 27 tests.
-- Setup-assistant repository parsing, dirty-worktree guard, and secret-via-stdin
-  tests: passed.
-- GitHub CLI command shapes verified against the current official CLI manual.
+## Validation
+
+- Focused local compile for v1.2 Python files: passed.
+- Focused local unit tests for installer and Kakao diagnostics: passed (10 tests).
+- Full repository test suite / workflow YAML / PR diff validation: pending GitHub
+  pull-request validation run.
+- PowerShell execution validation: not available in the current Linux container;
+  script receives static review and must be exercised on the next Windows install.
 
 ## Remaining Work
 
-1. Run the guided installer end-to-end on a clean third-party template clone with
-   GitHub CLI installed; this host does not currently have `gh` installed.
-2. Review the first scheduled daily workflow after it runs.
-3. Optionally remove the legacy `KAKAO_REFRESH_TOKEN` repository secret only
-   after the next scheduled delivery succeeds.
+1. Run/inspect the v1.2 pull-request validation workflow and merge only if green.
+2. Review the next scheduled daily workflow after merge for regression.
+3. Create a dedicated `kijm32-ops/flight-bot-template` repository and automate a
+   clean publication path so runtime files never exist in the distributable source.
+   Repository creation is blocked in the current connector environment.
+4. Start the next isolated task: PTIS v1.3 Focus Search (region/date intent search,
+   one daily focus slot replacing a discovery slot so monthly API usage stays flat).
 
 ## Resume Point
 
-- Push the v1.1 setup-assistant files, then exercise `python install_ptis.py` from
-  a clean template copy on a host with GitHub CLI. Do not change collection,
-  valuation, selection, normalization, or `data/state.json` without a new task.
+- Inspect the v1.2 PR validation result. If green, merge v1.2, then begin a new
+  `TASK.md` for Focus Search. Do not mix Focus Search into the installer-hardening
+  branch.

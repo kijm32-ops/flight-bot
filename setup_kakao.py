@@ -83,6 +83,23 @@ def _wait_for_code(callback, expected_state: str) -> str:
     return server.oauth_code
 
 
+def _safe_token_error(response) -> KakaoAuthError:
+    parts = []
+    try:
+        payload = response.json()
+    except (ValueError, requests.JSONDecodeError):
+        payload = {}
+    if isinstance(payload, dict):
+        for key in ("error", "error_description", "error_code"):
+            value = payload.get(key)
+            if isinstance(value, (str, int, float)) and str(value).strip():
+                parts.append(f"{key}={value}")
+    detail = f" ({', '.join(parts)})" if parts else ""
+    return KakaoAuthError(
+        f"Kakao token endpoint returned HTTP {response.status_code}{detail}."
+    )
+
+
 def _exchange_code(code: str, rest_api_key: str, redirect_uri: str, client_secret: str):
     data = {
         "grant_type": "authorization_code",
@@ -93,7 +110,8 @@ def _exchange_code(code: str, rest_api_key: str, redirect_uri: str, client_secre
     if client_secret:
         data["client_secret"] = client_secret
     response = requests.post(TOKEN_URL, data=data, timeout=15)
-    response.raise_for_status()
+    if not response.ok:
+        raise _safe_token_error(response)
     payload = response.json()
     refresh_token = payload.get("refresh_token")
     scopes = set(str(payload.get("scope", "")).split())
