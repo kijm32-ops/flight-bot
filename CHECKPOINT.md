@@ -2,18 +2,20 @@
 
 ## Status
 
-- Current state: V1.2 HARDENING IMPLEMENTED ON FEATURE BRANCH, VALIDATION IN PROGRESS
-- Current task: PTIS Personal Template v1.2 First-user Hardening
-- Source baseline: `fe8ed27307ce8891c07423bc4d4a30a718cf3e23`
-- Feature branch: `ptis-v1.2-first-user-hardening`
-- SerpAPI usage added by this task: 0 calls
+- Current state: V1.2 FIRST-USER HARDENING MERGED AND VALIDATED
+- Current task: next isolated task is PTIS v1.3 Focus Search
+- v1.2 source baseline: `fe8ed27307ce8891c07423bc4d4a30a718cf3e23`
+- v1.2 merged commit: `37513d5a63c04c300ed2ec3fe49de16948a6541f`
+- Pull request: `#1` (`PTIS v1.2: harden first-user setup`)
+- Validation run: GitHub Actions `35187032104` — success
+- SerpAPI usage added by v1.2: 0 calls
 
-## Real Third-party Validation Completed Before v1.2
+## Real Third-party Validation
 
 The first real guided installation was completed on `Victoryun0919/flight-bot`.
 Observed sequence and outcome:
 
-- Git/GitHub CLI installation was present but PATH registration required repair.
+- Git/GitHub CLI were installed but PATH registration required repair.
 - Initial installer run was blocked by installer-generated `__pycache__` because
   the template had no `.gitignore`.
 - Kakao OAuth browser consent/callback succeeded.
@@ -25,20 +27,20 @@ Observed sequence and outcome:
   committed and pushed.
 - Kakao Setup Verification succeeded and the target user confirmed the message in
   KakaoTalk My Chatroom.
-- The copied repository was also confirmed to contain source-instance historical
+- The copied repository also contained source-instance historical
   `data/state.json`, demonstrating template runtime-state contamination.
 
-## v1.2 Changes
+## v1.2 Completed
 
-- Added Python/local environment ignores to prevent installer-created cache files
-  from tripping the clean-worktree guard.
-- Added GitHub-authenticated repository-local Git identity bootstrap using an
-  ID-based GitHub `noreply` commit address.
+- Added `.gitignore` coverage for Python/cache/local environment artifacts.
+- Added GitHub-authenticated repository-local Git identity bootstrap using the
+  account's ID-based GitHub `noreply` address.
 - Added inherited runtime-state detection/reset for new installations and
   `--preserve-state` for explicit reconfiguration.
-- Added pre-commit rollback for state/auth files and push-failure commit rollback.
+- Added rollback for installer-generated state/auth changes before a successful
+  setup push, including push-failure handling.
 - Moved repository Secret writes until after local Kakao OAuth succeeds.
-- Added OAuth retry/change-credentials flow that keeps the SerpAPI key in memory.
+- Added OAuth retry/change-credentials flow that retains the SerpAPI key in memory.
 - Added safe Kakao token endpoint error details without logging secret request data.
 - Added `--doctor`, preflight status, setup completion summary, and Pages status check.
 - Added `setup_windows.ps1` for the Windows prerequisite/PATH/bootstrap path.
@@ -47,25 +49,36 @@ Observed sequence and outcome:
 
 ## Validation
 
-- Focused local compile for v1.2 Python files: passed.
-- Focused local unit tests for installer and Kakao diagnostics: passed (10 tests).
-- Full repository test suite / workflow YAML / PR diff validation: pending GitHub
-  pull-request validation run.
-- PowerShell execution validation: not available in the current Linux container;
-  script receives static review and must be exercised on the next Windows install.
+- Focused local Python compile: passed.
+- Focused local installer/Kakao tests: passed (10 tests).
+- GitHub Actions `Validate PTIS` run `35187032104`: passed.
+  - dependency installation: passed
+  - Python compile: passed
+  - full `python -m unittest`: passed
+  - all workflow YAML parse: passed
+  - `git diff --check`: passed
+- PowerShell runtime execution was not available in the Linux validation host;
+  `setup_windows.ps1` received static review and should be exercised on the next
+  Windows installation.
 
 ## Remaining Work
 
-1. Run/inspect the v1.2 pull-request validation workflow and merge only if green.
-2. Review the next scheduled daily workflow after merge for regression.
-3. Create a dedicated `kijm32-ops/flight-bot-template` repository and automate a
+1. Review the first scheduled daily workflow after v1.2 merge for regression.
+2. Create a dedicated `kijm32-ops/flight-bot-template` repository and automate a
    clean publication path so runtime files never exist in the distributable source.
-   Repository creation is blocked in the current connector environment.
-4. Start the next isolated task: PTIS v1.3 Focus Search (region/date intent search,
-   one daily focus slot replacing a discovery slot so monthly API usage stays flat).
+   Repository creation is not available through the current connector environment.
+3. Start PTIS v1.3 Focus Search as a new isolated task.
 
-## Resume Point
+## v1.3 Resume Point
 
-- Inspect the v1.2 PR validation result. If green, merge v1.2, then begin a new
-  `TASK.md` for Focus Search. Do not mix Focus Search into the installer-hardening
-  branch.
+Design/implement Focus Search without changing the monthly SerpAPI budget:
+
+- keep the existing Discovery Search behavior;
+- add a separate user-intent Focus Search for region/date/stay/max-price conditions;
+- use one daily Focus slot by replacing a low-priority discovery slot rather than
+  adding a new daily call;
+- current candidate replacement: `GMP/near`;
+- keep focus results logically separate from normal discovery diversity/exposure
+  handling so an explicitly requested destination is not demoted away;
+- calculate and verify monthly API usage before implementation;
+- do not mix v1.3 changes with installer-hardening code.
