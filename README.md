@@ -1,163 +1,212 @@
 # PTIS Personal Template
 
 PTIS finds discounted Google Flights fares with SerpAPI, publishes a GitHub Pages
-report, and can send the summary to your own KakaoTalk "My Chatroom". This is a
-personal template: each installation uses its own GitHub repository, SerpAPI key,
-and Kakao Developers app.
+report, and can send the summary to your own KakaoTalk "My Chatroom". Each personal
+installation uses its own GitHub repository, SerpAPI key, and Kakao Developers app.
 
 ## What stays private
 
-`data/kakao_auth.json` contains an encrypted Kakao refresh token and is committed
-to your repository so GitHub Actions can retain refresh-token rotations. It cannot
-be decrypted without the `KAKAO_TOKEN_ENCRYPTION_KEY` GitHub secret. Do not commit
-that secret, your Kakao client secret, or a plaintext refresh token. Restrict write
-access to the repository because writers can alter a workflow that reads secrets.
+`data/kakao_auth.json` contains only an encrypted Kakao refresh token. GitHub Actions
+can decrypt it only with the repository's `KAKAO_TOKEN_ENCRYPTION_KEY` secret. Never
+commit that encryption key, the Kakao Client Secret, a plaintext refresh token, or
+other API keys. Restrict repository write access because a writer can change a
+workflow that reads repository secrets.
 
-## Recommended: guided setup in about 10 minutes
+## Recommended guided setup
 
-Use this path when installing PTIS for one person. It registers the required
-GitHub Actions secrets, opens Kakao OAuth, commits only the encrypted refresh
-token, and can run the real My Chatroom verification in one guided session.
+### Windows
+
+After creating your repository with **Use this template** and cloning it, open
+PowerShell in the repository folder and run:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\setup_windows.ps1
+```
+
+The bootstrap checks Python 3.11+, Git, and GitHub CLI. It repairs the current
+PowerShell PATH for the standard Git and GitHub CLI install locations when those
+programs are already installed. If a prerequisite is actually missing, it prints
+the official `winget` command instead of silently installing software. It also runs
+`gh auth login` when needed, installs `requirements.txt`, and starts the guided
+installer.
+
+### macOS / Linux / already-prepared Windows
 
 Prerequisites:
 
 - Python 3.11 or newer
 - Git
-- [GitHub CLI](https://cli.github.com/) signed in with `gh auth login`
-- A clean local clone made from this template
+- [GitHub CLI](https://cli.github.com/) authenticated with `gh auth login`
+- a clean local clone created from the PTIS template
 
-First create your repository with **Use this template**, clone it, and run:
+Run:
 
 ```bash
 python -m pip install -r requirements.txt
 python install_ptis.py
 ```
 
-The assistant shows the exact Kakao Redirect URI and Pages domain for your
-GitHub account. After you finish the Kakao Developers settings, it asks for the
-SerpAPI key, Kakao REST API key, and Kakao Login Client Secret using hidden
-prompts. Secret values are kept in process memory, passed to `gh secret set`
-through standard input, and are never written to a plaintext config file or
-included in command-line arguments.
+For read-only diagnostics at any time:
 
-You personally approve Kakao access once in the browser. The assistant then:
+```bash
+python install_ptis.py --doctor
+```
 
-1. creates a fresh token-encryption key and saves all required repository secrets;
-2. obtains and encrypts the Kakao Refresh Token;
-3. commits and pushes only `data/kakao_auth.json`;
-4. opens the GitHub Pages setting;
-5. optionally runs **Kakao Setup Verification** and waits for its result.
+The doctor checks Python/Git/GitHub CLI readiness, GitHub authentication, the
+repository remote, working-tree state, Git commit identity presence, required
+repository Secret names, encrypted Kakao auth file presence, Pages status, and the
+latest Kakao verification status. It does not print secret values.
 
-If the template copy initially contains an unreadable `data/kakao_auth.json`, that
-is expected: it was encrypted for a different installation. The assistant replaces
-it using a new encryption key unique to your repository.
+## What the guided installer does
 
-GitHub and Kakao intentionally require their own login/consent steps, so those
-buttons cannot be bypassed safely. Everything between those required approvals is
-handled by the assistant.
+Before asking for secrets, the installer performs a preflight check and configures
+missing **repository-local** Git author settings from the authenticated GitHub
+account. It uses GitHub's ID-based `noreply` commit address, so a fresh PC does not
+need manual `git config user.email` setup.
+
+A GitHub template snapshot can contain runtime history from the source instance.
+For a new personal installation the installer detects meaningful history in
+`data/state.json` and asks to reset it before proceeding. This gives the new user
+an independent 30-day price history, exposure log, carryover state, and monthly API
+budget. When deliberately reconfiguring an existing installation, run:
+
+```bash
+python install_ptis.py --preserve-state
+```
+
+After preflight, configure the Kakao Developers app with the values printed by the
+installer. The fixed local Redirect URI is:
+
+```text
+http://127.0.0.1:8765/callback
+```
+
+The installer then asks through hidden prompts for:
+
+- SerpAPI key
+- Kakao REST API key
+- Kakao Login Client Secret
+
+It creates the token-encryption key itself. Secret values remain in process memory
+and are never placed in command-line arguments or a plaintext config file.
+
+The setup order is transactional:
+
+1. perform local Kakao OAuth and verify `talk_message`;
+2. if OAuth fails, retry with the same Kakao values or replace only the Kakao values
+   without re-entering the SerpAPI key;
+3. after OAuth succeeds, save the four required GitHub Actions secrets;
+4. commit and push the new installation state and encrypted refresh token;
+5. check/open GitHub Pages settings when Pages is not yet enabled;
+6. optionally run **Kakao Setup Verification** and wait for the real My Chatroom
+   delivery result;
+7. print a final status summary containing only verified/observed states.
+
+If setup stops before the setup commit is successfully pushed, installer-generated
+changes to the state/auth files are rolled back so a retry starts from a clean
+repository.
+
+## Kakao Developers settings
+
+Create a Kakao Developers app for the person who will receive messages, then:
+
+1. Enable **Kakao Login**.
+2. Register `http://127.0.0.1:8765/callback` as the Redirect URI.
+3. Enable the `talk_message` consent item.
+4. Enable the Kakao Login Client Secret for the REST API key.
+5. Under Product Link Management, register the Pages web domain printed by the
+   installer, normally `https://YOUR_GITHUB_OWNER.github.io`.
+
+The OAuth browser consent must be completed while signed into the Kakao account
+that should receive PTIS messages.
 
 ## Manual setup fallback
 
-Use the steps below if GitHub CLI is unavailable or if you prefer to configure
-each item yourself.
+Use this only when GitHub CLI is unavailable or you prefer to configure everything
+manually.
 
-1. Click **Use this template** on GitHub and create your own repository. Keep the
-   default branch as `main`. Enable GitHub Pages with **GitHub Actions** as its
-   source in **Settings > Pages**.
-2. Create a SerpAPI account and copy its API key.
-3. In [Kakao Developers](https://developers.kakao.com/), create an app, enable
-   **Kakao Login**, and register this exact Redirect URI under Kakao Login:
-   `http://127.0.0.1:8765/callback`.
-4. Under **Product Link Management**, register your Pages web domain:
-   `https://YOUR_GITHUB_OWNER.github.io`. In **Consent Items**, enable
-   **KakaoTalk Message (`talk_message`)**. Copy the REST API key and Client Secret.
-   Client Secret is normally enabled by default for new REST API keys.
-5. In your repository's **Settings > Secrets and variables > Actions**, add:
+1. Enable GitHub Pages with **GitHub Actions** as its source in repository Settings.
+2. Create a SerpAPI account and obtain its API key.
+3. Configure the Kakao Developers app as described above.
+4. Add these repository Actions secrets:
 
    | Secret | Required | Value |
    | --- | --- | --- |
    | `SERPAPI_KEY` | Yes | Your SerpAPI key |
    | `KAKAO_REST_API_KEY` | For Kakao | Kakao REST API key |
-   | `KAKAO_CLIENT_SECRET` | Recommended | Kakao Client Secret; required when it is enabled in Kakao Developers |
-   | `KAKAO_TOKEN_ENCRYPTION_KEY` | For Kakao | A new key generated in step 6 |
-   | `KAKAO_JS_KEY` | Optional | Kakao JavaScript key for the report's share button |
-   | `GMAIL_USER` / `GMAIL_PASSWORD` | Optional | Gmail address and app password for email notifications |
+   | `KAKAO_CLIENT_SECRET` | For Kakao | Client Secret paired with that REST API key |
+   | `KAKAO_TOKEN_ENCRYPTION_KEY` | For Kakao | Fresh Fernet key generated below |
+   | `KAKAO_JS_KEY` | Optional | Kakao JavaScript key for report sharing |
+   | `GMAIL_USER` / `GMAIL_PASSWORD` | Optional | Gmail address and app password |
 
-6. Clone your new repository locally, install dependencies, and generate a fresh
-   encryption key. Store that printed value as `KAKAO_TOKEN_ENCRYPTION_KEY` before
-   continuing.
+5. Generate the encryption key:
 
    ```bash
-   python -m pip install -r requirements.txt
    python setup_kakao.py --print-encryption-key
    ```
 
-7. Set the following local environment variables, then run the OAuth setup. The
-   browser opens a Kakao consent page. Sign in and grant **KakaoTalk Message**.
-   The script verifies that `talk_message` was granted and creates only the
-   encrypted `data/kakao_auth.json` file.
+6. Set `KAKAO_REST_API_KEY`, `KAKAO_CLIENT_SECRET`,
+   `KAKAO_TOKEN_ENCRYPTION_KEY`, and
+   `KAKAO_REDIRECT_URI=http://127.0.0.1:8765/callback` in the local shell, then run:
 
    ```bash
-   KAKAO_REST_API_KEY=your-rest-key
-   KAKAO_CLIENT_SECRET=your-client-secret
-   KAKAO_TOKEN_ENCRYPTION_KEY=the-key-from-step-6
-   KAKAO_REDIRECT_URI=http://127.0.0.1:8765/callback
    python setup_kakao.py
    ```
 
-   In PowerShell, set each value with `$env:NAME = 'value'` before the command.
-   Never put the values into a committed `.env` file.
-
-8. Commit and push the encrypted token file, then run **Kakao Setup Verification**
-   from the repository's **Actions** tab. A successful run sends one test message
-   to your KakaoTalk My Chatroom. This is the required proof path before relying on
-   the daily workflow.
-
-   ```bash
-   git add data/kakao_auth.json
-   git commit -m "Configure Kakao OAuth"
-   git push
-   ```
-
-9. Run **Daily Flight Deal Scraper** manually once. It publishes the Pages report
-   and thereafter runs at 07:00 KST. Gmail remains optional; leave its two secrets
-   empty to use Kakao and Pages only.
+7. Commit only the encrypted `data/kakao_auth.json`, then run **Kakao Setup
+   Verification** in Actions.
 
 ## Token rotation
 
-The daily workflow reads and decrypts `data/kakao_auth.json`, refreshes the access
-token, and immediately writes a newly returned refresh token back to that encrypted
-file before sending a message. The workflow commits this file together with its
-normal state update. Kakao currently returns a replacement refresh token only when
-the prior token has under one month remaining, so an absent replacement is normal.
+The daily workflow reads and decrypts `data/kakao_auth.json`, refreshes the Kakao
+access token, and persists a newly returned refresh token atomically before message
+delivery. The workflow commits that encrypted file together with normal runtime
+state updates when it changes.
 
 ## URLs and template behavior
 
 On GitHub Actions, the report URL is calculated as
-`https://OWNER.github.io/REPOSITORY/` from `GITHUB_REPOSITORY`, and the Kakao card
-image URL is calculated from the same repository plus the running commit SHA. No
-account name is embedded in the application code. For a custom domain or a local
-notification test, set `PTIS_PAGE_URL` and `PTIS_KAKAO_CARD_IMAGE_URL` explicitly.
+`https://OWNER.github.io/REPOSITORY/` from `GITHUB_REPOSITORY`. The Kakao card image
+URL is also derived from the running repository and revision. `PTIS_PAGE_URL` and
+`PTIS_KAKAO_CARD_IMAGE_URL` remain explicit overrides for a custom domain or local
+test.
 
-The current default message endpoint is `POST /v2/api/talk/memo/default/send`;
-it sends only to the user who completed OAuth.
-PTIS does not request the separate permission required for sending to friends.
+The Kakao delivery endpoint sends only to the OAuth user's own My Chatroom. PTIS
+does not request the separate friend-message permission.
+
+A dedicated clean distribution repository is still planned so runtime files never
+appear in the source template snapshot. Until that repository exists, the guided
+installer's runtime-state reset is required for new personal installations.
 
 ## Troubleshooting
 
-- `talk_message` missing: confirm the consent item is enabled, run OAuth setup
-  again, and grant consent in the browser.
-- `KOE` token error: confirm the REST API key, Client Secret setting, and matching
-  `KAKAO_TOKEN_ENCRYPTION_KEY`; repeat OAuth setup if the token was revoked.
-- Callback timeout: the registered URI and local `KAKAO_REDIRECT_URI` must exactly
-  match `http://127.0.0.1:8765/callback`, and port 8765 must be available.
-- No Kakao card image: make the repository public, or set
-  `PTIS_KAKAO_CARD_IMAGE_URL` to a publicly reachable image. Kakao fetches card
-  images itself.
+- **Installer says the repository is dirty immediately after start:** update to the
+  current template containing `.gitignore`, remove only generated cache directories
+  if present, then run `python install_ptis.py --doctor`.
+- **Kakao token HTTP 401:** the current setup script prints Kakao's safe
+  `error`/`error_description`/`error_code` fields when available. Verify the REST
+  API key and the Client Secret from the same REST key entry, and confirm the
+  Client Secret is enabled.
+- **Callback timeout:** the registered Redirect URI must exactly match
+  `http://127.0.0.1:8765/callback`, and local port 8765 must be available.
+- **Git commit identity:** guided setup configures this automatically only inside
+  the current repository. `--doctor` reports whether an identity is available.
+- **No Kakao card image:** the image URL must be publicly reachable by Kakao.
+- **Setup interrupted before commit:** rerun the installer. It rolls back the local
+  runtime/auth changes it generated before a successful setup commit.
+
+## Schedule and API budget
+
+The normal workflow still runs every day at UTC 22:00 (KST 07:00). v1.2 setup
+hardening adds **0 SerpAPI calls**; the flight search schedule and budget are
+unchanged.
 
 ## Development validation
 
 ```bash
-python -m unittest
 python -m py_compile *.py
+python -m unittest
 ```
+
+Pull requests also run **Validate PTIS**, which compiles Python, runs unit tests,
+parses workflow YAML, and checks diff whitespace without calling SerpAPI.
