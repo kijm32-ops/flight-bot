@@ -45,9 +45,12 @@ def generate_report_html(
     low_price_keys: Set[Tuple[str, str, str, str]] = None,
     focus_deals: List[Flight] = None,
     focus_label: str = "",
+    route_watch_deals: List[Flight] = None,
+    route_watch_label: str = "",
 ) -> None:
     low_price_keys = low_price_keys or set()
     focus_deals = focus_deals or []
+    route_watch_deals = route_watch_deals or []
     os.makedirs(OUTPUT_DIR, exist_ok=True)
 
     def render_rows(items: List[Flight], empty_message: str) -> str:
@@ -110,6 +113,27 @@ def generate_report_html(
         "\uAD00\uC2EC\uAC80\uC0C9 \uC870\uAC74\uC5D0 \uB9DE\uB294 \uACB0\uACFC\uAC00 \uC5C6\uC2B5\uB2C8\uB2E4.",
     )
     safe_focus_label = html_lib.escape(focus_label)
+    safe_route_watch_label = html_lib.escape(route_watch_label)
+
+    route_watch_rows_html = render_rows(
+        route_watch_deals,
+        "\uB178\uC120\uAC10\uC2DC \uC870\uAC74\uC5D0 \uB9DE\uB294 \uACB0\uACFC\uAC00 \uC5C6\uC2B5\uB2C8\uB2E4.",
+    )
+    route_watch_section = ""
+    if route_watch_deals:
+        route_watch_section = f"""
+        <section class='route-box'>
+          <h2>\U0001F4CD \uB178\uC120\uAC10\uC2DC ({len(route_watch_deals)}\uAC74)</h2>
+          <p class='route-label'>{safe_route_watch_label}</p>
+          <table>
+            <tr>
+              <th>\uB178\uC120</th><th>\uC77C\uC815</th><th>\uD2B9\uAC00 \uAE08\uC561</th><th>\uC608\uC57D</th>
+            </tr>
+            {route_watch_rows_html}
+          </table>
+        </section>
+        """
+
     focus_section = ""
     if focus_deals:
         focus_section = f"""
@@ -163,6 +187,12 @@ def generate_report_html(
     color: #5f6368; text-align: center;
   }}
   .alt li {{ padding: 2px 0; }}
+  .route-box {{
+    margin-bottom: 24px; padding: 14px; border: 2px solid #1a73e8;
+    border-radius: 10px; background: #e8f0fe;
+  }}
+  .route-box h2 {{ color: #174ea6; margin-top: 0; }}
+  .route-label {{ color: #5f6368; font-size: 13px; margin-top: -8px; }}
   .focus-box {{
     margin-bottom: 24px; padding: 14px; border: 2px solid #f9ab00;
     border-radius: 10px; background: #fff8e1;
@@ -177,6 +207,7 @@ def generate_report_html(
 </style>
 </head>
 <body>
+  {route_watch_section}
   {focus_section}
   <h2>\U0001f4ca \uc624\ub298\uc758 \uc9c1\ud56d \ud2b9\uac00 ({len(deals)}\uac74)</h2>
   <button id="shareBtn">💬 카카오톡으로 공유하기</button>
