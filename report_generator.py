@@ -1,6 +1,6 @@
 import os
 import logging
-import html
+import html as html_lib
 from typing import List, Set, Tuple
 from models import Flight
 
@@ -109,7 +109,7 @@ def generate_report_html(
         focus_deals,
         "\uAD00\uC2EC\uAC80\uC0C9 \uC870\uAC74\uC5D0 \uB9DE\uB294 \uACB0\uACFC\uAC00 \uC5C6\uC2B5\uB2C8\uB2E4.",
     )
-    safe_focus_label = html.escape(focus_label)
+    safe_focus_label = html_lib.escape(focus_label)
     focus_section = ""
     if focus_deals:
         focus_section = f"""
