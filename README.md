@@ -234,12 +234,69 @@ If the entire focus date window has passed, Focus Search is skipped automaticall
 and the normal `GMP/near` discovery slot is restored. Invalid Focus settings also
 disable only Focus for that run; the discovery pipeline continues.
 
+## Exact Route Watch
+
+Route Watch monitors one exact airport pair and exact round-trip dates with the
+SerpAPI `google_flights` engine. It shares the same one-per-day user-intent slot
+used by Region Focus, so it does not add a new scheduled API call.
+
+Example `user_config.json`:
+
+```json
+{
+  "focus_slot": {
+    "mode": "alternate"
+  },
+  "focus_search": {
+    "enabled": true,
+    "origin": "ICN",
+    "region": "Japan",
+    "outbound_from": "2026-10-02",
+    "outbound_to": "2026-10-11",
+    "stay_min": 3,
+    "stay_max": 5,
+    "max_price": 250000
+  },
+  "route_watch": {
+    "enabled": true,
+    "origin": "ICN",
+    "destination": "NRT",
+    "outbound_date": "2026-10-03",
+    "return_date": "2026-10-06",
+    "max_price": 300000,
+    "nonstop_only": true
+  }
+}
+```
+
+`focus_slot.mode` controls which user-intent search gets the single daily slot
+when both are active:
+
+- `alternate` (default): alternate Region Focus and Route Watch by KST date;
+- `route_first`: always prefer Route Watch while it is active;
+- `region_first`: always prefer Region Focus while it is active.
+
+If only one feature is active, that feature gets the slot. If neither is active,
+the original `GMP/near` discovery task is restored.
+
+The initial `google_flights` response includes the round-trip fare for each
+outbound option. v1.4 intentionally does not send the optional
+`departure_token` follow-up request because PTIS only needs the monitored
+round-trip price at this stage. Return-flight choice details and booking-token
+lookups are outside v1.4.
+
+Route Watch results do not compete with Discovery carryover, quota, or exposure
+demotion. They are displayed before Region Focus and Discovery in Kakao and on the
+Pages report. An invalid or expired Route Watch disables only that watch for the
+current run.
+
 ## Schedule and API budget
 
-The normal workflow still runs every day at UTC 22:00 (KST 07:00). Focus Search
-uses a replacement slot rather than an additional call, so the normal schedule
-remains about **221 calls/month** (7 daily tasks plus the weekly deep task) against
-the 235-call safety budget. v1.3 adds **0 net scheduled SerpAPI calls**.
+The normal workflow still runs every day at UTC 22:00 (KST 07:00). Region Focus
+and Exact Route Watch share one replacement slot rather than adding calls, so the
+normal schedule remains about **221 calls/month** (7 daily tasks plus the weekly
+deep task) against the 235-call safety budget. v1.4 adds **0 net scheduled SerpAPI
+calls**.
 
 ## Development validation
 
