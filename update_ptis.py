@@ -16,7 +16,7 @@ DEFAULT_UPSTREAM = os.environ.get(
 DEFAULT_BRANCH = os.environ.get("PTIS_UPSTREAM_BRANCH", "main")
 VERSION_FILE = "PTIS_VERSION"
 MANIFEST_FILE = ".ptis/update_manifest.json"
-VERSION_RE = re.compile(r"^(\\d+)\\.(\\d+)\\.(\\d+)$")
+VERSION_RE = re.compile(r"^(\d+)\.(\d+)\.(\d+)$")
 
 
 class UpdateError(RuntimeError):
