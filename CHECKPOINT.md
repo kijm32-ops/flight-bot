@@ -2,11 +2,13 @@
 
 ## Status
 
-- Current state: V1.6 CLEAN TEMPLATE DISTRIBUTION MERGED AND VALIDATED
-- Current task: template repository administration / artifact publication
+- Current state: V1.6 CLEAN TEMPLATE REPOSITORY INITIALIZED AND SMOKE-VALIDATED
+- Current task: verify GitHub Template repository flag, then legacy-user bootstrap
 - v1.6 merged commit: `dba1d068efc526b8eb99d42332bb4b011949d347`
 - Pull request: `#5` (`PTIS v1.6: add clean template distribution artifact`)
 - Validation run: GitHub Actions `35342347236` — success
+- version-correction merge: `5188364f790d4dceba3dc0631e70f20b59a650e1`
+- version-correction validation: GitHub Actions `35343157797` — success
 - PTIS_VERSION: `1.6.0`
 - SerpAPI usage added by v1.6: 0 calls
 
@@ -38,15 +40,37 @@ GitHub Actions `Validate PTIS` run `35342347236`: passed.
 - `git diff --check`: passed
 - no real SerpAPI call was made
 
+## Clean Template Repository
+
+`kijm32-ops/flight-bot-template` now exists and has been initialized from the
+v1.6 managed-file/seed allowlist.
+
+Verification:
+
+- every managed/seed file checked in the source exists in the template;
+- source/template blob SHAs match for all verified files;
+- `assets/kakao_card_v1.png` matches the source binary blob;
+- `data/state.json` is absent;
+- `data/kakao_auth.json` is absent;
+- `TASK.md` and `CHECKPOINT.md` are absent;
+- default `user_config.json` is present with Focus/Route disabled;
+- PTIS_VERSION is `1.6.0`;
+- temporary template smoke PR `#1` ran bundled Validate PTIS;
+- template validation run `35343822608` passed;
+- the temporary smoke PR was closed without merge;
+- template README was synchronized after validation (docs-only change).
+
 ## Remaining Work
 
-1. Confirm the post-merge **Build Clean PTIS Template** workflow run and inspect the
-   uploaded artifact.
-2. Repository-admin boundary: create `kijm32-ops/flight-bot-template`, populate it
-   from the verified artifact, and mark it as a GitHub template repository.
-3. Existing legacy install `Victoryun0919/flight-bot` still needs its one-time
+1. Confirm in GitHub repository settings that
+   `kijm32-ops/flight-bot-template` has **Template repository** enabled. The
+   connected repository API does not expose that flag for verification here.
+2. Existing legacy install `Victoryun0919/flight-bot` still needs its one-time
    v1.5 bootstrap from the owner's authenticated clone.
-4. Review the next scheduled daily PTIS run after v1.4/v1.5/v1.6 changes.
+3. Review the next scheduled daily PTIS run after v1.4/v1.5/v1.6 changes.
+4. Optionally run the source **Build Clean PTIS Template** workflow manually once
+   to retain a downloadable clean zip artifact; direct workflow dispatch is not
+   exposed by the connected tool in this session.
 
 ## Version Correction
 
@@ -57,17 +81,16 @@ detect v1.6 as a newer upstream version.
 
 ## Known Boundary
 
-The connected GitHub tooling in this session does not expose repository creation.
-No cross-repository PAT or automatic push was added. The source build artifact is
-implemented and validated separately from the one-time repository-admin action.
+The connected GitHub tooling can populate the created template repository but does
+not expose the GitHub **Template repository** setting itself, so that final flag
+requires UI confirmation.
 
-At the time this checkpoint was written, no post-merge workflow run was yet visible
-for commit `dba1d068efc526b8eb99d42332bb4b011949d347`; artifact publication therefore
-still needs confirmation.
+No cross-repository PAT is required for ongoing code updates: the clean template
+contains the v1.5 review-only updater, so future PTIS version bumps can arrive as
+update branches/PRs without copying upstream runtime/auth files.
 
 ## Resume Point
 
-Confirm the clean-template artifact workflow. Then create and initialize the
-separate template repository using the verified artifact. After that, new-user
-installation distribution and existing-user update delivery are separate, clean
-paths.
+Verify the template-repository checkbox in GitHub Settings. Then perform the
+one-time v1.5 bootstrap on `Victoryun0919/flight-bot` from the owner's authenticated
+clone and confirm its protected runtime/auth files remain unchanged.
