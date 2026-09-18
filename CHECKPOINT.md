@@ -7,6 +7,7 @@
 - v1.6 merged commit: `dba1d068efc526b8eb99d42332bb4b011949d347`
 - Pull request: `#5` (`PTIS v1.6: add clean template distribution artifact`)
 - Validation run: GitHub Actions `35342347236` — success
+- PTIS_VERSION: `1.6.0`
 - SerpAPI usage added by v1.6: 0 calls
 
 ## v1.6 Completed
@@ -46,6 +47,13 @@ GitHub Actions `Validate PTIS` run `35342347236`: passed.
 3. Existing legacy install `Victoryun0919/flight-bot` still needs its one-time
    v1.5 bootstrap from the owner's authenticated clone.
 4. Review the next scheduled daily PTIS run after v1.4/v1.5/v1.6 changes.
+
+## Version Correction
+
+Before publishing the separate template repository, verification found that
+`PTIS_VERSION` was still `1.5.0` after the v1.6 merge. It is corrected to
+`1.6.0` before any clean template is published, so installed repositories can
+detect v1.6 as a newer upstream version.
 
 ## Known Boundary
 
