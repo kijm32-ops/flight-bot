@@ -2,68 +2,76 @@
 
 ## Status
 
-- Current state: V1.3 FOCUS SEARCH IMPLEMENTED ON FEATURE BRANCH; VALIDATION PENDING
-- Current task: PTIS v1.3 Focus Search
-- Base: latest `main` after v1.2 hardening
-- Feature branch: `ptis-v1.3-focus-search`
+- Current state: V1.3 FOCUS SEARCH MERGED AND VALIDATED
+- Current task: next isolated task is PTIS v1.4 Exact Route Watch
+- v1.3 merged commit: `1f08e0a1b8c196bac8462312cd512b7edff442e0`
+- Pull request: `#2` (`PTIS v1.3: add Focus Search`)
+- Validation run: GitHub Actions `35295799958` — success
 - Net scheduled SerpAPI usage added by v1.3: 0 calls/month
 
-## v1.3 Implemented
+## v1.3 Completed
 
 - Added `user_config.json` with Focus Search disabled by default.
-- Added `focus.py` for validation, expiration handling, date-window clamping,
-  query construction, request parameters, and post-normalization matching.
-- Focus Search supports region, origin, outbound date window, optional stay range,
-  and optional max price.
+- Added `focus.py` for configuration validation, expiration handling, date-window
+  clamping, query construction, request parameters, and post-normalization matching.
+- Focus Search supports:
+  - origin
+  - region
+  - outbound date window
+  - optional stay range
+  - optional max price
 - Stay range is encoded in the Deals API `query`; `trip_length` is never sent
-  with `query`.
-- Active Focus replaces `GMP/near` at the same seventh daily priority position.
-- Expired/invalid/disabled Focus restores the original discovery task.
-- Focus results reuse existing normalization and safety gates but stay outside
-  discovery carryover, quota/diversity, and exposure logic.
+  together with `query`.
+- Active Focus replaces the low-priority daily `GMP/near` task one-for-one.
+- Disabled, invalid, or expired Focus restores the original `GMP/near` task.
+- Saturday `ICN/deep` behavior remains unchanged.
+- Focus results reuse existing normalization and safety gates but remain outside
+  discovery carryover, quota/diversity, and exposure handling.
 - Kakao prioritizes Focus results when present.
 - GitHub Pages renders a separate Focus section above discovery results.
-- Existing email delivery receives Focus results first without changing its public
-  function contract for callers that do not use Focus.
+- Existing email delivery receives Focus results first.
 - Added focused unit tests and README configuration instructions.
+- `data/state.json` and core discovery valuation/carryover semantics were not changed.
 
 ## Budget
 
-- Existing schedule: 7 daily tasks x 31 days = 217 calls.
-- Weekly deep search: about 4.3 calls/month.
-- Expected total remains about 221 calls/month.
-- Focus is a replacement slot, not an eighth daily call.
+- 7 daily tasks x 31 days = 217 calls.
+- Weekly deep search adds about 4.3 calls/month.
+- Expected monthly total remains about 221 calls/month.
+- Safety budget remains 235 calls/month.
+- Focus is a replacement slot, not an additional daily call.
 
 ## Validation
 
-Pending pull-request CI:
+GitHub Actions `Validate PTIS` run `35295799958`: passed.
 
-- Python compile
-- full unit tests
-- workflow YAML parse
-- diff whitespace check
-- no real SerpAPI call
+- dependency installation: passed
+- Python compile: passed
+- full `python -m unittest`: passed (44 tests)
+- workflow YAML parse: passed
+- `git diff --check`: passed
+- no real SerpAPI call was made by validation
+
+The first validation attempt found a report-generator name-shadowing bug. It was
+fixed on the feature branch and the second validation run passed fully before merge.
 
 ## Remaining Work
 
-1. Open v1.3 pull request and inspect **Validate PTIS**.
-2. Fix only Focus-related failures if CI is not green.
-3. Merge v1.3 after validation.
-4. Review the next scheduled daily run for regression.
-5. Start v1.4 separately: exact city/airport route watch with the
-   `google_flights` engine and no increase to the one-daily-Focus-slot budget.
+1. Review the next scheduled daily workflow after v1.3 merge for regression.
+2. Create the dedicated clean `flight-bot-template` distribution repository when
+   repository-administration tooling is available.
+3. Start PTIS v1.4 Exact Route Watch as a separate task.
 
-## Known Risks
+## v1.4 Resume Point
 
-- Deals API region queries are natural-language matching and may still return a
-  wider destination set than an exact airport watch.
-- Existing PTIS normalization/tier caps can reject a Focus result even if it is
-  below the user's Focus max_price; this is intentional in v1.3 so safety/value
-  gates remain consistent.
-- `user_config.json` is manual configuration in v1.3; installer editing can be
-  considered later if real-user setup shows that it is needed.
+Design exact city/airport route monitoring with the separate SerpAPI
+`google_flights` engine.
 
-## Resume Point
+Constraints:
 
-Run v1.3 PR validation. If green, merge and then begin v1.4 exact route watch as a
-separate task/commit.
+- examples: `ICN -> NRT` with exact outbound/return dates and max price;
+- do not add another daily API slot;
+- share the single Focus budget slot with v1.3 Focus Search, using explicit
+  priority/rotation rather than increasing monthly usage;
+- verify the `google_flights` response/round-trip token flow before implementation;
+- keep v1.4 separate from the merged v1.3 region-search code.
