@@ -195,11 +195,51 @@ installer's runtime-state reset is required for new personal installations.
 - **Setup interrupted before commit:** rerun the installer. It rolls back the local
   runtime/auth changes it generated before a successful setup commit.
 
+## Focus Search
+
+Focus Search adds one explicit user-intent search without increasing the normal
+monthly SerpAPI budget. When enabled, it replaces the lowest-priority daily
+`GMP/near` discovery task one-for-one. When disabled or expired, the original
+`GMP/near` task runs normally.
+
+Edit `user_config.json`:
+
+```json
+{
+  "focus_search": {
+    "enabled": true,
+    "origin": "ICN",
+    "region": "Japan",
+    "outbound_from": "2026-10-02",
+    "outbound_to": "2026-10-11",
+    "stay_min": 3,
+    "stay_max": 5,
+    "max_price": 250000
+  }
+}
+```
+
+Required when enabled: `origin`, `region`, `outbound_from`, and
+`outbound_to`. `stay_min` and `stay_max` are optional but must be supplied
+together. `max_price` is optional.
+
+The current Google Flights Deals API does not allow `query` and `trip_length`
+in the same request. PTIS therefore expresses a requested stay such as 3-5 days
+inside the region query while keeping the explicit outbound-date window. Focus
+results still pass PTIS normalization and price-safety gates, but they do not
+compete with discovery quota, carryover, or exposure demotion. They appear first
+in Kakao and in a separate Pages section.
+
+If the entire focus date window has passed, Focus Search is skipped automatically
+and the normal `GMP/near` discovery slot is restored. Invalid Focus settings also
+disable only Focus for that run; the discovery pipeline continues.
+
 ## Schedule and API budget
 
-The normal workflow still runs every day at UTC 22:00 (KST 07:00). v1.2 setup
-hardening adds **0 SerpAPI calls**; the flight search schedule and budget are
-unchanged.
+The normal workflow still runs every day at UTC 22:00 (KST 07:00). Focus Search
+uses a replacement slot rather than an additional call, so the normal schedule
+remains about **221 calls/month** (7 daily tasks plus the weekly deep task) against
+the 235-call safety budget. v1.3 adds **0 net scheduled SerpAPI calls**.
 
 ## Development validation
 
