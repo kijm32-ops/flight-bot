@@ -174,9 +174,36 @@ test.
 The Kakao delivery endpoint sends only to the OAuth user's own My Chatroom. PTIS
 does not request the separate friend-message permission.
 
-A dedicated clean distribution repository is still planned so runtime files never
-appear in the source template snapshot. Until that repository exists, the guided
-installer's runtime-state reset is required for new personal installations.
+PTIS v1.6 can now build a verified clean distribution artifact from the upstream
+source. The artifact contains only centrally managed program files plus safe seed
+configuration; it excludes runtime/auth files such as `data/state.json` and
+`data/kakao_auth.json`. The separate `flight-bot-template` repository still
+requires a one-time repository-administration step, but its contents can be taken
+directly from the **Build Clean PTIS Template** artifact.
+
+## Clean template distribution
+
+The upstream source repository is also a live installation, so it must not be
+copied directly for new users. Build a clean distribution with:
+
+```bash
+python build_template.py --output ../ptis-template --zip ../ptis-template.zip
+```
+
+The builder uses `.ptis/update_manifest.json` as an allowlist. It includes
+centrally managed program files and seed-if-missing files, while refusing protected
+runtime/auth files. The generated artifact intentionally excludes:
+
+- `data/state.json`
+- `data/kakao_auth.json`
+- `TASK.md`
+- `CHECKPOINT.md`
+- generated Pages output, caches, virtualenvs, and Git metadata
+
+The **Build Clean PTIS Template** GitHub Actions workflow produces the same verified
+zip artifact without SerpAPI calls. After the separate
+`kijm32-ops/flight-bot-template` repository is created, initialize it from this
+artifact and enable GitHub's template-repository setting there.
 
 ## Troubleshooting
 
