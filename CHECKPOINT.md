@@ -2,36 +2,31 @@
 
 ## Status
 
-- Current state: V1.4 EXACT ROUTE WATCH IMPLEMENTED ON FEATURE BRANCH; VALIDATION PENDING
-- Current task: PTIS v1.4 Exact Route Watch
-- Feature branch: `ptis-v1.4-route-watch`
-- Base: latest `main` after v1.3 Focus Search
+- Current state: V1.4 EXACT ROUTE WATCH MERGED AND VALIDATED
+- Current task: next isolated task is PTIS v1.5 Installed-user Update Path
+- v1.4 merged commit: `755754863c189ccbbaa1540462e5ba01ec9c5f24`
+- Pull request: `#3` (`PTIS v1.4: add Exact Route Watch`)
+- Validation run: GitHub Actions `35324763250` — success
 - Net scheduled SerpAPI usage added by v1.4: 0 calls/month
 
-## v1.4 Implemented
+## v1.4 Completed
 
-- Added `route_watch.py` for exact airport/date configuration, validation,
-  expiration handling, single-slot arbitration, and initial response parsing.
-- Route Watch supports:
-  - origin airport
-  - destination airport
-  - exact outbound date
-  - exact return date
-  - optional max price
-  - optional nonstop-only
-- Added `search.fetch_google_flights()` for one exact `google_flights` request.
-- No `departure_token` or `booking_token` follow-up request is made in v1.4.
-- Added `focus_slot.mode`:
+- Added exact airport/date Route Watch with the `google_flights` engine.
+- Route Watch supports origin, destination, exact outbound/return dates,
+  optional max price, and optional nonstop-only.
+- The initial `google_flights` response is sufficient for the monitored
+  round-trip fare; v1.4 makes no `departure_token` or `booking_token`
+  follow-up request.
+- Region Focus and Route Watch share the same one-daily user-intent slot.
+- Slot modes:
   - `alternate`
   - `route_first`
   - `region_first`
-- v1.3 Region Focus and v1.4 Route Watch share the same one-daily user-intent slot.
-- That slot still replaces `GMP/near`; no eighth daily call is added.
-- Route Watch output is logically separate from Discovery carryover/quota/exposure.
-- Kakao output priority: Route Watch -> Region Focus -> Discovery.
-- Pages output priority: Route Watch -> Region Focus -> Discovery.
-- Added focused Route Watch tests and README configuration instructions.
-- `data/state.json` and discovery valuation/carryover/selection semantics were not changed.
+- Disabled/expired/invalid user-intent searches restore another active intent or
+  the original `GMP/near` discovery slot.
+- Kakao/Pages output priority is Route Watch -> Region Focus -> Discovery.
+- Discovery carryover, valuation, selection, exposure, and `data/state.json`
+  semantics were not changed.
 
 ## Budget
 
@@ -39,46 +34,39 @@
 - Weekly deep search adds about 4.3 calls/month.
 - Expected monthly total remains about 221 calls/month.
 - Safety budget remains 235 calls/month.
-- Route Watch shares the existing Focus replacement slot.
-- No return-leg detail request is made, so a Route Watch day plans one user-intent
-  SerpAPI call, not two.
+- v1.4 adds 0 net scheduled calls.
 
 ## Validation
 
-Pending pull-request CI:
+GitHub Actions `Validate PTIS` run `35324763250`: passed.
 
-- Python compile
-- full unit tests
-- workflow YAML parse
-- `git diff --check`
-- no real SerpAPI call
+- dependency installation: passed
+- Python compile: passed
+- full unit tests: passed
+- workflow YAML parse: passed
+- `git diff --check`: passed
+- no real SerpAPI call was made by validation
 
 ## Remaining Work
 
-1. Open v1.4 pull request and inspect **Validate PTIS**.
-2. Fix only v1.4-related failures if CI is not green.
-3. Merge v1.4 after validation.
-4. Review the next scheduled daily run for regression.
-5. After v1.4 is stable, implement the deferred installed-user update path as a
-   separate task/branch:
-   - clean distribution/template source
-   - version source of truth
-   - installed repository update detection
-   - user-approved update PR
-   - preserve runtime/auth/user-config/secrets
+1. Review the next scheduled daily workflow after v1.4 merge for regression.
+2. Start PTIS v1.5 Installed-user Update Path as a separate task.
+3. Create a dedicated clean `flight-bot-template` repository when repository
+   creation/admin tooling is available.
 
-## Known Risks
+## v1.5 Resume Point
 
-- v1.4 intentionally reads only the initial `google_flights` response; it does
-  not enumerate the return-leg choices behind `departure_token`.
-- `google_flights` initial flight entries and Deals API entries have different
-  schemas; Route Watch therefore has a separate parser.
-- Exact airport codes are required in v1.4; city aliases and multiple-airport city
-  groups are not supported.
-- Update delivery to already-installed third-party repositories remains deferred
-  until after this feature is merged.
+Build an update mechanism for repositories that were already installed from PTIS.
 
-## Resume Point
+Requirements:
 
-Run v1.4 PR validation. If green, merge. Then create a separate distribution/update
-task instead of mixing updater mechanics into the Route Watch feature.
+- one upstream PTIS version/source of truth;
+- detect newer upstream PTIS versions;
+- update only centrally managed program files;
+- preserve `data/state.json`, `data/kakao_auth.json`, `user_config.json`,
+  GitHub Secrets, and other installation-specific state;
+- prefer a user-approved update PR over silent auto-update;
+- provide a manual/local fallback;
+- use `Victoryun0919/flight-bot` as the first real regression target;
+- keep the clean-template repository as a separate repository-administration step
+  if repository creation is not available.
