@@ -298,6 +298,63 @@ normal schedule remains about **221 calls/month** (7 daily tasks plus the weekly
 deep task) against the 235-call safety budget. v1.4 adds **0 net scheduled SerpAPI
 calls**.
 
+## Updating an installed PTIS repository
+
+PTIS v1.5 adds a protected update path for repositories that were already created
+from PTIS. Program files can follow the upstream project while personal state stays
+inside the installed repository.
+
+The update source of truth is:
+
+- upstream: `kijm32-ops/flight-bot`
+- branch: `main`
+- version: `PTIS_VERSION`
+- file policy: `.ptis/update_manifest.json`
+
+The manifest separates centrally managed program files from personal files.
+Updates never overwrite an existing:
+
+- `data/state.json`
+- `data/kakao_auth.json`
+- `user_config.json`
+
+Repository Secrets are not Git files and are not changed by the updater. A legacy
+install that does not yet have `user_config.json` receives the current disabled
+default once; after that, the file is user-owned.
+
+### Check or apply locally
+
+Read-only check:
+
+```bash
+python update_ptis.py --check
+```
+
+Apply the latest managed files to a clean working tree:
+
+```bash
+python update_ptis.py --apply
+```
+
+The updater fetches upstream once, pins the exact fetched commit, validates the
+manifest, and applies only managed files from that snapshot. It refuses a dirty
+working tree before changing files. Review `git diff --cached` before committing.
+
+### Update pull requests
+
+Installed repositories that already contain v1.5 run **PTIS Update Check** weekly
+and can also run it manually from Actions. When a newer PTIS version exists, the
+workflow creates an update branch and attempts to open a pull request. Nothing is
+merged automatically.
+
+GitHub may require the repository setting that allows GitHub Actions to create
+pull requests. If that permission is disabled, the workflow still pushes the
+update branch and prints a warning so the owner can open the PR manually.
+
+Repositories installed before v1.5 need a one-time bootstrap update to receive
+`update_ptis.py`, the manifest, version file, and update workflow. After that,
+normal updates use the same mechanism.
+
 ## Development validation
 
 ```bash
