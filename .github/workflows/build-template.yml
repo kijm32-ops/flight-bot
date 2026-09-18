@@ -1,0 +1,50 @@
+name: Build Clean PTIS Template
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - '.ptis/update_manifest.json'
+      - 'PTIS_VERSION'
+      - 'build_template.py'
+      - 'user_config.json'
+      - '*.py'
+      - '.github/workflows/*.yml'
+      - 'assets/**'
+      - 'requirements.txt'
+      - 'setup_windows.ps1'
+
+permissions:
+  contents: read
+
+jobs:
+  build-template:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out source repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Build clean template
+        run: |
+          python build_template.py             --output /tmp/ptis-template             --zip /tmp/ptis-template.zip
+
+      - name: Verify protected files are absent
+        run: |
+          test ! -e /tmp/ptis-template/data/state.json
+          test ! -e /tmp/ptis-template/data/kakao_auth.json
+          test -e /tmp/ptis-template/user_config.json
+          test -e /tmp/ptis-template/PTIS_VERSION
+
+      - name: Upload clean template artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ptis-clean-template
+          path: /tmp/ptis-template.zip
+          if-no-files-found: error
