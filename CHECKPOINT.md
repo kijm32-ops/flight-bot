@@ -58,9 +58,16 @@ fixed on the feature branch and the second validation run passed fully before me
 ## Remaining Work
 
 1. Review the next scheduled daily workflow after v1.3 merge for regression.
-2. Create the dedicated clean `flight-bot-template` distribution repository when
-   repository-administration tooling is available.
-3. Start PTIS v1.4 Exact Route Watch as a separate task.
+2. Start PTIS v1.4 Exact Route Watch as a separate task.
+3. Deferred distribution/update work:
+   - create a dedicated clean `flight-bot-template` repository;
+   - define a PTIS version/update source of truth;
+   - let installed user repositories detect newer PTIS releases;
+   - prefer an update PR / user-approved merge path over silent auto-update;
+   - preserve `data/state.json`, `data/kakao_auth.json`, `user_config.json`,
+     GitHub Secrets, and other installation-specific data during updates;
+   - use the first third-party installation as the regression case for the updater.
+   This work is intentionally deferred and must not be mixed into v1.4.
 
 ## v1.4 Resume Point
 
