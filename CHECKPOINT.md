@@ -2,58 +2,64 @@
 
 ## Status
 
-- Current state: V1.6 CLEAN TEMPLATE ARTIFACT IMPLEMENTED; VALIDATION PENDING
-- Current task: PTIS v1.6 Clean Template Distribution
-- Feature branch: `ptis-v1.6-clean-template`
-- Base: latest `main` after v1.5 installed-user updater
+- Current state: V1.6 CLEAN TEMPLATE DISTRIBUTION MERGED AND VALIDATED
+- Current task: template repository administration / artifact publication
+- v1.6 merged commit: `dba1d068efc526b8eb99d42332bb4b011949d347`
+- Pull request: `#5` (`PTIS v1.6: add clean template distribution artifact`)
+- Validation run: GitHub Actions `35342347236` — success
 - SerpAPI usage added by v1.6: 0 calls
 
-## v1.6 Implemented
+## v1.6 Completed
 
-- Added `build_template.py` using `.ptis/update_manifest.json` as the allowlist.
+- Added `build_template.py` driven by `.ptis/update_manifest.json`.
 - Clean output contains only managed files plus seed-if-missing files.
-- Protected runtime/auth files are rejected from the artifact.
+- Protected runtime/auth files are excluded and rejected if they overlap managed output.
 - Added deterministic zip generation.
 - Added `test_build_template.py` covering:
   - all manifest files present;
   - `data/state.json` absent;
   - `data/kakao_auth.json` absent;
   - safe disabled `user_config.json` present;
-  - development-only TASK/CHECKPOINT absent;
+  - TASK/CHECKPOINT absent;
   - repeated zip builds byte-identical;
   - output-inside-source refusal.
-- Added **Build Clean PTIS Template** workflow to build, verify, and upload the zip.
-- README now describes the clean-distribution path.
+- Added `.github/workflows/build-template.yml` to build, verify, and upload the
+  clean template zip artifact.
+- README now documents clean-template distribution.
 
 ## Validation
 
-Pending pull-request CI:
+GitHub Actions `Validate PTIS` run `35342347236`: passed.
 
-- Python compile
-- full unit tests
-- workflow YAML parse
-- `git diff --check`
-- no real SerpAPI call
+- Python compile: passed
+- full unit tests: passed
+- workflow YAML parse: passed
+- `git diff --check`: passed
+- no real SerpAPI call was made
 
 ## Remaining Work
 
-1. Open v1.6 PR and run **Validate PTIS**.
-2. Merge after green CI.
-3. Run **Build Clean PTIS Template** on main and verify its artifact.
-4. Repository-admin boundary: create `kijm32-ops/flight-bot-template`, populate it
-   from the verified artifact, and mark that repository as a GitHub template.
-5. Existing legacy install `Victoryun0919/flight-bot` still needs its one-time
+1. Confirm the post-merge **Build Clean PTIS Template** workflow run and inspect the
+   uploaded artifact.
+2. Repository-admin boundary: create `kijm32-ops/flight-bot-template`, populate it
+   from the verified artifact, and mark it as a GitHub template repository.
+3. Existing legacy install `Victoryun0919/flight-bot` still needs its one-time
    v1.5 bootstrap from the owner's authenticated clone.
+4. Review the next scheduled daily PTIS run after v1.4/v1.5/v1.6 changes.
 
 ## Known Boundary
 
 The connected GitHub tooling in this session does not expose repository creation.
-No cross-repository PAT or automatic push was added. This is intentional: the
-source build/publish artifact is implemented and verified separately from the
-one-time repository-admin action.
+No cross-repository PAT or automatic push was added. The source build artifact is
+implemented and validated separately from the one-time repository-admin action.
+
+At the time this checkpoint was written, no post-merge workflow run was yet visible
+for commit `dba1d068efc526b8eb99d42332bb4b011949d347`; artifact publication therefore
+still needs confirmation.
 
 ## Resume Point
 
-Validate and merge v1.6. Then run the clean-template build workflow on main. The
-only unresolved new-install distribution step should be creating and initializing
-the separate template repository.
+Confirm the clean-template artifact workflow. Then create and initialize the
+separate template repository using the verified artifact. After that, new-user
+installation distribution and existing-user update delivery are separate, clean
+paths.
