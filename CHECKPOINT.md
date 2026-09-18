@@ -2,71 +2,89 @@
 
 ## Status
 
-- Current state: V1.4 EXACT ROUTE WATCH MERGED AND VALIDATED
-- Current task: next isolated task is PTIS v1.5 Installed-user Update Path
-- v1.4 merged commit: `755754863c189ccbbaa1540462e5ba01ec9c5f24`
-- Pull request: `#3` (`PTIS v1.4: add Exact Route Watch`)
-- Validation run: GitHub Actions `35324763250` — success
-- Net scheduled SerpAPI usage added by v1.4: 0 calls/month
+- Current state: V1.5 INSTALLED-USER UPDATE PATH IMPLEMENTED ON FEATURE BRANCH; VALIDATION PENDING
+- Current task: PTIS v1.5 Installed-user Update Path
+- Feature branch: `ptis-v1.5-update-path`
+- Base: latest `main` after v1.4 Exact Route Watch
+- SerpAPI usage added by v1.5: 0 calls
 
-## v1.4 Completed
+## v1.5 Implemented
 
-- Added exact airport/date Route Watch with the `google_flights` engine.
-- Route Watch supports origin, destination, exact outbound/return dates,
-  optional max price, and optional nonstop-only.
-- The initial `google_flights` response is sufficient for the monitored
-  round-trip fare; v1.4 makes no `departure_token` or `booking_token`
-  follow-up request.
-- Region Focus and Route Watch share the same one-daily user-intent slot.
-- Slot modes:
-  - `alternate`
-  - `route_first`
-  - `region_first`
-- Disabled/expired/invalid user-intent searches restore another active intent or
-  the original `GMP/near` discovery slot.
-- Kakao/Pages output priority is Route Watch -> Region Focus -> Discovery.
-- Discovery carryover, valuation, selection, exposure, and `data/state.json`
-  semantics were not changed.
+- Added `PTIS_VERSION` as the upstream release/version source of truth.
+- Added `.ptis/update_manifest.json` separating:
+  - centrally managed program files;
+  - seed-if-missing user files;
+  - protected user/runtime files;
+  - future explicit removals.
+- Added `update_ptis.py`:
+  - one upstream fetch per check/apply;
+  - exact fetched commit pinned for the entire update;
+  - semantic version comparison;
+  - manifest validation and safe relative-path checks;
+  - clean-worktree requirement before apply;
+  - managed-file checkout only;
+  - `user_config.json` seed only when missing;
+  - protected runtime/auth/config files never overwritten;
+  - rollback to HEAD if an apply operation fails part-way;
+  - read-only `--check` and explicit `--apply` modes.
+- Added `.github/workflows/ptis-update.yml`:
+  - weekly check plus manual dispatch;
+  - installed repositories only (upstream source repo skips the job);
+  - creates a deterministic update branch;
+  - attempts to open a review-only PR;
+  - never auto-merges;
+  - leaves a pushed update branch and warning if Actions PR creation is disabled.
+- Added integration tests using temporary local Git repositories.
+- Added README instructions and legacy one-time bootstrap note.
 
-## Budget
+## Protected State
 
-- 7 daily tasks x 31 days = 217 calls.
-- Weekly deep search adds about 4.3 calls/month.
-- Expected monthly total remains about 221 calls/month.
-- Safety budget remains 235 calls/month.
-- v1.4 adds 0 net scheduled calls.
+The update mechanism must preserve existing content in:
+
+- `data/state.json`
+- `data/kakao_auth.json`
+- `user_config.json`
+
+GitHub Secrets remain outside the Git update path and are untouched.
+
+A missing legacy `user_config.json` may be seeded once with the upstream default.
 
 ## Validation
 
-GitHub Actions `Validate PTIS` run `35324763250`: passed.
+Pending pull-request CI:
 
-- dependency installation: passed
-- Python compile: passed
-- full unit tests: passed
-- workflow YAML parse: passed
-- `git diff --check`: passed
-- no real SerpAPI call was made by validation
+- Python compile
+- full unit tests
+- workflow YAML parse
+- `git diff --check`
+- updater integration tests
+- no real SerpAPI call
 
 ## Remaining Work
 
-1. Review the next scheduled daily workflow after v1.4 merge for regression.
-2. Start PTIS v1.5 Installed-user Update Path as a separate task.
-3. Create a dedicated clean `flight-bot-template` repository when repository
-   creation/admin tooling is available.
+1. Open v1.5 PR and inspect **Validate PTIS**.
+2. Fix only updater-related failures if CI is not green.
+3. Merge v1.5 after validation.
+4. Attempt the one-time bootstrap/update on `Victoryun0919/flight-bot` as the
+   first real installed-repository regression case, only if write permission is
+   available through the connected GitHub account.
+5. If write permission is unavailable, provide the exact one-time bootstrap path
+   for that repository owner.
+6. Create a dedicated clean `flight-bot-template` repository separately when
+   repository creation/admin tooling is available.
 
-## v1.5 Resume Point
+## Known Risks
 
-Build an update mechanism for repositories that were already installed from PTIS.
+- GitHub Actions PR creation depends on the installed repository allowing Actions
+  to create pull requests. The workflow degrades to a pushed update branch when
+  that permission is unavailable.
+- Existing user edits to centrally managed program files are intentionally
+  replaced by upstream on an update, but only inside a reviewable branch/PR.
+- Legacy repositories need one bootstrap update before they can self-check weekly.
+- `TASK.md` and `CHECKPOINT.md` are intentionally not centrally managed in
+  installed repositories; they are upstream development-operating documents.
 
-Requirements:
+## Resume Point
 
-- one upstream PTIS version/source of truth;
-- detect newer upstream PTIS versions;
-- update only centrally managed program files;
-- preserve `data/state.json`, `data/kakao_auth.json`, `user_config.json`,
-  GitHub Secrets, and other installation-specific state;
-- prefer a user-approved update PR over silent auto-update;
-- provide a manual/local fallback;
-- use `Victoryun0919/flight-bot` as the first real regression target;
-- keep the clean-template repository as a separate repository-administration step
-  if repository creation is not available.
+Run v1.5 PR validation. If green, merge, then test the bootstrap against the first
+real third-party repository without modifying protected user state.
