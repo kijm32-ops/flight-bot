@@ -190,13 +190,18 @@ def refresh_kakao_access_token() -> str:
     return access_token
 
 
-def send_kakao_message(deals: List[Flight], focus_deals: List[Flight] = None) -> bool:
+def send_kakao_message(
+    deals: List[Flight],
+    focus_deals: List[Flight] = None,
+    route_watch_deals: List[Flight] = None,
+) -> bool:
     """
     카카오톡 '나에게 보내기'로 특가 요약 알림 발송.
     성공 여부를 True/False로 반환한다 (연속 실패 감지에 사용).
     """
     focus_deals = focus_deals or []
-    if not deals and not focus_deals:
+    route_watch_deals = route_watch_deals or []
+    if not deals and not focus_deals and not route_watch_deals:
         return True  # 보낼 게 없는 것은 실패가 아님
 
     if not PAGE_URL or not KAKAO_CARD_IMAGE_URL:
@@ -210,39 +215,50 @@ def send_kakao_message(deals: List[Flight], focus_deals: List[Flight] = None) ->
         logging.error(f"❌ 카카오 Access Token 갱신 실패: {e}")
         return False
 
-    # 2단계: Focus 결과를 먼저, 나머지는 기존 발견형 특가로 요약한다.
+    # 2단계: Route Watch -> Region Focus -> Discovery 순으로 최대 3건 요약한다.
     summary_lines = []
-    if focus_deals:
-        for d in focus_deals[:2]:
-            nights = (d.return_date - d.depart_date).days
-            summary_lines.append(
-                f"\U0001F3AF {d.origin}\u2192{_short_name(d)} {d.price:,}\uC6D0 "
-                f"{d.depart_date.strftime('%m/%d')} {nights}\uBC15{nights+1}\uC77C"
-            )
-        remaining = max(0, 3 - len(summary_lines))
-        for d in deals[:remaining]:
-            nights = (d.return_date - d.depart_date).days
-            grade = d.value_grade.split(" ")[0] if d.value_grade and d.value_grade != "unknown" else ""
-            summary_lines.append(
-                f"\U0001F50E {grade}{d.origin}\u2192{_short_name(d)} {d.price:,}\uC6D0 "
-                f"{d.carryover_label} "
-                f"{d.depart_date.strftime('%m/%d')} {nights}\uBC15{nights+1}\uC77C"
-            )
+
+    for d in route_watch_deals[:1]:
+        nights = (d.return_date - d.depart_date).days
+        summary_lines.append(
+            f"\U0001F4CD {d.origin}\u2192{_short_name(d)} {d.price:,}\uC6D0 "
+            f"{d.depart_date.strftime('%m/%d')} {nights}\uBC15{nights+1}\uC77C"
+        )
+
+    remaining = max(0, 3 - len(summary_lines))
+    for d in focus_deals[:remaining]:
+        nights = (d.return_date - d.depart_date).days
+        summary_lines.append(
+            f"\U0001F3AF {d.origin}\u2192{_short_name(d)} {d.price:,}\uC6D0 "
+            f"{d.depart_date.strftime('%m/%d')} {nights}\uBC15{nights+1}\uC77C"
+        )
+
+    remaining = max(0, 3 - len(summary_lines))
+    for d in deals[:remaining]:
+        nights = (d.return_date - d.depart_date).days
+        grade = d.value_grade.split(" ")[0] if d.value_grade and d.value_grade != "unknown" else ""
+        summary_lines.append(
+            f"\U0001F50E {grade}{d.origin}\u2192{_short_name(d)} {d.price:,}\uC6D0 "
+            f"{d.carryover_label} "
+            f"{d.depart_date.strftime('%m/%d')} {nights}\uBC15{nights+1}\uC77C"
+        )
+
+    if route_watch_deals:
+        title = (
+            f"\u2708\uFE0F \uB178\uC120\uAC10\uC2DC {len(route_watch_deals)}\uAC74"
+            f" \u00B7 \uAD00\uC2EC\uAC80\uC0C9 {len(focus_deals)}\uAC74"
+            f" \u00B7 \uD2B9\uAC00 {len(deals)}\uAC74"
+        )
+    elif focus_deals:
         title = (
             f"\u2708\uFE0F \uAD00\uC2EC\uAC80\uC0C9 {len(focus_deals)}\uAC74"
             f" \u00B7 \uD2B9\uAC00 {len(deals)}\uAC74"
         )
     else:
-        top_deals = deals[:3]
-        for d in top_deals:
-            nights = (d.return_date - d.depart_date).days
-            grade = d.value_grade.split(" ")[0] if d.value_grade and d.value_grade != "unknown" else ""
-            summary_lines.append(
-                f"{grade}{d.origin}\u2192{_short_name(d)} {d.price:,}\uC6D0 "
-                f"{d.carryover_label} "
-                f"{d.depart_date.strftime('%m/%d')} {nights}\uBC15{nights+1}\uC77C"
-            )
-        title = f"\u2708\uFE0F \uC624\uB298\uC758 \uD2B9\uAC00 \uD56D\uACF5\uAD8C {len(deals)}\uAC74 \uBC1C\uACAC!"
+        title = (
+            f"\u2708\uFE0F \uC624\uB298\uC758 \uD2B9\uAC00 \uD56D\uACF5\uAD8C "
+            f"{len(deals)}\uAC74 \uBC1C\uACAC!"
+        )
 
     description_text = "\n".join(summary_lines)
 

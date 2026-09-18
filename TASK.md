@@ -1,63 +1,51 @@
-# PTIS v1.3 Focus Search
+# PTIS v1.4 Exact Route Watch
 
 ## Objective
 
-Add one daily user-intent Focus Search for a region/date window while preserving
-the existing Discovery Search behavior and monthly SerpAPI budget.
+Add exact airport/date route monitoring with SerpAPI `google_flights` while
+preserving the existing single daily user-intent slot and monthly SerpAPI budget.
 
-## Background
+## Verified API Facts
 
-The discovery profiles intentionally search broad date and price windows. They are
-good at finding unexpected discounts but can feel random when the user already
-knows the region and travel window they care about.
+SerpAPI `google_flights` supports exact `departure_id`, `arrival_id`,
+`outbound_date`, `return_date`, `max_price`, and `stops`.
 
-SerpAPI's current `google_flights_deals` API supports `query`,
-`outbound_date` ranges, and `max_price`. It does not allow `query` and
-`trip_length` together, so v1.3 expresses an optional stay range inside the query
-text instead of sending `trip_length`.
+For round trips, the initial response already includes a round-trip ticket
+`price` for each outbound option. A second request with `departure_token` is
+required only to inspect the return-flight choices. v1.4 is a price/route watch,
+so it intentionally uses only the initial request and does not spend a second
+SerpAPI call.
 
 ## Scope
 
-- Add `user_config.json` as the single source for user Focus preferences.
-- Support enabled/origin/region/outbound_from/outbound_to plus optional
-  stay_min/stay_max and max_price.
-- Validate settings and disable only Focus when settings are invalid or expired.
-- Replace the low-priority daily `GMP/near` task with one Focus task when active.
-- Keep the Saturday `ICN/deep` task and all other discovery priorities unchanged.
-- Reuse existing normalization and price-safety gates for Focus results.
-- Keep Focus results out of discovery carryover, quota/diversity, and exposure
-  demotion.
-- Show Focus results first in Kakao and in a separate GitHub Pages section.
-- Keep exact city/airport route watching out of this version.
+- Add `route_watch` settings to `user_config.json`.
+- Support exact origin airport, destination airport, outbound date, return date,
+  optional max price, and optional nonstop-only.
+- Parse the initial `google_flights` response and surface the cheapest matching
+  round-trip fare as a PTIS `Flight`.
+- Keep Route Watch logically separate from discovery carryover/quota/exposure.
+- Share the existing daily user-intent slot with v1.3 Focus Search.
+- When both Region Focus and Route Watch are active, support deterministic
+  `alternate`, `route_first`, or `region_first` slot selection.
+- Show Route Watch before Region Focus and Discovery in Kakao and Pages output.
+- Keep user configuration failures isolated from the Discovery pipeline.
 
 ## Budget
 
-- Focus OFF: 7 daily tasks + weekly deep, unchanged.
-- Focus ON: 6 original daily discovery tasks + 1 Focus task + weekly deep.
-- Expected monthly total remains about 221 calls.
+- Only one user-intent task may run per day.
+- Focus/Route Watch replaces `GMP/near` one-for-one.
+- Saturday `ICN/deep` behavior remains unchanged.
+- Expected monthly total remains about 221 calls/month.
 - Net scheduled SerpAPI increase: 0 calls/month.
-
-## Files
-
-- `focus.py`
-- `user_config.json`
-- `main.py`
-- `notifier.py`
-- `report_generator.py`
-- `test_focus.py`
-- `README.md`
-- `TASK.md`
-- `CHECKPOINT.md`
+- No `departure_token` follow-up call in v1.4.
 
 ## Explicit Non-goals
 
-- Do not modify `ACCESS_COST`, `TIER_HARD_CAP`, `TIER_BASELINE`, or
-  `TIER_TRIP_DAYS` ownership.
-- Do not change discovery carryover/valuation/selection semantics.
+- Do not fetch return-flight leg details.
+- Do not fetch booking options with `booking_token`.
 - Do not edit `data/state.json`.
-- Do not add a new daily API call.
-- Do not implement exact route/date watching with the separate
-  `google_flights` engine; that is v1.4.
+- Do not change discovery valuation/carryover/selection behavior.
+- Do not mix installed-user update delivery into this feature branch.
 
 ## Validation
 
@@ -65,18 +53,18 @@ text instead of sending `trip_length`.
 - `python -m unittest`
 - workflow YAML parse
 - `git diff --check`
-- Focus config valid/invalid/expired tests
-- Focus ON/OFF/deep/budget task-shape tests
-- mocked SerpAPI parameter-shape test
-- Kakao focus-priority test
-- Pages focus-section test
+- Route Watch config valid/invalid/expired tests
+- exact google_flights request-shape test
+- initial-response parser tests
+- Focus/Route slot arbitration tests
+- budget task-shape tests
+- Kakao/Pages route-priority tests
 - no real SerpAPI call
 
 ## Completion Criteria
 
-- Focus ON replaces, rather than adds to, the seventh daily slot.
-- Focus OFF or expired restores `GMP/near`.
-- Focus failures cannot stop Discovery Search.
-- Focus requests never combine `query` with `trip_length`.
-- Focus output is visibly separated from discovery output.
+- Exact route/date watch uses exactly one planned SerpAPI task.
+- No `departure_token` request is made.
+- Focus and Route Watch never consume two daily slots together.
+- Invalid/expired watch restores either Region Focus or `GMP/near` as appropriate.
 - Full validation passes with zero real SerpAPI calls.
