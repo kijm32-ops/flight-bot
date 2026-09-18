@@ -2,83 +2,68 @@
 
 ## Status
 
-- Current state: V1.2 FIRST-USER HARDENING MERGED AND VALIDATED
-- Current task: next isolated task is PTIS v1.3 Focus Search
-- v1.2 source baseline: `fe8ed27307ce8891c07423bc4d4a30a718cf3e23`
-- v1.2 merged commit: `37513d5a63c04c300ed2ec3fe49de16948a6541f`
-- Pull request: `#1` (`PTIS v1.2: harden first-user setup`)
-- Validation run: GitHub Actions `35187032104` — success
-- SerpAPI usage added by v1.2: 0 calls
+- Current state: V1.3 FOCUS SEARCH IMPLEMENTED ON FEATURE BRANCH; VALIDATION PENDING
+- Current task: PTIS v1.3 Focus Search
+- Base: latest `main` after v1.2 hardening
+- Feature branch: `ptis-v1.3-focus-search`
+- Net scheduled SerpAPI usage added by v1.3: 0 calls/month
 
-## Real Third-party Validation
+## v1.3 Implemented
 
-The first real guided installation was completed on `Victoryun0919/flight-bot`.
-Observed sequence and outcome:
+- Added `user_config.json` with Focus Search disabled by default.
+- Added `focus.py` for validation, expiration handling, date-window clamping,
+  query construction, request parameters, and post-normalization matching.
+- Focus Search supports region, origin, outbound date window, optional stay range,
+  and optional max price.
+- Stay range is encoded in the Deals API `query`; `trip_length` is never sent
+  with `query`.
+- Active Focus replaces `GMP/near` at the same seventh daily priority position.
+- Expired/invalid/disabled Focus restores the original discovery task.
+- Focus results reuse existing normalization and safety gates but stay outside
+  discovery carryover, quota/diversity, and exposure logic.
+- Kakao prioritizes Focus results when present.
+- GitHub Pages renders a separate Focus section above discovery results.
+- Existing email delivery receives Focus results first without changing its public
+  function contract for callers that do not use Focus.
+- Added focused unit tests and README configuration instructions.
 
-- Git/GitHub CLI were installed but PATH registration required repair.
-- Initial installer run was blocked by installer-generated `__pycache__` because
-  the template had no `.gitignore`.
-- Kakao OAuth browser consent/callback succeeded.
-- The first token exchange returned HTTP 401 with insufficient diagnostics.
-- After correcting/reissuing the Kakao Client Secret, OAuth and encrypted token
-  creation succeeded.
-- Git commit then failed with `unable to auto-detect email address` on the new PC.
-- After repository-local Git identity configuration, `data/kakao_auth.json` was
-  committed and pushed.
-- Kakao Setup Verification succeeded and the target user confirmed the message in
-  KakaoTalk My Chatroom.
-- The copied repository also contained source-instance historical
-  `data/state.json`, demonstrating template runtime-state contamination.
+## Budget
 
-## v1.2 Completed
-
-- Added `.gitignore` coverage for Python/cache/local environment artifacts.
-- Added GitHub-authenticated repository-local Git identity bootstrap using the
-  account's ID-based GitHub `noreply` address.
-- Added inherited runtime-state detection/reset for new installations and
-  `--preserve-state` for explicit reconfiguration.
-- Added rollback for installer-generated state/auth changes before a successful
-  setup push, including push-failure handling.
-- Moved repository Secret writes until after local Kakao OAuth succeeds.
-- Added OAuth retry/change-credentials flow that retains the SerpAPI key in memory.
-- Added safe Kakao token endpoint error details without logging secret request data.
-- Added `--doctor`, preflight status, setup completion summary, and Pages status check.
-- Added `setup_windows.ps1` for the Windows prerequisite/PATH/bootstrap path.
-- Added pull-request validation workflow and focused installer/Kakao tests.
-- Updated README installation/troubleshooting instructions.
+- Existing schedule: 7 daily tasks x 31 days = 217 calls.
+- Weekly deep search: about 4.3 calls/month.
+- Expected total remains about 221 calls/month.
+- Focus is a replacement slot, not an eighth daily call.
 
 ## Validation
 
-- Focused local Python compile: passed.
-- Focused local installer/Kakao tests: passed (10 tests).
-- GitHub Actions `Validate PTIS` run `35187032104`: passed.
-  - dependency installation: passed
-  - Python compile: passed
-  - full `python -m unittest`: passed
-  - all workflow YAML parse: passed
-  - `git diff --check`: passed
-- PowerShell runtime execution was not available in the Linux validation host;
-  `setup_windows.ps1` received static review and should be exercised on the next
-  Windows installation.
+Pending pull-request CI:
+
+- Python compile
+- full unit tests
+- workflow YAML parse
+- diff whitespace check
+- no real SerpAPI call
 
 ## Remaining Work
 
-1. Review the first scheduled daily workflow after v1.2 merge for regression.
-2. Create a dedicated `kijm32-ops/flight-bot-template` repository and automate a
-   clean publication path so runtime files never exist in the distributable source.
-   Repository creation is not available through the current connector environment.
-3. Start PTIS v1.3 Focus Search as a new isolated task.
+1. Open v1.3 pull request and inspect **Validate PTIS**.
+2. Fix only Focus-related failures if CI is not green.
+3. Merge v1.3 after validation.
+4. Review the next scheduled daily run for regression.
+5. Start v1.4 separately: exact city/airport route watch with the
+   `google_flights` engine and no increase to the one-daily-Focus-slot budget.
 
-## v1.3 Resume Point
+## Known Risks
 
-Design/implement Focus Search without changing the monthly SerpAPI budget:
+- Deals API region queries are natural-language matching and may still return a
+  wider destination set than an exact airport watch.
+- Existing PTIS normalization/tier caps can reject a Focus result even if it is
+  below the user's Focus max_price; this is intentional in v1.3 so safety/value
+  gates remain consistent.
+- `user_config.json` is manual configuration in v1.3; installer editing can be
+  considered later if real-user setup shows that it is needed.
 
-- keep the existing Discovery Search behavior;
-- add a separate user-intent Focus Search for region/date/stay/max-price conditions;
-- use one daily Focus slot by replacing a low-priority discovery slot rather than
-  adding a new daily call;
-- current candidate replacement: `GMP/near`;
-- keep focus results logically separate from normal discovery diversity/exposure
-  handling so an explicitly requested destination is not demoted away;
-- calculate and verify monthly API usage before implementation;
-- do not mix v1.3 changes with installer-hardening code.
+## Resume Point
+
+Run v1.3 PR validation. If green, merge and then begin v1.4 exact route watch as a
+separate task/commit.

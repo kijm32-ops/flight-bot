@@ -1,5 +1,6 @@
 import os
 import logging
+import html as html_lib
 from typing import List, Set, Tuple
 from models import Flight
 
@@ -38,43 +39,91 @@ def _alt_dates_html(deal: Flight) -> str:
     """
 
 
-def generate_report_html(deals: List[Flight], js_key: str, low_price_keys: Set[Tuple[str, str, str, str]] = None) -> None:
+def generate_report_html(
+    deals: List[Flight],
+    js_key: str,
+    low_price_keys: Set[Tuple[str, str, str, str]] = None,
+    focus_deals: List[Flight] = None,
+    focus_label: str = "",
+) -> None:
     low_price_keys = low_price_keys or set()
+    focus_deals = focus_deals or []
     os.makedirs(OUTPUT_DIR, exist_ok=True)
 
-    if not deals:
-        rows_html = "<tr><td colspan='4' style='padding:20px;text-align:center;'>오늘은 조건에 맞는 특가가 없습니다.</td></tr>"
-    else:
-        rows_html = ""
-        for deal in deals:
+    def render_rows(items: List[Flight], empty_message: str) -> str:
+        if not items:
+            return (
+                "<tr><td colspan='4' style='padding:20px;text-align:center;'>"
+                + empty_message
+                + "</td></tr>"
+            )
+
+        rows = ""
+        for deal in items:
             trip_nights = (deal.return_date - deal.depart_date).days
-            dedup_key = (deal.origin, deal.destination, str(deal.depart_date), str(deal.return_date))
-            badge = "<br><span class='badge'>🔥 30일 최저가</span>" if dedup_key in low_price_keys else ""
+            dedup_key = (
+                deal.origin,
+                deal.destination,
+                str(deal.depart_date),
+                str(deal.return_date),
+            )
+            badge = (
+                "<br><span class='badge'>\U0001F525 30\uC77C \uCD5C\uC800\uAC00</span>"
+                if dedup_key in low_price_keys else ""
+            )
             grade_badge = _grade_badge(deal)
             alt_html = _alt_dates_html(deal)
-            carryover_html = f"<br><small>{deal.carryover_label}</small>" if deal.is_carryover else ""
+            carryover_html = (
+                f"<br><small>{deal.carryover_label}</small>"
+                if deal.is_carryover else ""
+            )
 
-            rows_html += f"""
+            rows += f"""
             <tr>
                 <td>
-                    {deal.origin} ➔ {deal.destination_name}
+                    {deal.origin} \u2794 {deal.destination_name}
                     <br><span class='sub'>({deal.destination_country})</span>
                     {f"<br>{grade_badge}" if grade_badge else ""}
                 </td>
                 <td>
                     {deal.depart_date} ~ {deal.return_date}
-                    <br><span class='sub'>({trip_nights}박 {trip_nights+1}일)</span>
+                    <br><span class='sub'>({trip_nights}\uBC15 {trip_nights+1}\uC77C)</span>
                     {alt_html}
                 </td>
                 <td class='price'>
-                    {deal.price:,}원<br>
+                    {deal.price:,}\uC6D0<br>
                     <span class='sub'>(-{deal.discount_percentage}%)</span>
                     {badge}
                     {carryover_html}
                 </td>
-                <td><a href="{deal.booking_link}" target="_blank" rel="noopener">확인</a></td>
+                <td><a href="{deal.booking_link}" target="_blank" rel="noopener">\uD655\uC778</a></td>
             </tr>
             """
+        return rows
+
+    rows_html = render_rows(
+        deals,
+        "\uC624\uB298\uC740 \uC870\uAC74\uC5D0 \uB9DE\uB294 \uD2B9\uAC00\uAC00 \uC5C6\uC2B5\uB2C8\uB2E4.",
+    )
+    focus_rows_html = render_rows(
+        focus_deals,
+        "\uAD00\uC2EC\uAC80\uC0C9 \uC870\uAC74\uC5D0 \uB9DE\uB294 \uACB0\uACFC\uAC00 \uC5C6\uC2B5\uB2C8\uB2E4.",
+    )
+    safe_focus_label = html_lib.escape(focus_label)
+    focus_section = ""
+    if focus_deals:
+        focus_section = f"""
+        <section class='focus-box'>
+          <h2>\U0001F3AF \uAD00\uC2EC\uAC80\uC0C9 ({len(focus_deals)}\uAC74)</h2>
+          <p class='focus-label'>{safe_focus_label}</p>
+          <table>
+            <tr>
+              <th>\uB178\uC120</th><th>\uC77C\uC815</th><th>\uD2B9\uAC00 \uAE08\uC561</th><th>\uC608\uC57D</th>
+            </tr>
+            {focus_rows_html}
+          </table>
+        </section>
+        """
 
     html = f"""<!DOCTYPE html>
 <html lang="ko">
@@ -114,6 +163,12 @@ def generate_report_html(deals: List[Flight], js_key: str, low_price_keys: Set[T
     color: #5f6368; text-align: center;
   }}
   .alt li {{ padding: 2px 0; }}
+  .focus-box {{
+    margin-bottom: 24px; padding: 14px; border: 2px solid #f9ab00;
+    border-radius: 10px; background: #fff8e1;
+  }}
+  .focus-box h2 {{ color: #b06000; margin-top: 0; }}
+  .focus-label {{ color: #5f6368; font-size: 13px; margin-top: -8px; }}
   #shareBtn {{
     display: inline-block; margin-bottom: 16px; padding: 10px 16px;
     background-color: #FEE500; color: #191919; border: none; border-radius: 6px;
@@ -122,6 +177,7 @@ def generate_report_html(deals: List[Flight], js_key: str, low_price_keys: Set[T
 </style>
 </head>
 <body>
+  {focus_section}
   <h2>\U0001f4ca \uc624\ub298\uc758 \uc9c1\ud56d \ud2b9\uac00 ({len(deals)}\uac74)</h2>
   <button id="shareBtn">💬 카카오톡으로 공유하기</button>
   <table>
