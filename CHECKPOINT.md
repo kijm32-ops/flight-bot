@@ -56,19 +56,22 @@ GitHub Actions `Validate PTIS` run `35325421779`: passed.
 - no `.github/workflows/validate.yml`;
 - therefore it predates v1.3/v1.4/v1.5.
 
-The connected GitHub integration can read this repository. A collaborator
-permission lookup returned 403 from the integration, so write permission remains
-unconfirmed.
+The connected GitHub integration can read this repository. Write access is now
+confirmed unavailable through this integration: collaborator-permission lookup and
+an attempted `ptis-update-v1-5-0` branch creation both returned GitHub 403
+`Resource not accessible by integration`. No remote mutation occurred.
 
 ## Remaining Work
 
-1. Attempt a one-time bootstrap/update branch on `Victoryun0919/flight-bot` only
-   if the connected GitHub integration permits writing.
-2. If write access is unavailable, give that repository owner the minimal one-time
-   bootstrap procedure; after bootstrap, the weekly updater can maintain future
-   versions.
-3. Review the next scheduled PTIS daily run after v1.4/v1.5 merge.
-4. Create a dedicated clean `flight-bot-template` repository when repository
+1. Perform the one-time updater bootstrap on `Victoryun0919/flight-bot` from the
+   repository owner's authenticated local clone. The connected integration cannot
+   create the branch.
+2. Verify on that bootstrap branch that `data/state.json` and
+   `data/kakao_auth.json` have no diff; `user_config.json` may be added once
+   because the legacy install does not have it.
+3. Run compile/unit tests, push the update branch, and merge only after review.
+4. Review the next scheduled PTIS daily run after v1.4/v1.5 merge.
+5. Create a dedicated clean `flight-bot-template` repository when repository
    creation/admin tooling becomes available.
 
 ## Known Risks
@@ -83,6 +86,7 @@ unconfirmed.
 
 ## Resume Point
 
-Validate v1.5 against the first real legacy install without touching its protected
-runtime/auth state. If write access is unavailable, stop before any remote mutation
-and provide the repository owner with the bootstrap commands.
+On the owner's local clone of `Victoryun0919/flight-bot`, create
+`ptis-update-v1-5-0`, fetch upstream `main`, bootstrap only `update_ptis.py`,
+commit that bootstrap, then run `python update_ptis.py --apply --yes`. Confirm
+protected runtime/auth files have no diff before committing/pushing the full update.
