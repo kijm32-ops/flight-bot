@@ -1,0 +1,120 @@
+name: 여행 조건 설정
+
+on:
+  workflow_dispatch:
+    inputs:
+      operation:
+        description: '무엇을 할까요?'
+        required: true
+        type: choice
+        options:
+          - '1. 정확한 여행 일정 추가'
+          - '2. 기존 정확 일정 전체 교체'
+          - '3. 지역·기간 관심검색 설정'
+          - '4. 모든 관심검색 잠시 끄기'
+      name:
+        description: '설정 이름 (예: 11월 오사카 가족여행)'
+        required: false
+        type: string
+      origin:
+        description: '출발 공항'
+        required: true
+        default: ICN
+        type: choice
+        options:
+          - ICN
+          - CJJ
+          - GMP
+      destination_or_region:
+        description: '도착 공항코드 또는 지역명 (예: KIX / Japan)'
+        required: false
+        type: string
+      outbound_from:
+        description: '출발일 또는 검색 시작일 (YYYY-MM-DD)'
+        required: false
+        type: string
+      outbound_to:
+        description: '귀국일 또는 검색 종료일 (YYYY-MM-DD)'
+        required: false
+        type: string
+      stay_min:
+        description: '지역검색 최소 숙박일 (정확 일정은 무시)'
+        required: false
+        default: 3
+        type: number
+      stay_max:
+        description: '지역검색 최대 숙박일 (정확 일정은 무시)'
+        required: false
+        default: 7
+        type: number
+      max_price:
+        description: '최대 왕복 항공권 가격(원), 제한 없으면 0'
+        required: false
+        default: 0
+        type: number
+      nonstop_only:
+        description: '정확 일정에서 직항만 찾기'
+        required: true
+        default: false
+        type: boolean
+
+permissions:
+  contents: write
+
+concurrency:
+  group: ptis-user-config
+  cancel-in-progress: false
+
+jobs:
+  save:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 현재 설정 불러오기
+        uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: Python 준비
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: 입력 검증 후 설정 저장
+        env:
+          PTIS_OPERATION: ${{ inputs.operation }}
+          PTIS_NAME: ${{ inputs.name }}
+          PTIS_ORIGIN: ${{ inputs.origin }}
+          PTIS_DESTINATION_OR_REGION: ${{ inputs.destination_or_region }}
+          PTIS_OUTBOUND_FROM: ${{ inputs.outbound_from }}
+          PTIS_OUTBOUND_TO: ${{ inputs.outbound_to }}
+          PTIS_STAY_MIN: ${{ inputs.stay_min }}
+          PTIS_STAY_MAX: ${{ inputs.stay_max }}
+          PTIS_MAX_PRICE: ${{ inputs.max_price }}
+          PTIS_NONSTOP_ONLY: ${{ inputs.nonstop_only }}
+        run: |
+          args=(
+            --operation "$PTIS_OPERATION"
+            --name "$PTIS_NAME"
+            --origin "$PTIS_ORIGIN"
+            --destination-or-region "$PTIS_DESTINATION_OR_REGION"
+            --outbound-from "$PTIS_OUTBOUND_FROM"
+            --outbound-to "$PTIS_OUTBOUND_TO"
+            --stay-min "$PTIS_STAY_MIN"
+            --stay-max "$PTIS_STAY_MAX"
+            --max-price "$PTIS_MAX_PRICE"
+          )
+          if [ "$PTIS_NONSTOP_ONLY" = "true" ]; then args+=(--nonstop-only); fi
+          python manage_trip_settings.py "${args[@]}"
+
+      - name: 설정 반영
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add user_config.json
+          if git diff --staged --quiet; then
+            echo "설정에 변경 사항이 없습니다."
+            exit 0
+          fi
+          git commit -m "config: 휴대폰에서 여행 조건 변경 [skip ci]"
+          git pull --rebase origin main
+          git push origin HEAD:main

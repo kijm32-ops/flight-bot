@@ -1,37 +1,40 @@
-# PTIS v1.7 Multi Route Watch + User-intent Scheduler
+# PTIS v1.8 Mobile Trip Settings
 
 ## Objective
 
-Extend Exact Route Watch to multiple routes while preserving one shared daily
-user-intent SerpAPI slot with Region Focus.
+Let a non-technical user configure Focus Search and Route Watches from a phone
+without opening or editing `user_config.json`.
 
 ## Scope
 
-- Accept `route_watches` as an ordered list and preserve v1.4 `route_watch`.
-- Select one active Focus/Route intent by KST-date deterministic rotation.
-- Exclude invalid and expired routes independently.
-- Preserve Discovery valuation, carryover, exposure, and selection semantics.
-- Show the selected Route Watch label in Pages and Kakao.
-- Bump `PTIS_VERSION` to `1.7.0` and verify template/updater compatibility.
+- Add a mobile-friendly GitHub Actions form with Korean labels, choices, defaults,
+  and clear validation errors.
+- Support adding/replacing an exact route, setting a region/date-range focus, and
+  pausing all interest searches.
+- Validate and atomically update `user_config.json` with a tested Python command.
+- Link the form from GitHub Pages and the Kakao daily card.
+- Include the new managed files in clean-template and updater distribution.
+- Preserve Discovery, valuation, selection, state, and the v1.7 one-slot scheduler.
+- Do not edit `data/state.json` or call SerpAPI.
 
-## Do Not Change
+## Usage Estimate
 
-- `data/state.json`.
-- Discovery search task count or the monthly API budget.
-- Legacy-user bootstrap in `Victoryun0919/flight-bot`.
-- Real SerpAPI execution.
+- SerpAPI: 0 implementation/test calls and 0 net scheduled calls after deployment.
+- GitHub Actions: one short configuration run per user save.
+- Expected session: 4-7 source/workflow/document files plus focused tests.
 
 ## Validation
 
-- [x] Python compile
-- [x] Full unit suite including multi-route scheduler coverage
-- [x] Workflow YAML parse
-- [x] `git diff --check`
-- [x] Clean template build
-- [x] No real SerpAPI call
+- Python compile and full unit suite.
+- Focused add/replace/focus/pause/invalid-input tests.
+- Every workflow YAML parsed.
+- Clean template build and updater manifest coverage.
+- Existing `main` import smoke check and `git diff --check`.
 
 ## Completion Criteria
 
-- One active intent replaces exactly one `GMP/near` discovery task.
-- Active intents rotate fairly with no scheduler state storage.
-- Existing v1.4 single-route configuration remains valid.
+- The user can start from a Pages/Kakao button and save a valid trip without JSON.
+- Invalid dates, airport codes, stays, and prices do not change the config file.
+- Existing settings are preserved unless the chosen operation explicitly replaces
+  or pauses them.
+- The next scheduled PTIS run reads the saved configuration automatically.
