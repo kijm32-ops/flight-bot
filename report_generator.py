@@ -3,6 +3,7 @@ import logging
 import html as html_lib
 from typing import List, Set, Tuple
 from models import Flight
+from config import TRIP_SETTINGS_URL
 
 OUTPUT_DIR = "public"
 OUTPUT_FILE = os.path.join(OUTPUT_DIR, "index.html")
@@ -51,6 +52,12 @@ def generate_report_html(
     low_price_keys = low_price_keys or set()
     focus_deals = focus_deals or []
     route_watch_deals = route_watch_deals or []
+    settings_link = ""
+    if TRIP_SETTINGS_URL:
+        settings_link = (
+            f'<a class="settings-link" href="{TRIP_SETTINGS_URL}">'
+            "\uC5EC\uD589 \uC870\uAC74 \uC124\uC815</a>"
+        )
     os.makedirs(OUTPUT_DIR, exist_ok=True)
 
     def render_rows(items: List[Flight], empty_message: str) -> str:
@@ -204,6 +211,11 @@ def generate_report_html(
     background-color: #FEE500; color: #191919; border: none; border-radius: 6px;
     font-weight: bold; cursor: pointer; font-size: 15px;
   }}
+  .settings-link {{
+    display: inline-block; margin: 0 0 16px 8px; padding: 10px 16px;
+    background:#174ea6; color:white; text-decoration:none; border-radius:6px;
+    font-weight:bold; font-size:15px;
+  }}
 </style>
 </head>
 <body>
@@ -211,6 +223,7 @@ def generate_report_html(
   {focus_section}
   <h2>\U0001f4ca \uc624\ub298\uc758 \uc9c1\ud56d \ud2b9\uac00 ({len(deals)}\uac74)</h2>
   <button id="shareBtn">💬 카카오톡으로 공유하기</button>
+  {settings_link}
   <table>
     <tr>
       <th>노선</th><th>일정</th><th>특가 금액</th><th>예약</th>

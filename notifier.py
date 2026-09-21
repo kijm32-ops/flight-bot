@@ -8,7 +8,7 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from config import (
     GMAIL_USER, GMAIL_PASSWORD, KAKAO_CARD_IMAGE_URL, KAKAO_CLIENT_SECRET,
-    KAKAO_REST_API_KEY, KAKAO_TOKEN_ENCRYPTION_KEY, PAGE_URL,
+    KAKAO_REST_API_KEY, KAKAO_TOKEN_ENCRYPTION_KEY, PAGE_URL, TRIP_SETTINGS_URL,
 )
 from kakao_auth import KakaoAuthError, load_refresh_token, store_refresh_token
 from models import Flight
@@ -287,6 +287,16 @@ def send_kakao_message(
             }
         ],
     }
+    if TRIP_SETTINGS_URL:
+        template_object["buttons"].append(
+            {
+                "title": "\uC5EC\uD589 \uC870\uAC74 \uC124\uC815",
+                "link": {
+                    "web_url": TRIP_SETTINGS_URL,
+                    "mobile_web_url": TRIP_SETTINGS_URL,
+                },
+            }
+        )
 
     # 3단계: 나에게 보내기 API 호출
     try:

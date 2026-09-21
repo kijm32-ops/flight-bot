@@ -343,6 +343,31 @@ demotion. Kakao and Pages show the exact Route Watch label selected that day bef
 Region Focus and Discovery. An invalid or expired Route Watch disables only that
 watch for the current run.
 
+## Phone-friendly trip settings
+
+You do not need to edit `user_config.json`. Open the latest PTIS Pages report or
+Kakao message and tap **여행 조건 설정**. After signing in to GitHub, tap
+**Run workflow**, choose an action, fill in the visible fields, and run it.
+
+The guided form supports:
+
+- adding one exact airport/date watch while keeping existing watches;
+- replacing all exact-route watches with one new watch;
+- setting a region, date range, stay length, and maximum price;
+- pausing every interest search without deleting the saved entries.
+
+For an exact route, enter a three-letter airport code such as `KIX`, an exact
+departure date, and an exact return date. The stay-length fields are ignored.
+For a region search, enter a region understood by Google Flights such as `Japan`,
+a search start/end date, and minimum/maximum stay. The direct-flight checkbox is
+ignored for region searches. Enter `0` for no price ceiling.
+
+The workflow validates all values before it changes the file. Invalid airport
+codes, past or reversed dates, invalid stays, and invalid prices fail without
+changing the saved configuration. A successful save is used automatically by the
+next scheduled PTIS run. The form requires repository write access, so visitors
+to a public report cannot change the owner's settings.
+
 ## Schedule and API budget
 
 The normal workflow still runs every day at UTC 22:00 (KST 07:00). Region Focus
