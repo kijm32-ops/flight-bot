@@ -2,7 +2,8 @@
 
 ## Status
 
-- Current state: v1.7 implementation complete locally; PR and CI pending.
+- Current state: v1.7 implementation complete and pushed; PR/CI/merge blocked by
+  an unauthenticated GitHub web session.
 - Branch: `feature/v1.7-multi-route-watch`
 - PTIS_VERSION: `1.7.0`
 - SerpAPI usage added by v1.7: 0 scheduled calls (about 221/month retained).
@@ -28,11 +29,11 @@
 
 ## Remaining Work
 
-1. Commit, push, open PR, and confirm GitHub Actions CI.
-2. Merge after CI succeeds.
-3. Synchronize `kijm32-ops/flight-bot-template` from the verified clean artifact;
+1. From an authenticated GitHub session, open a PR from
+   `feature/v1.7-multi-route-watch` to `main`, confirm CI, then merge.
+2. Synchronize `kijm32-ops/flight-bot-template` from the verified clean artifact;
    do not run legacy-user bootstrap.
 
 ## Resume Point
 
-Push `feature/v1.7-multi-route-watch` and create the v1.7 PR.
+Open the v1.7 PR from the already-pushed `feature/v1.7-multi-route-watch` branch.
