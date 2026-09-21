@@ -347,20 +347,23 @@ watch for the current run.
 
 You do not need to edit `user_config.json`. Open the latest PTIS Pages report or
 Kakao message and tap **여행 조건 설정**. After signing in to GitHub, tap
-**Run workflow**, choose an action, fill in the visible fields, and run it.
+**Run workflow** and choose the destination, travel month, departure week, stay,
+and budget.
+The setting name and dates are generated automatically.
 
 The guided form supports:
 
-- adding one exact airport/date watch while keeping existing watches;
-- replacing all exact-route watches with one new watch;
-- setting a region, date range, stay length, and maximum price;
+- adding one exact route from popular-airport choices;
+- replacing all exact-route watches with one selected route;
+- setting a region for a selected future month, stay range, and budget;
 - pausing every interest search without deleting the saved entries.
 
-For an exact route, enter a three-letter airport code such as `KIX`, an exact
-departure date, and an exact return date. The stay-length fields are ignored.
-For a region search, enter a region understood by Google Flights such as `Japan`,
-a search start/end date, and minimum/maximum stay. The direct-flight checkbox is
-ignored for region searches. Enter `0` for no price ceiling.
+For an exact route, PTIS selects the Friday in the chosen week and calculates
+the return date from the selected stay. For a region search, PTIS searches the whole
+chosen month and turns the stay choice into a small range. The optional custom
+fields remain available for a destination or exact dates that are not in the
+lists; most users can leave all three blank. The direct-flight checkbox is
+ignored for region searches.
 
 The workflow validates all values before it changes the file. Invalid airport
 codes, past or reversed dates, invalid stays, and invalid prices fail without
