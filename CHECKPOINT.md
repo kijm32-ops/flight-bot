@@ -2,9 +2,8 @@
 
 ## Status
 
-- Current state: v1.7 implementation complete and pushed; PR/CI/merge blocked by
-  an unauthenticated GitHub web session.
-- Branch: `feature/v1.7-multi-route-watch`
+- Current state: v1.7 merged to upstream main and synchronized to the clean
+  template repository.
 - PTIS_VERSION: `1.7.0`
 - SerpAPI usage added by v1.7: 0 scheduled calls (about 221/month retained).
 
@@ -29,11 +28,16 @@
 
 ## Remaining Work
 
-1. From an authenticated GitHub session, open a PR from
-   `feature/v1.7-multi-route-watch` to `main`, confirm CI, then merge.
-2. Synchronize `kijm32-ops/flight-bot-template` from the verified clean artifact;
-   do not run legacy-user bootstrap.
+1. Existing personal installations can use the v1.5 updater path to review and
+   apply v1.7 managed files.
+2. Do not run legacy-user bootstrap in `Victoryun0919/flight-bot` as part of this
+   release.
 
 ## Resume Point
 
-Open the v1.7 PR from the already-pushed `feature/v1.7-multi-route-watch` branch.
+Begin the next scoped PTIS feature from upstream `main`.
+
+## Merge Evidence
+
+- Source PR #7: merged after `Validate PTIS` passed; merge commit `78418e8`.
+- Template PR #2: merged after `Validate PTIS` passed; merge commit `ed1fe26`.
