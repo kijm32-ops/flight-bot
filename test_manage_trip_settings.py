@@ -7,7 +7,12 @@ from unittest.mock import Mock, patch
 
 from config import KST
 import config
-from manage_trip_settings import SettingsError, save_settings, update_settings
+from manage_trip_settings import (
+    SettingsError,
+    resolve_guided_inputs,
+    save_settings,
+    update_settings,
+)
 from models import Flight
 import notifier
 import report_generator
@@ -46,6 +51,39 @@ class ManageTripSettingsTests(unittest.TestCase):
         self.assertTrue(result["custom"]["keep"])
         self.assertEqual("KIX", result["route_watches"][0]["destination"])
         self.assertTrue(result["route_watches"][0]["nonstop_only"])
+
+    def test_guided_exact_choice_generates_dates_and_name(self):
+        guided = resolve_guided_inputs(
+            "exact_add", "\uc624\uc0ac\uce74 (KIX)", "2\uac1c\uc6d4 \ud6c4 (next_2)",
+            "\ub458\uc9f8 \uc8fc (week_2)", "4\ubc15 (4)",
+            "30\ub9cc\uc6d0 (300000)", now=NOW,
+        )
+        self.assertEqual("KIX", guided["destination_or_region"])
+        self.assertEqual("\uc624\uc0ac\uce74", guided["name"])
+        self.assertEqual("2026-11-13", guided["outbound_from"])
+        self.assertEqual("2026-11-17", guided["outbound_to"])
+        self.assertEqual("300000", guided["max_price"])
+
+    def test_guided_focus_choice_uses_whole_month(self):
+        guided = resolve_guided_inputs(
+            "focus_set", "\uc77c\ubcf8 \uc804\uccb4 (Japan)", "next_1", "week_2", "3",
+            "\uc81c\ud55c \uc5c6\uc74c (0)", now=NOW,
+        )
+        self.assertEqual("Japan", guided["destination_or_region"])
+        self.assertEqual("2026-10-01", guided["outbound_from"])
+        self.assertEqual("2026-10-31", guided["outbound_to"])
+        self.assertEqual("3", guided["stay_min"])
+        self.assertEqual("5", guided["stay_max"])
+
+    def test_custom_guided_values_override_choices(self):
+        guided = resolve_guided_inputs(
+            "exact_add", "\uc624\uc0ac\uce74 (KIX)", "next_1", "week_2", "3", "0",
+            custom_destination="CDG", custom_outbound="2026-12-20",
+            custom_return="2026-12-28", now=NOW,
+        )
+        self.assertEqual("CDG", guided["destination_or_region"])
+        self.assertEqual("2026-12-20", guided["outbound_from"])
+        self.assertEqual("2026-12-28", guided["outbound_to"])
 
     def test_replace_exact_routes_only_replaces_routes(self):
         payload = base()

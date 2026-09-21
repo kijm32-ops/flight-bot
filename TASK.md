@@ -1,14 +1,16 @@
-# PTIS v1.8 Mobile Trip Settings
+# PTIS v1.9 Choice-based Mobile Trip Settings
 
 ## Objective
 
 Let a non-technical user configure Focus Search and Route Watches from a phone
-without opening or editing `user_config.json`.
+primarily through choices, without typing codes, names, dates, or prices.
 
 ## Scope
 
-- Add a mobile-friendly GitHub Actions form with Korean labels, choices, defaults,
-  and clear validation errors.
+- Replace common free-text inputs with destination, relative-month, departure-week,
+  stay, and budget choices.
+- Generate a readable name and valid dates automatically, while retaining
+  optional custom destination/date overrides.
 - Support adding/replacing an exact route, setting a region/date-range focus, and
   pausing all interest searches.
 - Validate and atomically update `user_config.json` with a tested Python command.
@@ -21,19 +23,20 @@ without opening or editing `user_config.json`.
 
 - SerpAPI: 0 implementation/test calls and 0 net scheduled calls after deployment.
 - GitHub Actions: one short configuration run per user save.
-- Expected session: 4-7 source/workflow/document files plus focused tests.
+- Expected session: 5 source/workflow/document files plus focused tests.
 
 ## Validation
 
 - Python compile and full unit suite.
-- Focused add/replace/focus/pause/invalid-input tests.
+- Focused guided-date, choice parsing, add/replace/focus/pause, and invalid-input tests.
 - Every workflow YAML parsed.
 - Clean template build and updater manifest coverage.
 - Existing `main` import smoke check and `git diff --check`.
 
 ## Completion Criteria
 
-- The user can start from a Pages/Kakao button and save a valid trip without JSON.
+- The user can save a common trip by making choices only.
+- Optional custom fields still support destinations and dates outside the presets.
 - Invalid dates, airport codes, stays, and prices do not change the config file.
 - Existing settings are preserved unless the chosen operation explicitly replaces
   or pauses them.
