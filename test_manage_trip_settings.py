@@ -10,6 +10,7 @@ import config
 from manage_trip_settings import (
     SettingsError,
     resolve_guided_inputs,
+    resolve_issue_event_inputs,
     save_settings,
     update_settings,
 )
@@ -27,6 +28,30 @@ def base():
         "focus_search": {"enabled": False},
         "route_watch": {"enabled": False},
         "route_watches": [],
+    }
+
+
+def issue_event(sender="owner", custom_response="_No response_"):
+    body = (
+        "### \uc791\uc5c5\n\n1. \uc815\ud655\ud55c \uc5ec\ud589 \uc77c\uc815 \ucd94\uac00\n\n"
+        "### \ucd9c\ubc1c \uacf5\ud56d\n\nICN\n\n"
+        "### \ubaa9\uc801\uc9c0/\uc9c0\uc5ed\n\n\uc624\uc0ac\uce74 (KIX)\n\n"
+        "### \uc5ec\ud589 \uc2dc\uae30\n\n2\uac1c\uc6d4 \ud6c4 (next_2)\n\n"
+        "### \uc219\ubc15\n\n4\ubc15 (4)\n\n"
+        "### \ucd9c\ubc1c \uc8fc\ucc28\n\n\ub458\uc9f8 \uc8fc (week_2)\n\n"
+        "### \uc608\uc0b0\n\n30\ub9cc\uc6d0 (300000)\n\n"
+        "### \uc9c1\ud56d \uc5ec\ubd80\n\n\uc608 (true)\n\n"
+        f"### \uc9c1\uc811 \ubaa9\uc801\uc9c0\n\n{custom_response}\n\n"
+        "### \uc9c1\uc811 \uc2dc\uc791\uc77c\n\n_No response_\n\n"
+        "### \uc9c1\uc811 \uc885\ub8cc\uc77c\n\n_No response_\n"
+    )
+    return {
+        "repository": {"owner": {"login": "owner"}},
+        "sender": {"login": sender},
+        "issue": {
+            "title": "[PTIS \uc124\uc815] mobile",
+            "body": body,
+        },
     }
 
 
@@ -85,6 +110,23 @@ class ManageTripSettingsTests(unittest.TestCase):
         self.assertEqual("2026-12-20", guided["outbound_from"])
         self.assertEqual("2026-12-28", guided["outbound_to"])
 
+    def test_issue_form_owner_event_parses_guided_inputs(self):
+        parsed = resolve_issue_event_inputs(issue_event())
+        self.assertEqual("exact_add", parsed["operation"])
+        self.assertEqual("ICN", parsed["origin"])
+        self.assertEqual("\uc624\uc0ac\uce74 (KIX)", parsed["destination_choice"])
+        self.assertEqual("next_2", parsed["travel_month"].split("(")[1].rstrip(")"))
+        self.assertTrue(parsed["nonstop_only"])
+        self.assertEqual("", parsed["custom_destination"])
+
+    def test_issue_form_custom_destination_is_preserved(self):
+        parsed = resolve_issue_event_inputs(issue_event(custom_response="CDG"))
+        self.assertEqual("CDG", parsed["custom_destination"])
+
+    def test_issue_form_rejects_non_owner(self):
+        with self.assertRaises(SettingsError):
+            resolve_issue_event_inputs(issue_event(sender="visitor"))
+
     def test_replace_exact_routes_only_replaces_routes(self):
         payload = base()
         payload["focus_search"] = {
@@ -138,12 +180,12 @@ class ManageTripSettingsTests(unittest.TestCase):
     def test_repository_settings_url_is_automatic(self):
         with patch.dict("os.environ", {"GITHUB_REPOSITORY": "owner/repo"}):
             self.assertEqual(
-                "https://github.com/owner/repo/actions/workflows/trip-settings.yml",
+                "https://github.com/owner/repo/issues/new?template=trip-settings.yml",
                 config._trip_settings_url(),
             )
 
     def test_pages_and_kakao_include_settings_button(self):
-        settings_url = "https://github.com/owner/repo/actions/workflows/trip-settings.yml"
+        settings_url = "https://github.com/owner/repo/issues/new?template=trip-settings.yml"
         with tempfile.TemporaryDirectory() as directory, \
              patch.object(report_generator, "OUTPUT_DIR", directory), \
              patch.object(report_generator, "OUTPUT_FILE", str(Path(directory) / "index.html")), \

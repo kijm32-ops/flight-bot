@@ -1,4 +1,4 @@
-"""Safely update PTIS user_config.json from a guided workflow form."""
+"""Safely update PTIS user_config.json from guided GitHub forms."""
 
 import argparse
 import calendar
@@ -23,6 +23,21 @@ MONTH_OFFSETS = {"next_1": 1, "next_2": 2, "next_3": 3, "next_4": 4,
 STAY_OPTIONS = {"2": (2, 4), "3": (3, 5), "4": (4, 6),
                 "5": (5, 7), "7": (7, 10)}
 WEEK_OFFSETS = {"week_1": 0, "week_2": 7, "week_3": 14, "week_4": 21}
+ISSUE_TITLE_PREFIX = "[PTIS \uc124\uc815]"
+ISSUE_FIELD_LABELS = {
+    "operation": "\uc791\uc5c5",
+    "origin": "\ucd9c\ubc1c \uacf5\ud56d",
+    "destination_choice": "\ubaa9\uc801\uc9c0/\uc9c0\uc5ed",
+    "travel_month": "\uc5ec\ud589 \uc2dc\uae30",
+    "stay_option": "\uc219\ubc15",
+    "departure_week": "\ucd9c\ubc1c \uc8fc\ucc28",
+    "budget_option": "\uc608\uc0b0",
+    "nonstop_only": "\uc9c1\ud56d \uc5ec\ubd80",
+    "custom_destination": "\uc9c1\uc811 \ubaa9\uc801\uc9c0",
+    "custom_outbound": "\uc9c1\uc811 \uc2dc\uc791\uc77c",
+    "custom_return": "\uc9c1\uc811 \uc885\ub8cc\uc77c",
+}
+NO_RESPONSE_VALUES = {"", "_no response_", "no response", "_\uc751\ub2f5 \uc5c6\uc74c_"}
 
 
 class SettingsError(ValueError):
@@ -256,10 +271,95 @@ def _operation(value: str) -> str:
     return mapping.get(key, value)
 
 
+def _issue_sections(body: str) -> Dict[str, str]:
+    sections: Dict[str, str] = {}
+    current = ""
+    lines = []
+    for raw_line in body.splitlines():
+        if raw_line.startswith("### "):
+            if current:
+                sections[current] = "\n".join(lines).strip()
+            current = raw_line[4:].strip()
+            lines = []
+        elif current:
+            lines.append(raw_line)
+    if current:
+        sections[current] = "\n".join(lines).strip()
+    return sections
+
+
+def _issue_value(sections: Dict[str, str], key: str) -> str:
+    label = ISSUE_FIELD_LABELS[key]
+    value = sections.get(label, "").strip()
+    if value.lower() in NO_RESPONSE_VALUES:
+        return ""
+    return value
+
+
+def resolve_issue_event_inputs(event_payload: Dict[str, Any]) -> Dict[str, Any]:
+    """Parse one owner-authored GitHub Issue Form event into guided inputs."""
+    if not isinstance(event_payload, dict):
+        raise SettingsError("issue event must be a JSON object")
+
+    repository = event_payload.get("repository")
+    sender = event_payload.get("sender")
+    issue = event_payload.get("issue")
+    if not isinstance(repository, dict) or not isinstance(sender, dict) or not isinstance(issue, dict):
+        raise SettingsError("issue event is missing repository, sender, or issue data")
+
+    owner = repository.get("owner")
+    if not isinstance(owner, dict):
+        raise SettingsError("issue event is missing repository owner data")
+    owner_login = str(owner.get("login", "")).strip()
+    sender_login = str(sender.get("login", "")).strip()
+    if not owner_login or sender_login != owner_login:
+        raise SettingsError("only the repository owner can apply PTIS settings")
+
+    title = str(issue.get("title", ""))
+    if not title.startswith(ISSUE_TITLE_PREFIX):
+        raise SettingsError("issue title is not a PTIS settings request")
+
+    body = issue.get("body")
+    if not isinstance(body, str):
+        raise SettingsError("issue body is missing")
+    sections = _issue_sections(body)
+
+    operation_raw = _issue_value(sections, "operation")
+    operation = _operation(operation_raw)
+    if operation not in OPERATIONS:
+        raise SettingsError("issue operation is missing or invalid")
+
+    nonstop = _choice_value(_issue_value(sections, "nonstop_only")).lower() == "true"
+    return {
+        "operation": operation,
+        "origin": _issue_value(sections, "origin"),
+        "destination_choice": _issue_value(sections, "destination_choice"),
+        "travel_month": _issue_value(sections, "travel_month"),
+        "stay_option": _issue_value(sections, "stay_option"),
+        "departure_week": _issue_value(sections, "departure_week"),
+        "budget_option": _issue_value(sections, "budget_option"),
+        "nonstop_only": nonstop,
+        "custom_destination": _issue_value(sections, "custom_destination"),
+        "custom_outbound": _issue_value(sections, "custom_outbound"),
+        "custom_return": _issue_value(sections, "custom_return"),
+    }
+
+
+def _read_issue_event(path: Path) -> Dict[str, Any]:
+    try:
+        payload = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as exc:
+        raise SettingsError(f"Cannot read issue event {path}: {exc}") from exc
+    if not isinstance(payload, dict):
+        raise SettingsError("issue event must contain a JSON object")
+    return payload
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--config", type=Path, default=USER_CONFIG_FILE)
-    parser.add_argument("--operation", required=True)
+    parser.add_argument("--issue-event", type=Path)
+    parser.add_argument("--operation", default="")
     parser.add_argument("--name", default="")
     parser.add_argument("--origin", default="")
     parser.add_argument("--destination-or-region", default="")
@@ -279,6 +379,20 @@ def main() -> int:
     parser.add_argument("--custom-return", default="")
     args = parser.parse_args()
     try:
+        if args.issue_event:
+            issue_inputs = resolve_issue_event_inputs(_read_issue_event(args.issue_event))
+            args.operation = issue_inputs["operation"]
+            args.origin = issue_inputs["origin"]
+            args.destination_choice = issue_inputs["destination_choice"]
+            args.travel_month = issue_inputs["travel_month"]
+            args.stay_option = issue_inputs["stay_option"]
+            args.departure_week = issue_inputs["departure_week"]
+            args.budget_option = issue_inputs["budget_option"]
+            args.nonstop_only = issue_inputs["nonstop_only"]
+            args.custom_destination = issue_inputs["custom_destination"]
+            args.custom_outbound = issue_inputs["custom_outbound"]
+            args.custom_return = issue_inputs["custom_return"]
+
         operation = _operation(args.operation)
         if args.destination_choice and operation != "pause_all":
             guided = resolve_guided_inputs(

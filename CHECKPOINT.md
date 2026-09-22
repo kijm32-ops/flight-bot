@@ -2,53 +2,81 @@
 
 ## Status
 
-- Current state: v1.9 choice-based mobile settings implemented and validated.
-- Branch: `feature/choice-trip-settings`
-- Baseline: `13cab95` (v1.8 merged main)
-- PTIS_VERSION: `1.9.0`
-- SerpAPI usage added: 0 calls; scheduled budget remains about 221/month.
+- Current state: v1.10 direct mobile trip settings implemented and PR validation passed.
+- Branch: `feature/direct-trip-settings-form`
+- PR: #12
+- Baseline: `6217f17`
+- PTIS_VERSION: `1.10.0`
+- SerpAPI usage added: 0 calls; scheduled budget remains unchanged.
 
 ## Completed
 
-- Replaced common text entry with destination, month, departure-week, stay, and
-  budget choices.
-- Added automatic exact-trip and region-month date generation.
-- Kept optional custom destination/date overrides for uncommon trips.
-- Added exact-route add/replace, region-focus set, and pause-all operations.
-- Added strict validation and atomic `user_config.json` writes.
-- Invalid new route input is rejected before the tolerant v1.7 runtime loader can
-  skip it silently.
-- Added automatic repository-derived settings URL to Pages and Kakao buttons.
-- Added the workflow, command, and tests to the updater/template manifest.
-- Updated README guidance and bumped version to 1.8.0.
-- Preserved Discovery, v1.7 scheduling, and `data/state.json`.
+- Added `.github/ISSUE_TEMPLATE/trip-settings.yml` as the direct mobile settings form.
+- Changed Pages/Kakao **여행 조건 설정** to open the Issue Form directly.
+- Added `.github/workflows/trip-settings-issue.yml` to validate and apply owner-authored requests.
+- Reused `manage_trip_settings.py` for the existing exact-route, region-focus, pause,
+  date-generation, and input-validation logic.
+- Added an owner check in both workflow gating and issue-event parsing.
+- Kept `.github/workflows/trip-settings.yml` as the administrator fallback.
+- Shared the existing `ptis-user-config` concurrency group across both save paths.
+- Added the form/workflow to `.ptis/update_manifest.json` and clean-template validation.
+- Updated installer/README guidance to register both the Pages domain and
+  `https://github.com` in Kakao Product Link Management.
+- Bumped PTIS to 1.10.0.
+- Did not modify `data/state.json`.
 
 ## Changed Files
 
-- Updated: `.github/workflows/trip-settings.yml`, `manage_trip_settings.py`,
-  `test_manage_trip_settings.py`, `README.md`, `PTIS_VERSION`, `TASK.md`,
-  `CHECKPOINT.md`.
-- Unchanged: `data/state.json`, core collection/normalization/valuation/selection.
+- New: `.github/ISSUE_TEMPLATE/trip-settings.yml`
+- New: `.github/workflows/trip-settings-issue.yml`
+- Updated: `config.py`, `manage_trip_settings.py`, `test_manage_trip_settings.py`
+- Updated: `.github/workflows/validate.yml`, `.ptis/update_manifest.json`
+- Updated: `install_ptis.py`, `README.md`, `PTIS_VERSION`, `TASK.md`, `CHECKPOINT.md`
 
 ## Validation Performed
 
+- PR #12 Validate PTIS run #13 completed successfully.
 - Python compile: passed.
-- Full unit suite: passed, 83 tests.
-- Focused mobile-settings suite: passed, 10 tests.
-- Workflow YAML parse: passed for every workflow.
-- Existing main import smoke: passed.
-- New Python source ASCII check: passed.
+- Full unit suite: passed, 86 tests.
+- GitHub workflow YAML and Issue Form YAML parse: passed.
+- Clean-template build: passed, 43 files.
+- New Issue Form and handler workflow presence in clean template: passed.
 - `git diff --check`: passed.
-- Pages and Kakao settings-button payload tests: passed.
-- Clean-template build and required-file presence: passed (rebuild once before handoff).
 - No real SerpAPI call was made.
 
 ## Remaining Work
 
-1. Commit and push the feature branch, open a PR, confirm CI, and merge.
-2. Open the merged `여행 조건 설정` form on a phone and verify the choices.
+1. Merge PR #12 after the final documentation-only validation rerun.
+2. On the merged main, open **여행 조건 설정** from Pages/Kakao on a phone and
+   confirm the dedicated form appears directly.
+3. Submit a real settings change only after choosing the desired trip values;
+   this changes `user_config.json`.
+4. Update downstream template/install repositories separately if immediate v1.10
+   distribution is required.
+
+## Current Blockers / Known Issues
+
+- GitHub Issue Forms require GitHub sign-in to submit.
+- The final submit button is GitHub's **Submit new issue** UI; it cannot be renamed
+  to a PTIS-specific button without adding a separate authenticated backend.
+- `AGENTS.md` and `PROJECT_GUIDE.md` are not present in the repository main
+  branch; the project-provided copies were used for the work procedure.
 
 ## Resume Point
 
-Push `feature/choice-trip-settings`, open a PR, and confirm CI.
-Do not edit `data/state.json`.
+Merge PR #12 after the final validation run, then perform a non-destructive mobile
+smoke test by opening the settings form. Do not submit a configuration change
+until the desired trip values are chosen.
+
+## Risks
+
+- Public visitors can open issues in a public repository, but the settings workflow
+  does not run unless the issue author is the repository owner and the PTIS title
+  prefix is present.
+- If Issues are disabled in a downstream installation, the direct settings form
+  will not be available; the existing manual Actions workflow remains the fallback.
+
+## Next Action
+
+Confirm the final PR validation is green, merge PR #12, then open the new direct
+settings form from Kakao without submitting it.
