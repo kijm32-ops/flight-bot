@@ -49,6 +49,12 @@ jobs:
               print(f'parsed {path}')
           PY
 
+      - name: Build clean template
+        run: |
+          python build_template.py --output /tmp/ptis-template
+          test -f /tmp/ptis-template/.github/ISSUE_TEMPLATE/trip-settings.yml
+          test -f /tmp/ptis-template/.github/workflows/trip-settings-issue.yml
+
       - name: Check diff whitespace
         if: github.event_name == 'pull_request'
         run: git diff --check "${{ github.event.pull_request.base.sha }}...${{ github.event.pull_request.head.sha }}"
