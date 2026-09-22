@@ -52,13 +52,13 @@ Product Link Management for this destination.
 
 ## Validation
 
-- [ ] Python compile passes.
-- [ ] Full unit suite passes.
-- [ ] Issue-event parsing and owner-only tests pass.
-- [ ] Workflow and Issue Form YAML parse.
-- [ ] Clean template contains the new form and handler workflow.
-- [ ] Pull-request whitespace check passes.
-- [ ] No real SerpAPI call is made.
+- [x] Python compile passes.
+- [x] Full unit suite passes.
+- [x] Issue-event parsing and owner-only tests pass.
+- [x] Workflow and Issue Form YAML parse.
+- [x] Clean template contains the new form and handler workflow.
+- [x] Pull-request whitespace check passes.
+- [x] No real SerpAPI call is made.
 
 ## Completion Criteria
 
