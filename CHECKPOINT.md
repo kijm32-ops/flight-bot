@@ -2,10 +2,8 @@
 
 ## Status
 
-- Current state: v1.10 direct mobile trip settings implemented and PR validation passed.
-- Branch: `feature/direct-trip-settings-form`
-- PR: #12
-- Baseline: `6217f17`
+- Current state: PTIS v1.10 direct mobile trip settings merged to `main`.
+- Merge commit: `3e15ece` (PR #12)
 - PTIS_VERSION: `1.10.0`
 - SerpAPI usage added: 0 calls; scheduled budget remains unchanged.
 
@@ -35,7 +33,7 @@
 
 ## Validation Performed
 
-- PR #12 Validate PTIS run #13 completed successfully.
+- PR #12 final Validate PTIS run #14: passed.
 - Python compile: passed.
 - Full unit suite: passed, 86 tests.
 - GitHub workflow YAML and Issue Form YAML parse: passed.
@@ -46,12 +44,11 @@
 
 ## Remaining Work
 
-1. Merge PR #12 after the final documentation-only validation rerun.
-2. On the merged main, open **여행 조건 설정** from Pages/Kakao on a phone and
-   confirm the dedicated form appears directly.
-3. Submit a real settings change only after choosing the desired trip values;
+1. Open **여행 조건 설정** from Kakao or the next regenerated Pages report and
+   confirm the dedicated settings form appears directly.
+2. Submit a real settings change only after choosing the desired trip values;
    this changes `user_config.json`.
-4. Update downstream template/install repositories separately if immediate v1.10
+3. Update downstream template/install repositories separately if immediate v1.10
    distribution is required.
 
 ## Current Blockers / Known Issues
@@ -64,9 +61,8 @@
 
 ## Resume Point
 
-Merge PR #12 after the final validation run, then perform a non-destructive mobile
-smoke test by opening the settings form. Do not submit a configuration change
-until the desired trip values are chosen.
+Perform a non-destructive mobile smoke test by opening the direct settings form.
+Do not submit a configuration change until the desired trip values are chosen.
 
 ## Risks
 
@@ -78,5 +74,4 @@ until the desired trip values are chosen.
 
 ## Next Action
 
-Confirm the final PR validation is green, merge PR #12, then open the new direct
-settings form from Kakao without submitting it.
+Open the new direct settings form from Kakao without submitting it.
