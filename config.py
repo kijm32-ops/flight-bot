@@ -33,7 +33,7 @@ def _trip_settings_url() -> str:
     repository = os.environ.get("GITHUB_REPOSITORY", "")
     if not repository or "/" not in repository:
         return ""
-    return f"https://github.com/{repository}/actions/workflows/trip-settings.yml"
+    return f"https://github.com/{repository}/issues/new?template=trip-settings.yml"
 
 
 # Deployment URLs have one source: GitHub Actions repository context. PTIS_PAGE_URL
