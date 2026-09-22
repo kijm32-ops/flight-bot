@@ -114,8 +114,10 @@ Create a Kakao Developers app for the person who will receive messages, then:
 2. Register `http://127.0.0.1:8765/callback` as the Redirect URI.
 3. Enable the `talk_message` consent item.
 4. Enable the Kakao Login Client Secret for the REST API key.
-5. Under Product Link Management, register the Pages web domain printed by the
-   installer, normally `https://YOUR_GITHUB_OWNER.github.io`.
+5. Under Product Link Management, register both the Pages web domain printed by
+   the installer (normally `https://YOUR_GITHUB_OWNER.github.io`) and
+   `https://github.com`. The second domain is required for the Kakao
+   **여행 조건 설정** button to open the GitHub-hosted settings form.
 
 The OAuth browser consent must be completed while signed into the Kakao account
 that should receive PTIS messages.
@@ -346,12 +348,11 @@ watch for the current run.
 ## Phone-friendly trip settings
 
 You do not need to edit `user_config.json`. Open the latest PTIS Pages report or
-Kakao message and tap **여행 조건 설정**. After signing in to GitHub, tap
-**Run workflow** and choose the destination, travel month, departure week, stay,
-and budget.
-The setting name and dates are generated automatically.
+Kakao message and tap **여행 조건 설정**. After signing in to GitHub when needed,
+the button opens a dedicated PTIS settings form directly; you no longer need to
+open Actions and tap **Run workflow** first.
 
-The guided form supports:
+The direct form supports:
 
 - adding one exact route from popular-airport choices;
 - replacing all exact-route watches with one selected route;
@@ -359,17 +360,22 @@ The guided form supports:
 - pausing every interest search without deleting the saved entries.
 
 For an exact route, PTIS selects the Friday in the chosen week and calculates
-the return date from the selected stay. For a region search, PTIS searches the whole
-chosen month and turns the stay choice into a small range. The optional custom
-fields remain available for a destination or exact dates that are not in the
-lists; most users can leave all three blank. The direct-flight checkbox is
-ignored for region searches.
+the return date from the selected stay. For a region search, PTIS searches the
+whole chosen month and turns the stay choice into a small range. Optional custom
+destination/date fields remain available for uncommon trips; most users can leave
+them blank. The direct-flight choice is ignored for region searches.
 
-The workflow validates all values before it changes the file. Invalid airport
-codes, past or reversed dates, invalid stays, and invalid prices fail without
-changing the saved configuration. A successful save is used automatically by the
-next scheduled PTIS run. The form requires repository write access, so visitors
-to a public report cannot change the owner's settings.
+Submitting the form creates a short-lived settings request in GitHub Issues.
+`.github/workflows/trip-settings-issue.yml` accepts only requests authored by the
+repository owner, validates them with the same `manage_trip_settings.py` logic,
+updates `user_config.json`, and closes the request after a successful save.
+Visitors to a public report cannot change the owner's configuration.
+
+The original **여행 조건 설정** Actions workflow remains available as an
+administrator fallback. Both paths share the same `ptis-user-config` concurrency
+group so simultaneous saves do not race. Invalid airport codes, dates, stays, or
+prices fail without changing the saved configuration. A successful save is used
+automatically by the next scheduled PTIS run.
 
 ## Schedule and API budget
 
