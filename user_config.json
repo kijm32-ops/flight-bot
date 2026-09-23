@@ -3,7 +3,14 @@
     "mode": "alternate"
   },
   "focus_search": {
-    "enabled": false
+    "enabled": true,
+    "origin": "CJJ",
+    "region": "Japan",
+    "outbound_from": "2026-10-01",
+    "outbound_to": "2026-10-31",
+    "stay_min": 3,
+    "stay_max": 5,
+    "max_price": 300000
   },
   "route_watch": {
     "enabled": false
