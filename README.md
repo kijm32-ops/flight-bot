@@ -259,7 +259,9 @@ in the same request. PTIS therefore expresses a requested stay such as 3-5 days
 inside the region query while keeping the explicit outbound-date window. Focus
 results still pass PTIS normalization and price-safety gates, but they do not
 compete with discovery quota, carryover, or exposure demotion. They appear first
-in Kakao and in a separate Pages section.
+in Kakao and in a separate Pages section. When Focus Search runs but returns zero
+deals, Pages and Kakao still show the active condition and a concise funnel status
+such as the number of candidates removed by the PTIS price cap.
 
 If the entire focus date window has passed, Focus Search is skipped automatically
 and the normal `GMP/near` discovery slot is restored. Invalid Focus settings also
