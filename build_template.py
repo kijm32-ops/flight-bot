@@ -10,6 +10,12 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent
 MANIFEST = ROOT / ".ptis" / "update_manifest.json"
+DEFAULT_USER_CONFIG = {
+    "focus_slot": {"mode": "alternate"},
+    "focus_search": {"enabled": False},
+    "route_watch": {"enabled": False},
+    "route_watches": [],
+}
 
 
 class TemplateBuildError(RuntimeError):
@@ -102,7 +108,13 @@ def build_directory(output: Path, root: Path = ROOT) -> list[Path]:
         source = root / rel
         target = output / rel
         target.parent.mkdir(parents=True, exist_ok=True)
-        shutil.copy2(source, target)
+        if rel == Path("user_config.json"):
+            target.write_text(
+                json.dumps(DEFAULT_USER_CONFIG, indent=2) + "\n",
+                encoding="utf-8",
+            )
+        else:
+            shutil.copy2(source, target)
     return files
 
 
