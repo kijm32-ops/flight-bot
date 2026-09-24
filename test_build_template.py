@@ -40,7 +40,14 @@ class CleanTemplateTests(unittest.TestCase):
         self.assertIn("PTIS_VERSION", actual)
 
     def test_default_user_config_is_safe_and_disabled(self):
-        payload = json.loads((ROOT / "user_config.json").read_text(encoding="utf-8"))
+        with tempfile.TemporaryDirectory() as tmp:
+            output = Path(tmp) / "template"
+            build_template.build_directory(output)
+            payload = json.loads(
+                (output / "user_config.json").read_text(encoding="utf-8")
+            )
+
+        self.assertEqual(payload, build_template.DEFAULT_USER_CONFIG)
         self.assertFalse(payload["focus_search"]["enabled"])
         self.assertFalse(payload["route_watch"]["enabled"])
 
