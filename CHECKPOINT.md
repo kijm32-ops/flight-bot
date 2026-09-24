@@ -2,10 +2,8 @@
 
 ## Status
 
-- Current state: PTIS v1.10.1 Focus zero-result visibility implemented; PR #14 validation passed before final documentation update.
-- Branch: `fix/focus-zero-result-visibility`
-- PR: #14
-- Baseline: `ca667569`
+- Current state: PTIS v1.10.1 Focus zero-result visibility merged to `main`.
+- Merge commit: `2860489` (PR #14)
 - PTIS_VERSION: `1.10.1`
 - SerpAPI calls added: 0; scheduled daily task count unchanged.
 
@@ -60,7 +58,7 @@ Minimal fix applied:
 
 ## Validation Performed
 
-- PR #14 Validate PTIS run #17: passed before final documentation-only update.
+- PR #14 final Validate PTIS run #18: passed.
 - Python compile: passed.
 - Full unit suite: 90 tests passed.
 - GitHub YAML parse: passed.
@@ -70,10 +68,11 @@ Minimal fix applied:
 
 ## Remaining Work
 
-1. Run final CI after this documentation update.
-2. Merge PR #14 if final CI remains green.
-3. Observe the next scheduled PTIS message/Page. With the current saved condition
-   and a zero-result funnel, it should visibly show the Focus condition and exclusion reason.
+1. Observe the next scheduled PTIS message/Page.
+2. With the current saved condition and a zero-result funnel, confirm that the UI
+   shows the Focus condition and exclusion reason.
+3. Decide separately, after collecting funnel evidence, whether user max price
+   should interact differently with `TIER_HARD_CAP`.
 
 ## Current Blockers / Known Issues
 
@@ -84,9 +83,9 @@ Minimal fix applied:
 
 ## Resume Point
 
-Check the final PR #14 Validate PTIS run. If green, merge without changing search
-logic. Do not run Daily Flight Deal Scraper merely for validation because that
-would consume SerpAPI budget.
+Inspect the next scheduled PTIS output and compare the visible Focus status with
+the run's actual Focus funnel. Do not change price gates without separate funnel
+evidence.
 
 ## Risks
 
@@ -97,4 +96,4 @@ would consume SerpAPI budget.
 
 ## Next Action
 
-Confirm final CI is green and merge PR #14.
+Verify the next scheduled message/Page shows the active Focus Search even when it returns zero deals.
