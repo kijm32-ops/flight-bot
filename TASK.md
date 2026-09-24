@@ -32,6 +32,8 @@ Observed 2026-09-24 funnel:
 - Show the zero-result Focus status in Kakao while preserving existing deal priority.
 - Add regression tests for zero-result Pages/Kakao output and funnel status.
 - Do not call SerpAPI during implementation or tests.
+- Preserve the live protected `user_config.json`; clean-template builds must emit a
+  disabled seed instead of copying the owner's active settings.
 
 ## Files to Inspect / Change
 
@@ -41,6 +43,8 @@ Observed 2026-09-24 funnel:
 - `test_focus.py`
 - `README.md`
 - `PTIS_VERSION`
+- `build_template.py`
+- `test_build_template.py`
 - `TASK.md`
 - `CHECKPOINT.md`
 
@@ -63,6 +67,16 @@ Observed 2026-09-24 funnel:
 - Pages currently hides the Focus section when `focus_deals` is empty.
 - Kakao currently treats zero Focus deals like no Focus Search was active.
 
+## Validation Blocker Found
+
+The first PR validation run exposed an existing clean-template invariant conflict:
+`test_build_template.py` assumed the repository's live `user_config.json` must
+always be disabled. That assumption became invalid once the direct settings form
+legitimately committed the owner's active Focus Search. Copying the live file into
+a clean template would also leak personal trip settings. The minimal safety fix is
+to keep `user_config.json` untouched in the repository and have `build_template.py`
+emit a disabled default seed only into distribution artifacts.
+
 ## Usage Estimate
 
 - SerpAPI implementation/test calls: 0.
@@ -71,15 +85,15 @@ Observed 2026-09-24 funnel:
 
 ## Validation
 
-- [ ] Python compile passes.
-- [ ] Full unit suite passes.
-- [ ] Zero-result Focus status identifies the actual funnel reason.
-- [ ] Pages renders an active Focus section with zero deals.
-- [ ] Kakao identifies an active Focus Search with zero deals.
-- [ ] Positive-result Focus output remains compatible.
-- [ ] Clean template build passes.
-- [ ] Pull-request whitespace check passes.
-- [ ] No real SerpAPI call is made.
+- [x] Python compile passes.
+- [x] Full unit suite passes.
+- [x] Zero-result Focus status identifies the actual funnel reason.
+- [x] Pages renders an active Focus section with zero deals.
+- [x] Kakao identifies an active Focus Search with zero deals.
+- [x] Positive-result Focus output remains compatible.
+- [x] Clean template build passes.
+- [x] Pull-request whitespace check passes.
+- [x] No real SerpAPI call is made.
 
 ## Completion Criteria
 
