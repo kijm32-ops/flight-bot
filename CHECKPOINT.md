@@ -2,76 +2,99 @@
 
 ## Status
 
-- Current state: PTIS v1.10 direct mobile trip settings merged to `main`.
-- Merge commit: `3e15ece` (PR #12)
-- PTIS_VERSION: `1.10.0`
-- SerpAPI usage added: 0 calls; scheduled budget remains unchanged.
+- Current state: PTIS v1.10.1 Focus zero-result visibility implemented; PR #14 validation passed before final documentation update.
+- Branch: `fix/focus-zero-result-visibility`
+- PR: #14
+- Baseline: `ca667569`
+- PTIS_VERSION: `1.10.1`
+- SerpAPI calls added: 0; scheduled daily task count unchanged.
 
 ## Completed
 
-- Added `.github/ISSUE_TEMPLATE/trip-settings.yml` as the direct mobile settings form.
-- Changed Pages/Kakao **여행 조건 설정** to open the Issue Form directly.
-- Added `.github/workflows/trip-settings-issue.yml` to validate and apply owner-authored requests.
-- Reused `manage_trip_settings.py` for the existing exact-route, region-focus, pause,
-  date-generation, and input-validation logic.
-- Added an owner check in both workflow gating and issue-event parsing.
-- Kept `.github/workflows/trip-settings.yml` as the administrator fallback.
-- Shared the existing `ptis-user-config` concurrency group across both save paths.
-- Added the form/workflow to `.ptis/update_manifest.json` and clean-template validation.
-- Updated installer/README guidance to register both the Pages domain and
-  `https://github.com` in Kakao Product Link Management.
-- Bumped PTIS to 1.10.0.
-- Did not modify `data/state.json`.
+- Verified Issue #13 settings are persisted and active:
+  - origin `CJJ`
+  - region `Japan`
+  - 2026-10-01 through 2026-10-31
+  - 3-5 nights
+  - max user price 300,000 KRW
+- Verified the 2026-09-24 scheduled run actually executed Focus Search:
+  - raw=5
+  - drop_over_cap=5
+  - qualified=0
+  - final focus=0
+- Added a user-facing Focus label with origin, region, date window, stay, and user budget.
+- Added Focus-specific funnel status generation without changing existing gates.
+- Pages now renders the Focus section even when zero deals remain.
+- Kakao now identifies an active zero-result Focus Search and shows the funnel reason.
+- Positive-result Focus behavior remains compatible.
+- Search exceptions are distinguishable from legitimate zero-result runs.
+- Did not change `TIER_HARD_CAP`, `ACCESS_COST`, scheduler shape, or `data/state.json`.
+- Did not modify the protected live `user_config.json`.
+
+## Validation Blocker Resolved
+
+The first PR run failed an existing clean-template test because the live
+`user_config.json` is now legitimately enabled by the direct settings workflow.
+The clean-template builder also would have copied those active personal settings
+into a distribution artifact.
+
+Minimal fix applied:
+
+- `build_template.py` now writes a disabled `DEFAULT_USER_CONFIG` only into clean
+  template output.
+- The live repository `user_config.json` remains untouched.
+- `test_build_template.py` validates the generated seed rather than requiring the
+  owner's runtime configuration to be disabled.
 
 ## Changed Files
 
-- New: `.github/ISSUE_TEMPLATE/trip-settings.yml`
-- New: `.github/workflows/trip-settings-issue.yml`
-- Updated: `config.py`, `manage_trip_settings.py`, `test_manage_trip_settings.py`
-- Updated: `.github/workflows/validate.yml`, `.ptis/update_manifest.json`
-- Updated: `install_ptis.py`, `README.md`, `PTIS_VERSION`, `TASK.md`, `CHECKPOINT.md`
+- `main.py` — Focus label/status generation and separate Focus funnel tracking.
+- `report_generator.py` — zero-result Focus section and status display.
+- `notifier.py` — zero-result Focus visibility in Kakao.
+- `test_focus.py` — zero-result funnel, Pages, and Kakao regression tests.
+- `build_template.py` — sanitize distribution `user_config.json` seed.
+- `test_build_template.py` — validate generated safe seed.
+- `README.md` — document zero-result visibility.
+- `PTIS_VERSION` — 1.10.1.
+- `TASK.md`, `CHECKPOINT.md` — task/report state.
 
 ## Validation Performed
 
-- PR #12 final Validate PTIS run #14: passed.
+- PR #14 Validate PTIS run #17: passed before final documentation-only update.
 - Python compile: passed.
-- Full unit suite: passed, 86 tests.
-- GitHub workflow YAML and Issue Form YAML parse: passed.
+- Full unit suite: 90 tests passed.
+- GitHub YAML parse: passed.
 - Clean-template build: passed, 43 files.
-- New Issue Form and handler workflow presence in clean template: passed.
-- `git diff --check`: passed.
+- Pull-request whitespace check: passed.
 - No real SerpAPI call was made.
 
 ## Remaining Work
 
-1. Open **여행 조건 설정** from Kakao or the next regenerated Pages report and
-   confirm the dedicated settings form appears directly.
-2. Submit a real settings change only after choosing the desired trip values;
-   this changes `user_config.json`.
-3. Update downstream template/install repositories separately if immediate v1.10
-   distribution is required.
+1. Run final CI after this documentation update.
+2. Merge PR #14 if final CI remains green.
+3. Observe the next scheduled PTIS message/Page. With the current saved condition
+   and a zero-result funnel, it should visibly show the Focus condition and exclusion reason.
 
 ## Current Blockers / Known Issues
 
-- GitHub Issue Forms require GitHub sign-in to submit.
-- The final submit button is GitHub's **Submit new issue** UI; it cannot be renamed
-  to a PTIS-specific button without adding a separate authenticated backend.
-- `AGENTS.md` and `PROJECT_GUIDE.md` are not present in the repository main
-  branch; the project-provided copies were used for the work procedure.
+- Focus Search still obeys existing PTIS hard caps after the user's API max-price
+  filter. This task deliberately does not change that policy.
+- The Kakao card has limited visible description space; a long condition/status may
+  be truncated by the client, while the full details remain visible on Pages.
 
 ## Resume Point
 
-Perform a non-destructive mobile smoke test by opening the direct settings form.
-Do not submit a configuration change until the desired trip values are chosen.
+Check the final PR #14 Validate PTIS run. If green, merge without changing search
+logic. Do not run Daily Flight Deal Scraper merely for validation because that
+would consume SerpAPI budget.
 
 ## Risks
 
-- Public visitors can open issues in a public repository, but the settings workflow
-  does not run unless the issue author is the repository owner and the PTIS title
-  prefix is present.
-- If Issues are disabled in a downstream installation, the direct settings form
-  will not be available; the existing manual Actions workflow remains the fallback.
+- User-entered max price and PTIS `TIER_HARD_CAP` remain separate constraints; a
+  user budget higher than the PTIS cap can still yield zero Focus results.
+- Any future changes to funnel stage names must update the user-facing mapping in
+  `main.py`.
 
 ## Next Action
 
-Open the new direct settings form from Kakao without submitting it.
+Confirm final CI is green and merge PR #14.
