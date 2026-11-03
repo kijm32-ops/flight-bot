@@ -120,6 +120,10 @@
       {
         "date": "2026-11-03",
         "price": 189900
+      },
+      {
+        "date": "2026-11-03",
+        "price": 190000
       }
     ],
     "ICN->다카마쓰시": [
@@ -462,6 +466,10 @@
       {
         "date": "2026-11-03",
         "price": 253947
+      },
+      {
+        "date": "2026-11-03",
+        "price": 253966
       }
     ],
     "CJJ->상하이": [
@@ -548,6 +556,10 @@
       {
         "date": "2026-11-03",
         "price": 207257
+      },
+      {
+        "date": "2026-11-03",
+        "price": 227004
       }
     ],
     "ICN->코타키나바루": [
@@ -609,6 +621,10 @@
       },
       {
         "date": "2026-11-01",
+        "price": 328480
+      },
+      {
+        "date": "2026-11-03",
         "price": 328480
       },
       {
@@ -738,6 +754,10 @@
       {
         "date": "2026-11-03",
         "price": 344713
+      },
+      {
+        "date": "2026-11-03",
+        "price": 344713
       }
     ],
     "ICN->하노이": [
@@ -826,6 +846,10 @@
       {
         "date": "2026-11-03",
         "price": 186400
+      },
+      {
+        "date": "2026-11-03",
+        "price": 186900
       }
     ],
     "ICN->호찌민시": [
@@ -939,6 +963,10 @@
       },
       {
         "date": "2026-11-01",
+        "price": 285349
+      },
+      {
+        "date": "2026-11-03",
         "price": 285349
       },
       {
@@ -1066,6 +1094,10 @@
       {
         "date": "2026-11-03",
         "price": 640125
+      },
+      {
+        "date": "2026-11-03",
+        "price": 637049
       }
     ],
     "ICN->콜롬보": [
@@ -1148,6 +1180,10 @@
       {
         "date": "2026-11-03",
         "price": 565027
+      },
+      {
+        "date": "2026-11-03",
+        "price": 564863
       }
     ],
     "ICN->시즈오카시": [
@@ -1426,6 +1462,10 @@
       {
         "date": "2026-11-03",
         "price": 232883
+      },
+      {
+        "date": "2026-11-03",
+        "price": 232906
       }
     ],
     "ICN->후쿠오카시": [
@@ -1478,6 +1518,10 @@
       {
         "date": "2026-11-03",
         "price": 204661
+      },
+      {
+        "date": "2026-11-03",
+        "price": 208661
       }
     ],
     "ICN->다낭": [
@@ -1556,6 +1600,10 @@
       {
         "date": "2026-11-03",
         "price": 213432
+      },
+      {
+        "date": "2026-11-03",
+        "price": 225269
       }
     ],
     "ICN->시드니": [
@@ -1706,6 +1754,10 @@
       {
         "date": "2026-11-03",
         "price": 255301
+      },
+      {
+        "date": "2026-11-03",
+        "price": 255483
       }
     ],
     "ICN->덴파사르": [
@@ -2004,7 +2056,7 @@
   "kakao_consecutive_failures": 0,
   "api_usage": {
     "month": "2026-11",
-    "count": 14
+    "count": 21
   },
   "exposure_log": {
     "ICN->시티 오브 마닐라": [
@@ -2031,6 +2083,10 @@
       {
         "date": "2026-11-01",
         "price": 252569
+      },
+      {
+        "date": "2026-11-03",
+        "price": 253966
       }
     ],
     "CJJ->상하이": [
@@ -2150,6 +2206,10 @@
     "ICN->호찌민시": [
       {
         "date": "2026-10-31",
+        "price": 285349
+      },
+      {
+        "date": "2026-11-03",
         "price": 285349
       }
     ],
@@ -2350,11 +2410,11 @@
       "airline": "비엣젯항공",
       "duration": 0,
       "stops": 0,
-      "booking_link": "https://www.google.com/travel/flights?tfs=CCoQAhojEgoyMDI3LTA1LTE4agcIARIDSUNOcgwIAhIIL20vMGhuNGgaIxIKMjAyNy0wNi0wMWoMCAISCC9tLzBobjRocgcIARIDSUNOQAFIAVIDS1JXYODcKnqAAUNqUklRME4zZVd0UE1HNHhObTlCUWxkSGNrRkNSeTB0TFMwdExTMHRMVzk1Y21neE5VRkJRVUZCUjNKd1RqVkZUR2R1TmpoQkVoTkVaV0ZzUTI5dWMzUnlZV2x1ZEhNd0xUSXpHZ3NJcGJVUkVBQWFBMHRTVnpnNGNJMm1BUT09&curr=KRW&hl=ko&gl=KR&gsas=1",
+      "booking_link": "https://www.google.com/travel/flights?tfs=CCoQAhojEgoyMDI3LTA1LTE4agcIARIDSUNOcgwIAhIIL20vMGhuNGgaIxIKMjAyNy0wNi0wMWoMCAISCC9tLzBobjRocgcIARIDSUNOQAFIAVIDS1JXYODcKnqAAUNqUklWM0pXWW5NNWRFTTVPVWxCUW1neFVsRkNSeTB0TFMwdExTMHRMWFowZFhNeU1VRkJRVUZCUjNKeFkyVlpSbDkxY0RaQkVoTkVaV0ZzUTI5dWMzUnlZV2x1ZEhNd0xUSTBHZ3NJcGJVUkVBQWFBMHRTVnpnNGNQdWxBUT09&curr=KRW&hl=ko&gl=KR&gsas=1",
       "value_ratio": 1.141,
       "value_grade": "",
       "alt_dates": [],
-      "last_confirmed_at": "2026-11-03T10:23:35.694299+09:00",
+      "last_confirmed_at": "2026-11-04T08:44:43.540343+09:00",
       "is_carryover": false
     },
     {
@@ -2371,50 +2431,10 @@
       "duration": 0,
       "stops": 0,
       "booking_link": "https://www.google.com/travel/flights?tfs=CCoQAhojEgoyMDI3LTAyLTIzagcIARIDSUNOcgwIAhIIL20vMGZ0a3gaIxIKMjAyNy0wMy0wNGoMCAISCC9tLzBmdGt4cgcIARIDSUNOQAFIAVIDS1JXYICmHXqAAUNqUklZVkp4YVU1U01EVjZWVkZCUWxONWNWRkNSeTB0TFMwdExTMTJkSGhsTkMxdU1rRkJRVUZCUjNKd1RqVkZRWFpsYzJ0QkVoTkVaV0ZzUTI5dWMzUnlZV2x1ZEhNd0xURTFHZ3NJdGZjT0VBQWFBMHRTVnpnNGNMYU9BUT09&curr=KRW&hl=ko&gl=KR&gsas=1",
-      "value_ratio": 1.223,
+      "value_ratio": 0.0,
       "value_grade": "",
       "alt_dates": [],
       "last_confirmed_at": "2026-11-03T10:23:35.694299+09:00",
-      "is_carryover": false
-    },
-    {
-      "origin": "ICN",
-      "destination": "/m/0hn4h",
-      "destination_name": "호찌민시",
-      "destination_country": "베트남",
-      "depart_date": "2027-02-23",
-      "return_date": "2027-03-06",
-      "price": 293992,
-      "average_price": 399308,
-      "discount_percentage": 26,
-      "airline": "Unknown",
-      "duration": 0,
-      "stops": 0,
-      "booking_link": "https://www.google.com/travel/flights?tfs=CCoQAhojEgoyMDI3LTAyLTIzagcIARIDSUNOcgwIAhIIL20vMGhuNGgaIxIKMjAyNy0wMy0wNmoMCAISCC9tLzBobjRocgcIARIDSUNOQAFIAVIDS1JXYICmHXqAAUNqUklUbFJQWmpSTE1IVnJURzlCVkVaMU5HZENSeTB0TFMwdExTMHRMVzk1Ym5Fek5rRkJRVUZCUjNKdWRsZHpSVjlET0dkQkVoTkVaV0ZzUTI5dWMzUnlZV2x1ZEhNd0xUSXlHZ3NJNlBnUkVBQWFBMHRTVnpnNGNLQ3NBUT09&curr=KRW&hl=ko&gl=KR&gsas=1",
-      "value_ratio": 0.0,
-      "value_grade": "",
-      "alt_dates": [],
-      "last_confirmed_at": "2026-11-02T07:30:03.984894+09:00",
-      "is_carryover": true
-    },
-    {
-      "origin": "ICN",
-      "destination": "/m/0hn4h",
-      "destination_name": "호찌민시",
-      "destination_country": "베트남",
-      "depart_date": "2027-02-25",
-      "return_date": "2027-03-06",
-      "price": 293992,
-      "average_price": 408100,
-      "discount_percentage": 28,
-      "airline": "Unknown",
-      "duration": 0,
-      "stops": 0,
-      "booking_link": "https://www.google.com/travel/flights?tfs=CCoQAhojEgoyMDI3LTAyLTI1agcIARIDSUNOcgwIAhIIL20vMGhuNGgaIxIKMjAyNy0wMy0wNmoMCAISCC9tLzBobjRocgcIARIDSUNOQAFIAVIDS1JXYIC1GHqAAUNqUklSMHBPVEMwMlgybzVSRTFCUTA1VFUzZENSeTB0TFMwdExTMHRMUzEyZDNOd05rRkJRVUZCUjNKdWRsZFpSVkpvYW1WQkVoTkVaV0ZzUTI5dWMzUnlZV2x1ZEhNd0xURTRHZ3NJNlBnUkVBQWFBMHRTVnpnNGNLQ3NBUT09&curr=KRW&hl=ko&gl=KR&gsas=1",
-      "value_ratio": 0.0,
-      "value_grade": "",
-      "alt_dates": [],
-      "last_confirmed_at": "2026-11-02T07:30:03.984894+09:00",
       "is_carryover": true
     },
     {
@@ -2424,17 +2444,17 @@
       "destination_country": "일본",
       "depart_date": "2026-12-09",
       "return_date": "2026-12-16",
-      "price": 189900,
+      "price": 190000,
       "average_price": 595100,
       "discount_percentage": 68,
       "airline": "에어서울",
       "duration": 0,
       "stops": 0,
-      "booking_link": "https://www.google.com/travel/flights?tfs=CCoQAhokEgoyMDI2LTEyLTA5agcIARIDSUNOcg0IAhIJL20vMGdwNmZ0GiQSCjIwMjYtMTItMTZqDQgCEgkvbS8wZ3A2ZnRyBwgBEgNJQ05AAUgBUgNLUldggKYdenxDalJJWVZKeGFVNVNNRFY2VlZGQlFsTjVjVkZDUnkwdExTMHRMUzEyZEhobE5DMXVNa0ZCUVVGQlIzSndUalZGUVhabGMydEJFaEpFWldGc1EyOXVjM1J5WVdsdWRITXdMVElhQ3dqTXl3c1FBQm9EUzFKWE9EaHd4VzQ9&curr=KRW&hl=ko&gl=KR&gsas=1",
-      "value_ratio": 1.266,
+      "booking_link": "https://www.google.com/travel/flights?tfs=CCoQAhokEgoyMDI2LTEyLTA5agcIARIDSUNOcg0IAhIJL20vMGdwNmZ0GiQSCjIwMjYtMTItMTZqDQgCEgkvbS8wZ3A2ZnRyBwgBEgNJQ05AAUgBUgNLUldggKYdenxDalJJYkdZd2FVczBRakpYWmpCQlNIaFBVWGRDUnkwdExTMHRMUzB0TFMxMmRIZGhOMEZCUVVGQlIzSnhZMlZaUTNoTGRuTkJFaEpFWldGc1EyOXVjM1J5WVdsdWRITXdMVElhQ3dpd3pBc1FBQm9EUzFKWE9EaHd3VzQ9&curr=KRW&hl=ko&gl=KR&gsas=1",
+      "value_ratio": 1.267,
       "value_grade": "",
       "alt_dates": [],
-      "last_confirmed_at": "2026-11-03T10:23:35.694299+09:00",
+      "last_confirmed_at": "2026-11-04T08:44:43.540343+09:00",
       "is_carryover": false
     },
     {
@@ -2451,30 +2471,10 @@
       "duration": 0,
       "stops": 0,
       "booking_link": "https://www.google.com/travel/flights?tfs=CCoQAhokEgoyMDI3LTAzLTAxagcIARIDSUNOcg0IAhIJL20vMDI2eXFmGiQSCjIwMjctMDMtMDlqDQgCEgkvbS8wMjZ5cWZyBwgBEgNJQ05AAUgBUgNLUldggLUYenxDalJJYjJ4MmRUVmpMVEZxVkhkQlFsTkRjV2RDUnkwdExTMHRMUzB0ZG5SaVpISXhPVUZCUVVGQlIzSndUalZCVEVWTVlrOUJFaE5FWldGc1EyOXVjM1J5WVdsdWRITXdMVEV3R2dzSXVJTU5FQUFhQTB0U1Z6ZzRjSjk4&curr=KRW&hl=ko&gl=KR&gsas=1",
-      "value_ratio": 0.854,
-      "value_grade": "",
-      "alt_dates": [],
-      "last_confirmed_at": "2026-11-03T10:23:35.694299+09:00",
-      "is_carryover": false
-    },
-    {
-      "origin": "ICN",
-      "destination": "/m/0gp6ft",
-      "destination_name": "요나고시",
-      "destination_country": "일본",
-      "depart_date": "2026-11-25",
-      "return_date": "2026-12-02",
-      "price": 189900,
-      "average_price": 592870,
-      "discount_percentage": 68,
-      "airline": "에어서울",
-      "duration": 0,
-      "stops": 0,
-      "booking_link": "https://www.google.com/travel/flights?tfs=CCoQAhokEgoyMDI2LTExLTI1agcIARIDSUNOcg0IAhIJL20vMGdwNmZ0GiQSCjIwMjYtMTItMDJqDQgCEgkvbS8wZ3A2ZnRyBwgBEgNJQ05AAUgBUgNLUldgwIsRenxDalJJV25kQmIwTjJjR1pOVVhkQlRWWktNRUZDUnkwdExTMHRMUzB0TFMxdmEyRnVORUZCUVVGQlIzSnVkbGRaUTJsaWMwOUJFaEpFWldGc1EyOXVjM1J5WVdsdWRITXdMVEVhQ3dqTXl3c1FBQm9EUzFKWE9EaHdvbTg9&curr=KRW&hl=ko&gl=KR&gsas=1",
       "value_ratio": 0.0,
       "value_grade": "",
       "alt_dates": [],
-      "last_confirmed_at": "2026-11-02T07:30:03.984894+09:00",
+      "last_confirmed_at": "2026-11-03T10:23:35.694299+09:00",
       "is_carryover": true
     },
     {
@@ -2484,58 +2484,18 @@
       "destination_country": "스리랑카",
       "depart_date": "2027-03-03",
       "return_date": "2027-03-16",
-      "price": 565027,
+      "price": 564863,
       "average_price": 718728,
       "discount_percentage": 21,
       "airline": "Unknown",
       "duration": 0,
       "stops": 1,
-      "booking_link": "https://www.google.com/travel/flights?tfs=CCoQAhojEgoyMDI3LTAzLTAzagcIARIDSUNOcgwIAhIIL20vMGZuN3IaIxIKMjAyNy0wMy0xNmoMCAISCC9tLzBmbjdycgcIARIDSUNOQAFIAVIDS1JXYODcKnqAAUNqUklRME4zZVd0UE1HNHhObTlCUWxkSGNrRkNSeTB0TFMwdExTMHRMVzk1Y21neE5VRkJRVUZCUjNKd1RqVkZUR2R1TmpoQkVoTkVaV0ZzUTI5dWMzUnlZV2x1ZEhNd0xUSTBHZ3NJbzc0aUVBQWFBMHRTVnpnNGNQVElBZz09&curr=KRW&hl=ko&gl=KR&gsas=1",
+      "booking_link": "https://www.google.com/travel/flights?tfs=CCoQAhojEgoyMDI3LTAzLTAzagcIARIDSUNOcgwIAhIIL20vMGZuN3IaIxIKMjAyNy0wMy0xNmoMCAISCC9tLzBmbjdycgcIARIDSUNOQAFIAVIDS1JXYODcKnqAAUNqUklWM0pXWW5NNWRFTTVPVWxCUW1neFVsRkNSeTB0TFMwdExTMHRMWFowZFhNeU1VRkJRVUZCUjNKeFkyVlpSbDkxY0RaQkVoTkVaV0ZzUTI5dWMzUnlZV2x1ZEhNd0xUSTNHZ3NJLzd3aUVBQWFBMHRTVnpnNGNNUElBZz09&curr=KRW&hl=ko&gl=KR&gsas=1",
       "value_ratio": 0.565,
       "value_grade": "",
       "alt_dates": [],
-      "last_confirmed_at": "2026-11-03T10:23:35.694299+09:00",
+      "last_confirmed_at": "2026-11-04T08:44:43.540343+09:00",
       "is_carryover": false
-    },
-    {
-      "origin": "CJJ",
-      "destination": "/m/026yqf",
-      "destination_name": "다낭",
-      "destination_country": "베트남",
-      "depart_date": "2026-11-07",
-      "return_date": "2026-11-12",
-      "price": 264339,
-      "average_price": 705702,
-      "discount_percentage": 63,
-      "airline": "Trinity Airways",
-      "duration": 0,
-      "stops": 0,
-      "booking_link": "https://www.google.com/travel/flights?tfs=CCoQAhokEgoyMDI2LTExLTA3agcIARIDQ0pKcg0IAhIJL20vMDI2eXFmGiQSCjIwMjYtMTEtMTJqDQgCEgkvbS8wMjZ5cWZyBwgBEgNDSkpAAUgBUgNLUldgwIsRenxDalJJV2toYVdsWlhVa1I0VkRCQlRtVmhSMEZDUnkwdExTMHRMUzB0YjJ0aWFuZ3hNVUZCUVVGQlIzSnVkbGRWVGpCTGVYTkJFaEpFWldGc1EyOXVjM1J5WVdsdWRITXdMVEFhQ3dpVGtSQVFBQm9EUzFKWE9EaHc4Sm9C&curr=KRW&hl=ko&gl=KR&gsas=1",
-      "value_ratio": 0.0,
-      "value_grade": "",
-      "alt_dates": [],
-      "last_confirmed_at": "2026-11-02T07:30:03.984894+09:00",
-      "is_carryover": true
-    },
-    {
-      "origin": "ICN",
-      "destination": "/m/0195pd",
-      "destination_name": "시티 오브 마닐라",
-      "destination_country": "필리핀",
-      "depart_date": "2027-02-14",
-      "return_date": "2027-02-23",
-      "price": 252569,
-      "average_price": 357300,
-      "discount_percentage": 29,
-      "airline": "세부퍼시픽",
-      "duration": 0,
-      "stops": 0,
-      "booking_link": "https://www.google.com/travel/flights?tfs=CCoQAhokEgoyMDI3LTAyLTE0agcIARIDSUNOcg0IAhIJL20vMDE5NXBkGiQSCjIwMjctMDItMjNqDQgCEgkvbS8wMTk1cGRyBwgBEgNJQ05AAUgBUgNLUldggLUYeoABQ2pSSVIwcE9UQzAyWDJvNVJFMUJRMDVUVTNkQ1J5MHRMUzB0TFMwdExTMTJkM053TmtGQlFVRkJSM0p1ZGxkWlJWSm9hbVZCRWhORVpXRnNRMjl1YzNSeVlXbHVkSE13TFRFMEdnc0ltYlVQRUFBYUEwdFNWemc0Y1AyVEFRPT0&curr=KRW&hl=ko&gl=KR&gsas=1",
-      "value_ratio": 0.0,
-      "value_grade": "",
-      "alt_dates": [],
-      "last_confirmed_at": "2026-11-02T07:30:03.984894+09:00",
-      "is_carryover": true
     },
     {
       "origin": "ICN",
@@ -2550,132 +2510,12 @@
       "airline": "에어아시아",
       "duration": 0,
       "stops": 0,
-      "booking_link": "https://www.google.com/travel/flights?tfs=CCoQAhokEgoyMDI3LTA3LTAxagcIARIDSUNOcg0IAhIJL20vMDFfZzdmGiQSCjIwMjctMDctMDhqDQgCEgkvbS8wMV9nN2ZyBwgBEgNJQ05AAUgBUgNLUldg4NwqeoABQ2pSSVEwTjNlV3RQTUc0eE5tOUJRbGRIY2tGQ1J5MHRMUzB0TFMwdExXOTVjbWd4TlVGQlFVRkJSM0p3VGpWRlRHZHVOamhCRWhORVpXRnNRMjl1YzNSeVlXbHVkSE13TFRFekdnc0lvSVlVRUFBYUEwdFNWemc0Y0p1L0FRPT0&curr=KRW&hl=ko&gl=KR&gsas=1",
+      "booking_link": "https://www.google.com/travel/flights?tfs=CCoQAhokEgoyMDI3LTA3LTAxagcIARIDSUNOcg0IAhIJL20vMDFfZzdmGiQSCjIwMjctMDctMDhqDQgCEgkvbS8wMV9nN2ZyBwgBEgNJQ05AAUgBUgNLUldg4NwqeoABQ2pSSVYzSldZbk01ZEVNNU9VbEJRbWd4VWxGQ1J5MHRMUzB0TFMwdExYWjBkWE15TVVGQlFVRkJSM0p4WTJWWlJsOTFjRFpCRWhORVpXRnNRMjl1YzNSeVlXbHVkSE13TFRFeUdnc0lvSVlVRUFBYUEwdFNWemc0Y0lhL0FRPT0&curr=KRW&hl=ko&gl=KR&gsas=1",
       "value_ratio": 0.782,
       "value_grade": "",
       "alt_dates": [],
-      "last_confirmed_at": "2026-11-03T10:23:35.694299+09:00",
+      "last_confirmed_at": "2026-11-04T08:44:43.540343+09:00",
       "is_carryover": false
-    },
-    {
-      "origin": "ICN",
-      "destination": "/m/044cjv",
-      "destination_name": "Nha Trang",
-      "destination_country": "베트남",
-      "depart_date": "2027-03-29",
-      "return_date": "2027-04-07",
-      "price": 285349,
-      "average_price": 434351,
-      "discount_percentage": 34,
-      "airline": "비엣젯항공",
-      "duration": 0,
-      "stops": 0,
-      "booking_link": "https://www.google.com/travel/flights?tfs=CCoQAhokEgoyMDI3LTAzLTI5agcIARIDSUNOcg0IAhIJL20vMDQ0Y2p2GiQSCjIwMjctMDQtMDdqDQgCEgkvbS8wNDRjanZyBwgBEgNJQ05AAUgBUgNLUldg4NwqeoABQ2pSSU4xRkllbWsxUTJWSE5VMUJUR3cwWkVGQ1J5MHRMUzB0TFMwdExTMXdhbUZ1TWtGQlFVRkJSM0p1ZGxkVlRXSlNkRWxCRWhORVpXRnNRMjl1YzNSeVlXbHVkSE13TFRFekdnc0lwYlVSRUFBYUEwdFNWemc0Y0ppbkFRPT0&curr=KRW&hl=ko&gl=KR&gsas=1",
-      "value_ratio": 0.0,
-      "value_grade": "",
-      "alt_dates": [],
-      "last_confirmed_at": "2026-11-02T07:30:03.984894+09:00",
-      "is_carryover": true
-    },
-    {
-      "origin": "ICN",
-      "destination": "/m/01b8jj",
-      "destination_name": "브리즈번",
-      "destination_country": "오스트레일리아",
-      "depart_date": "2027-03-02",
-      "return_date": "2027-03-16",
-      "price": 638013,
-      "average_price": 946600,
-      "discount_percentage": 33,
-      "airline": "젯스타",
-      "duration": 0,
-      "stops": 0,
-      "booking_link": "https://www.google.com/travel/flights?tfs=CCoQAhokEgoyMDI3LTAzLTAyagcIARIDSUNOcg0IAhIJL20vMDFiOGpqGiQSCjIwMjctMDMtMTZqDQgCEgkvbS8wMWI4ampyBwgBEgNJQ05AAUgBUgNLUldg4NwqeoABQ2pSSU4xRkllbWsxUTJWSE5VMUJUR3cwWkVGQ1J5MHRMUzB0TFMwdExTMXdhbUZ1TWtGQlFVRkJSM0p1ZGxkVlRXSlNkRWxCRWhORVpXRnNRMjl1YzNSeVlXbHVkSE13TFRFMEdnc0l2ZmdtRUFBYUEwdFNWemc0Y09qMUFnPT0&curr=KRW&hl=ko&gl=KR&gsas=1",
-      "value_ratio": 0.0,
-      "value_grade": "",
-      "alt_dates": [],
-      "last_confirmed_at": "2026-11-02T07:30:03.984894+09:00",
-      "is_carryover": true
-    },
-    {
-      "origin": "ICN",
-      "destination": "/m/0195pd",
-      "destination_name": "시티 오브 마닐라",
-      "destination_country": "필리핀",
-      "depart_date": "2027-02-11",
-      "return_date": "2027-02-23",
-      "price": 252569,
-      "average_price": 341000,
-      "discount_percentage": 26,
-      "airline": "세부퍼시픽",
-      "duration": 0,
-      "stops": 0,
-      "booking_link": "https://www.google.com/travel/flights?tfs=CCoQAhokEgoyMDI3LTAyLTExagcIARIDSUNOcg0IAhIJL20vMDE5NXBkGiQSCjIwMjctMDItMjNqDQgCEgkvbS8wMTk1cGRyBwgBEgNJQ05AAUgBUgNLUldg4NwqeoABQ2pSSU4xRkllbWsxUTJWSE5VMUJUR3cwWkVGQ1J5MHRMUzB0TFMwdExTMXdhbUZ1TWtGQlFVRkJSM0p1ZGxkVlRXSlNkRWxCRWhORVpXRnNRMjl1YzNSeVlXbHVkSE13TFRJd0dnc0ltYlVQRUFBYUEwdFNWemc0Y1AyVEFRPT0&curr=KRW&hl=ko&gl=KR&gsas=1",
-      "value_ratio": 0.0,
-      "value_grade": "",
-      "alt_dates": [],
-      "last_confirmed_at": "2026-11-02T07:30:03.984894+09:00",
-      "is_carryover": true
-    },
-    {
-      "origin": "ICN",
-      "destination": "/m/034tl",
-      "destination_name": "괌",
-      "destination_country": "괌",
-      "depart_date": "2027-03-15",
-      "return_date": "2027-03-22",
-      "price": 241039,
-      "average_price": 266600,
-      "discount_percentage": 10,
-      "airline": "Unknown",
-      "duration": 0,
-      "stops": 0,
-      "booking_link": "https://www.google.com/travel/flights?tfs=CCoQAhojEgoyMDI3LTAzLTE1agcIARIDSUNOcgwIAhIIL20vMDM0dGwaIxIKMjAyNy0wMy0yMmoMCAISCC9tLzAzNHRscgcIARIDSUNOQAFIAVIDS1JXYODcKnqAAUNqUklOMUZJZW1rMVEyVkhOVTFCVEd3MFpFRkNSeTB0TFMwdExTMHRMUzF3YW1GdU1rRkJRVUZCUjNKdWRsZFZUV0pTZEVsQkVoTkVaV0ZzUTI5dWMzUnlZV2x1ZEhNd0xUSTRHZ3NJajlzT0VBQWFBMHRTVnpnNGNKMk5BUT09&curr=KRW&hl=ko&gl=KR&gsas=1",
-      "value_ratio": 0.0,
-      "value_grade": "",
-      "alt_dates": [],
-      "last_confirmed_at": "2026-11-02T07:30:03.984894+09:00",
-      "is_carryover": true
-    },
-    {
-      "origin": "ICN",
-      "destination": "/m/034tl",
-      "destination_name": "괌",
-      "destination_country": "괌",
-      "depart_date": "2026-12-04",
-      "return_date": "2026-12-08",
-      "price": 254739,
-      "average_price": 373500,
-      "discount_percentage": 32,
-      "airline": "Unknown",
-      "duration": 0,
-      "stops": 0,
-      "booking_link": "https://www.google.com/travel/flights?tfs=CCoQAhojEgoyMDI2LTEyLTA0agcIARIDSUNOcgwIAhIIL20vMDM0dGwaIxIKMjAyNi0xMi0wOGoMCAISCC9tLzAzNHRscgcIARIDSUNOQAFIAVIDS1JXYICmHXqAAUNqUklUbFJQWmpSTE1IVnJURzlCVkVaMU5HZENSeTB0TFMwdExTMHRMVzk1Ym5Fek5rRkJRVUZCUjNKdWRsZHpSVjlET0dkQkVoTkVaV0ZzUTI5dWMzUnlZV2x1ZEhNd0xURTRHZ3NJazhZUEVBQWFBMHRTVnpnNGNLQ1ZBUT09&curr=KRW&hl=ko&gl=KR&gsas=1",
-      "value_ratio": 0.0,
-      "value_grade": "",
-      "alt_dates": [],
-      "last_confirmed_at": "2026-11-02T07:30:03.984894+09:00",
-      "is_carryover": true
-    },
-    {
-      "origin": "ICN",
-      "destination": "/m/03h64",
-      "destination_name": "홍콩",
-      "destination_country": "홍콩",
-      "depart_date": "2026-12-03",
-      "return_date": "2026-12-07",
-      "price": 242800,
-      "average_price": 312939,
-      "discount_percentage": 22,
-      "airline": "홍콩 익스프레스항공",
-      "duration": 0,
-      "stops": 0,
-      "booking_link": "https://www.google.com/travel/flights?tfs=CCoQAhojEgoyMDI2LTEyLTAzagcIARIDSUNOcgwIAhIIL20vMDNoNjQaIxIKMjAyNi0xMi0wN2oMCAISCC9tLzAzaDY0cgcIARIDSUNOQAFIAVIDS1JXYICmHXqAAUNqUklUbFJQWmpSTE1IVnJURzlCVkVaMU5HZENSeTB0TFMwdExTMHRMVzk1Ym5Fek5rRkJRVUZCUjNKdWRsZHpSVjlET0dkQkVoTkVaV0ZzUTI5dWMzUnlZV2x1ZEhNd0xUSTBHZ3NJOE9nT0VBQWFBMHRTVnpnNGNLR09BUT09&curr=KRW&hl=ko&gl=KR&gsas=1",
-      "value_ratio": 0.0,
-      "value_grade": "",
-      "alt_dates": [],
-      "last_confirmed_at": "2026-11-02T07:30:03.984894+09:00",
-      "is_carryover": true
     },
     {
       "origin": "ICN",
@@ -2684,17 +2524,17 @@
       "destination_country": "베트남",
       "depart_date": "2027-03-13",
       "return_date": "2027-03-18",
-      "price": 232883,
+      "price": 232906,
       "average_price": 402300,
       "discount_percentage": 42,
       "airline": "에어서울",
       "duration": 0,
       "stops": 0,
-      "booking_link": "https://www.google.com/travel/flights?tfs=CCoQAhokEgoyMDI3LTAzLTEzagcIARIDSUNOcg0IAhIJL20vMDQ0Y2p2GiQSCjIwMjctMDMtMThqDQgCEgkvbS8wNDRjanZyBwgBEgNJQ05AAUgBUgNLUldggLUYenxDalJJYjJ4MmRUVmpMVEZxVkhkQlFsTkRjV2RDUnkwdExTMHRMUzB0ZG5SaVpISXhPVUZCUVVGQlIzSndUalZCVEVWTVlrOUJFaEpFWldGc1EyOXVjM1J5WVdsdWRITXdMVGthQ3dpem13NFFBQm9EUzFKWE9EaHd5SWNC&curr=KRW&hl=ko&gl=KR&gsas=1",
+      "booking_link": "https://www.google.com/travel/flights?tfs=CCoQAhokEgoyMDI3LTAzLTEzagcIARIDSUNOcg0IAhIJL20vMDQ0Y2p2GiQSCjIwMjctMDMtMThqDQgCEgkvbS8wNDRjanZyBwgBEgNJQ05AAUgBUgNLUldggLUYenxDalJJU2prMFdXZEpNVzE2YUhOQlJrTkRlSGRDUnkwdExTMHRMUzB0TFMxMmQyeDJNVUZCUVVGQlIzSnhZMlZ2VG5sUU0yZEJFaEpFWldGc1EyOXVjM1J5WVdsdWRITXdMVGthQ3dqS213NFFBQm9EUzFKWE9EaHd1NGNC&curr=KRW&hl=ko&gl=KR&gsas=1",
       "value_ratio": 0.932,
       "value_grade": "",
       "alt_dates": [],
-      "last_confirmed_at": "2026-11-03T10:23:35.694299+09:00",
+      "last_confirmed_at": "2026-11-04T08:44:43.540343+09:00",
       "is_carryover": false
     },
     {
@@ -2704,17 +2544,17 @@
       "destination_country": "괌",
       "depart_date": "2027-02-24",
       "return_date": "2027-03-04",
-      "price": 255301,
+      "price": 255490,
       "average_price": 367600,
-      "discount_percentage": 31,
+      "discount_percentage": 30,
       "airline": "Unknown",
       "duration": 0,
       "stops": 0,
-      "booking_link": "https://www.google.com/travel/flights?tfs=CCoQAhojEgoyMDI3LTAyLTI0agcIARIDSUNOcgwIAhIIL20vMDM0dGwaIxIKMjAyNy0wMy0wNGoMCAISCC9tLzAzNHRscgcIARIDSUNOQAFIAVIDS1JXYIC1GHqAAUNqUkliMngyZFRWakxURnFWSGRCUWxORGNXZENSeTB0TFMwdExTMHRkblJpWkhJeE9VRkJRVUZCUjNKd1RqVkJURVZNWWs5QkVoTkVaV0ZzUTI5dWMzUnlZV2x1ZEhNd0xURTBHZ3NJeGNvUEVBQWFBMHRTVnpnNGNNNlVBUT09&curr=KRW&hl=ko&gl=KR&gsas=1",
-      "value_ratio": 0.729,
+      "booking_link": "https://www.google.com/travel/flights?tfs=CCoQAhojEgoyMDI3LTAyLTI0agcIARIDSUNOcgwIAhIIL20vMDM0dGwaIxIKMjAyNy0wMy0wNGoMCAISCC9tLzAzNHRscgcIARIDSUNOQAFIAVIDS1JXYICmHXqAAUNqUkliR1l3YVVzMFFqSlhaakJCU0hoUFVYZENSeTB0TFMwdExTMHRMUzEyZEhkaE4wRkJRVUZCUjNKeFkyVlpRM2hMZG5OQkVoTkVaV0ZzUTI5dWMzUnlZV2x1ZEhNd0xURTJHZ3NJZ3N3UEVBQWFBMHRTVnpnNGNNeVVBUT09&curr=KRW&hl=ko&gl=KR&gsas=1",
+      "value_ratio": 0.73,
       "value_grade": "",
       "alt_dates": [],
-      "last_confirmed_at": "2026-11-03T10:23:35.694299+09:00",
+      "last_confirmed_at": "2026-11-04T08:44:43.540343+09:00",
       "is_carryover": false
     },
     {
@@ -2730,11 +2570,11 @@
       "airline": "스쿳항공",
       "duration": 0,
       "stops": 0,
-      "booking_link": "https://www.google.com/travel/flights?tfs=CCoQAhojEgoyMDI3LTAyLTE1agcIARIDSUNOcgwIAhIIL20vMDZ0MnQaIxIKMjAyNy0wMi0yMGoMCAISCC9tLzA2dDJ0cgcIARIDSUNOQAFIAVIDS1JXYIC1GHqAAUNqUkliMngyZFRWakxURnFWSGRCUWxORGNXZENSeTB0TFMwdExTMHRkblJpWkhJeE9VRkJRVUZCUjNKd1RqVkJURVZNWWs5QkVoTkVaV0ZzUTI5dWMzUnlZV2x1ZEhNd0xURTJHZ3NJaVlVVkVBQWFBMHRTVnpnNGNOWElBUT09&curr=KRW&hl=ko&gl=KR&gsas=1",
+      "booking_link": "https://www.google.com/travel/flights?tfs=CCoQAhojEgoyMDI3LTAyLTE1agcIARIDSUNOcgwIAhIIL20vMDZ0MnQaIxIKMjAyNy0wMi0yMGoMCAISCC9tLzA2dDJ0cgcIARIDSUNOQAFIAVIDS1JXYICmHXqAAUNqUkliR1l3YVVzMFFqSlhaakJCU0hoUFVYZENSeTB0TFMwdExTMHRMUzEyZEhkaE4wRkJRVUZCUjNKeFkyVlpRM2hMZG5OQkVoTkVaV0ZzUTI5dWMzUnlZV2x1ZEhNd0xURTNHZ3NJaVlVVkVBQWFBMHRTVnpnNGNMN0lBUT09&curr=KRW&hl=ko&gl=KR&gsas=1",
       "value_ratio": 0.821,
       "value_grade": "",
       "alt_dates": [],
-      "last_confirmed_at": "2026-11-03T10:23:35.694299+09:00",
+      "last_confirmed_at": "2026-11-04T08:44:43.540343+09:00",
       "is_carryover": false
     },
     {
@@ -2744,17 +2584,17 @@
       "destination_country": "필리핀",
       "depart_date": "2027-02-28",
       "return_date": "2027-03-07",
-      "price": 253947,
+      "price": 253966,
       "average_price": 357300,
       "discount_percentage": 29,
       "airline": "세부퍼시픽",
       "duration": 0,
       "stops": 0,
-      "booking_link": "https://www.google.com/travel/flights?tfs=CCoQAhokEgoyMDI3LTAyLTI4agcIARIDSUNOcg0IAhIJL20vMDE5NXBkGiQSCjIwMjctMDMtMDdqDQgCEgkvbS8wMTk1cGRyBwgBEgNJQ05AAUgBUgNLUldggLUYeoABQ2pSSWIyeDJkVFZqTFRGcVZIZEJRbE5EY1dkQ1J5MHRMUzB0TFMwdGRuUmlaSEl4T1VGQlFVRkJSM0p3VGpWQlRFVk1ZazlCRWhORVpXRnNRMjl1YzNSeVlXbHVkSE13TFRFM0dnc0krNzhQRUFBYUEwdFNWemc0Y09xVEFRPT0&curr=KRW&hl=ko&gl=KR&gsas=1",
+      "booking_link": "https://www.google.com/travel/flights?tfs=CCoQAhokEgoyMDI3LTAyLTI4agcIARIDSUNOcg0IAhIJL20vMDE5NXBkGiQSCjIwMjctMDMtMDdqDQgCEgkvbS8wMTk1cGRyBwgBEgNJQ05AAUgBUgNLUldggKYdeoABQ2pSSWJHWXdhVXMwUWpKWFpqQkJTSGhQVVhkQ1J5MHRMUzB0TFMwdExTMTJkSGRoTjBGQlFVRkJSM0p4WTJWWlEzaExkbk5CRWhORVpXRnNRMjl1YzNSeVlXbHVkSE13TFRFNUdnc0lqc0FQRUFBYUEwdFNWemc0Y051VEFRPT0&curr=KRW&hl=ko&gl=KR&gsas=1",
       "value_ratio": 1.016,
       "value_grade": "",
       "alt_dates": [],
-      "last_confirmed_at": "2026-11-03T10:23:35.694299+09:00",
+      "last_confirmed_at": "2026-11-04T08:44:43.540343+09:00",
       "is_carryover": false
     },
     {
@@ -2771,11 +2611,11 @@
       "duration": 0,
       "stops": 0,
       "booking_link": "https://www.google.com/travel/flights?tfs=CCoQAhojEgoyMDI3LTAyLTI4agcIARIDSUNOcgwIAhIIL20vMGhuNGgaIxIKMjAyNy0wMy0wNmoMCAISCC9tLzBobjRocgcIARIDSUNOQAFIAVIDS1JXYIC1GHqAAUNqUkliMngyZFRWakxURnFWSGRCUWxORGNXZENSeTB0TFMwdExTMHRkblJpWkhJeE9VRkJRVUZCUjNKd1RqVkJURVZNWWs5QkVoTkVaV0ZzUTI5dWMzUnlZV2x1ZEhNd0xURTVHZ3NJeTRBU0VBQWFBMHRTVnpnNGNOdXJBUT09&curr=KRW&hl=ko&gl=KR&gsas=1",
-      "value_ratio": 1.18,
+      "value_ratio": 0.0,
       "value_grade": "",
       "alt_dates": [],
       "last_confirmed_at": "2026-11-03T10:23:35.694299+09:00",
-      "is_carryover": false
+      "is_carryover": true
     },
     {
       "origin": "ICN",
@@ -2790,51 +2630,11 @@
       "airline": "스쿳항공",
       "duration": 0,
       "stops": 0,
-      "booking_link": "https://www.google.com/travel/flights?tfs=CCoQAhojEgoyMDI3LTAzLTMwagcIARIDSUNOcgwIAhIIL20vMGZ0a3gaIxIKMjAyNy0wNC0wOGoMCAISCC9tLzBmdGt4cgcIARIDSUNOQAFIAVIDS1JXYIC1GHp8Q2pSSWIyeDJkVFZqTFRGcVZIZEJRbE5EY1dkQ1J5MHRMUzB0TFMwdGRuUmlaSEl4T1VGQlFVRkJSM0p3VGpWQlRFVk1ZazlCRWhORVpXRnNRMjl1YzNSeVlXbHVkSE13TFRJeUdnc0lsZDRNRUFBYUEwdFNWemc0Y0x0NQ&curr=KRW&hl=ko&gl=KR&gsas=1",
+      "booking_link": "https://www.google.com/travel/flights?tfs=CCoQAhojEgoyMDI3LTAzLTMwagcIARIDSUNOcgwIAhIIL20vMGZ0a3gaIxIKMjAyNy0wNC0wOGoMCAISCC9tLzBmdGt4cgcIARIDSUNOQAFIAVIDS1JXYIC1GHp8Q2pSSVNqazBXV2RKTVcxNmFITkJSa05EZUhkQ1J5MHRMUzB0TFMwdExTMTJkMngyTVVGQlFVRkJSM0p4WTJWdlRubFFNMmRCRWhORVpXRnNRMjl1YzNSeVlXbHVkSE13TFRJeEdnc0lsZDRNRUFBYUEwdFNWemc0Y0s1NQ&curr=KRW&hl=ko&gl=KR&gsas=1",
       "value_ratio": 1.043,
       "value_grade": "",
       "alt_dates": [],
-      "last_confirmed_at": "2026-11-03T10:23:35.694299+09:00",
-      "is_carryover": false
-    },
-    {
-      "origin": "CJJ",
-      "destination": "/m/026yqf",
-      "destination_name": "다낭",
-      "destination_country": "베트남",
-      "depart_date": "2026-11-04",
-      "return_date": "2026-11-08",
-      "price": 265317,
-      "average_price": 705702,
-      "discount_percentage": 62,
-      "airline": "Trinity Airways",
-      "duration": 0,
-      "stops": 0,
-      "booking_link": "https://www.google.com/travel/flights?tfs=CCoQAhokEgoyMDI2LTExLTA0agcIARIDQ0pKcg0IAhIJL20vMDI2eXFmGiQSCjIwMjYtMTEtMDhqDQgCEgkvbS8wMjZ5cWZyBwgBEgNDSkpAAUgBUgNLUldgwIsRenxDalJJYTBnd1kyUmtXRnBVVG05QlFsSmtSR2RDUnkwdExTMHRMUzB0Y0dwaVptZ3hOVUZCUVVGQlIzSndUalZCVGxGbWVHRkJFaEpFWldGc1EyOXVjM1J5WVdsdWRITXdMVEFhQ3dqbG1CQVFBQm9EUzFKWE9EaHd1Wm9C&curr=KRW&hl=ko&gl=KR&gsas=1",
-      "value_ratio": 1.061,
-      "value_grade": "",
-      "alt_dates": [],
-      "last_confirmed_at": "2026-11-03T10:23:35.694299+09:00",
-      "is_carryover": false
-    },
-    {
-      "origin": "CJJ",
-      "destination": "/m/06wjf",
-      "destination_name": "상하이",
-      "destination_country": "중국",
-      "depart_date": "2026-11-04",
-      "return_date": "2026-11-10",
-      "price": 207257,
-      "average_price": 281790,
-      "discount_percentage": 26,
-      "airline": "스프링항공",
-      "duration": 0,
-      "stops": 0,
-      "booking_link": "https://www.google.com/travel/flights?tfs=CCoQAhojEgoyMDI2LTExLTA0agcIARIDQ0pKcgwIAhIIL20vMDZ3amYaIxIKMjAyNi0xMS0xMGoMCAISCC9tLzA2d2pmcgcIARIDQ0pKQAFIAVIDS1JXYMCLEXp8Q2pSSWEwZ3dZMlJrV0ZwVVRtOUJRbEprUkdkQ1J5MHRMUzB0TFMwdGNHcGlabWd4TlVGQlFVRkJSM0p3VGpWQlRsRm1lR0ZCRWhKRVpXRnNRMjl1YzNSeVlXbHVkSE13TFRJYUN3aVowd3dRQUJvRFMxSlhPRGh3MDNnPQ&curr=KRW&hl=ko&gl=KR&gsas=1",
-      "value_ratio": 0.942,
-      "value_grade": "",
-      "alt_dates": [],
-      "last_confirmed_at": "2026-11-03T10:23:35.694299+09:00",
+      "last_confirmed_at": "2026-11-04T08:44:43.540343+09:00",
       "is_carryover": false
     },
     {
@@ -2851,11 +2651,11 @@
       "duration": 0,
       "stops": 0,
       "booking_link": "https://www.google.com/travel/flights?tfs=CCoQAhokEgoyMDI3LTAzLTAxagcIARIDSUNOcg0IAhIJL20vMDQ0Y2p2GiQSCjIwMjctMDMtMDVqDQgCEgkvbS8wNDRjanZyBwgBEgNJQ05AAUgBUgNLUldggKYdeoABQ2pSSVlWSnhhVTVTTURWNlZWRkJRbE41Y1ZGQ1J5MHRMUzB0TFMxMmRIaGxOQzF1TWtGQlFVRkJSM0p3VGpWRlFYWmxjMnRCRWhORVpXRnNRMjl1YzNSeVlXbHVkSE13TFRFekdnc0ltczhPRUFBYUEwdFNWemc0Y0xhTEFRPT0&curr=KRW&hl=ko&gl=KR&gsas=1",
-      "value_ratio": 0.958,
+      "value_ratio": 0.0,
       "value_grade": "",
       "alt_dates": [],
       "last_confirmed_at": "2026-11-03T10:23:35.694299+09:00",
-      "is_carryover": false
+      "is_carryover": true
     },
     {
       "origin": "ICN",
@@ -2871,11 +2671,11 @@
       "duration": 0,
       "stops": 0,
       "booking_link": "https://www.google.com/travel/flights?tfs=CCoQAhokEgoyMDI3LTAzLTEzagcIARIDSUNOcg0IAhIJL20vMDQ0Y2p2GiQSCjIwMjctMDMtMjJqDQgCEgkvbS8wNDRjanZyBwgBEgNJQ05AAUgBUgNLUldg4NwqenxDalJJUTBOM2VXdFBNRzR4Tm05QlFsZEhja0ZDUnkwdExTMHRMUzB0TFc5NWNtZ3hOVUZCUVVGQlIzSndUalZGVEdkdU5qaEJFaEpFWldGc1EyOXVjM1J5WVdsdWRITXdMVFVhQ3dpem13NFFBQm9EUzFKWE9EaHd5SWNC&curr=KRW&hl=ko&gl=KR&gsas=1",
-      "value_ratio": 0.932,
+      "value_ratio": 0.0,
       "value_grade": "",
       "alt_dates": [],
       "last_confirmed_at": "2026-11-03T10:23:35.694299+09:00",
-      "is_carryover": false
+      "is_carryover": true
     },
     {
       "origin": "ICN",
@@ -2891,11 +2691,11 @@
       "duration": 0,
       "stops": 0,
       "booking_link": "https://www.google.com/travel/flights?tfs=CCoQAhojEgoyMDI3LTA3LTAxagcIARIDSUNOcgwIAhIIL20vMDZ5NTcaIxIKMjAyNy0wNy0xMmoMCAISCC9tLzA2eTU3cgcIARIDSUNOQAFIAVIDS1JXYODcKnp8Q2pSSVEwTjNlV3RQTUc0eE5tOUJRbGRIY2tGQ1J5MHRMUzB0TFMwdExXOTVjbWd4TlVGQlFVRkJSM0p3VGpWRlRHZHVOamhCRWhKRVpXRnNRMjl1YzNSeVlXbHVkSE13TFRZYUN3alBqeWNRQUJvRFMxSlhPRGh3ai9VQw&curr=KRW&hl=ko&gl=KR&gsas=1",
-      "value_ratio": 0.801,
+      "value_ratio": 0.0,
       "value_grade": "",
       "alt_dates": [],
       "last_confirmed_at": "2026-11-03T10:23:35.694299+09:00",
-      "is_carryover": false
+      "is_carryover": true
     },
     {
       "origin": "ICN",
@@ -2911,11 +2711,11 @@
       "duration": 0,
       "stops": 0,
       "booking_link": "https://www.google.com/travel/flights?tfs=CCoQAhokEgoyMDI3LTAyLTI1agcIARIDSUNOcg0IAhIJL20vMDFiOGpqGiQSCjIwMjctMDMtMDRqDQgCEgkvbS8wMWI4ampyBwgBEgNJQ05AAUgBUgNLUldg4NwqenxDalJJUTBOM2VXdFBNRzR4Tm05QlFsZEhja0ZDUnkwdExTMHRMUzB0TFc5NWNtZ3hOVUZCUVVGQlIzSndUalZGVEdkdU5qaEJFaEpFWldGc1EyOXVjM1J5WVdsdWRITXdMVGdhQ3dqOWlDY1FBQm9EUzFKWE9EaHcwUFFD&curr=KRW&hl=ko&gl=KR&gsas=1",
-      "value_ratio": 0.8,
+      "value_ratio": 0.0,
       "value_grade": "",
       "alt_dates": [],
       "last_confirmed_at": "2026-11-03T10:23:35.694299+09:00",
-      "is_carryover": false
+      "is_carryover": true
     },
     {
       "origin": "ICN",
@@ -2931,11 +2731,11 @@
       "duration": 0,
       "stops": 0,
       "booking_link": "https://www.google.com/travel/flights?tfs=CCoQAhojEgoyMDI3LTA0LTEwagcIARIDSUNOcgwIAhIIL20vMGZ0a3gaIxIKMjAyNy0wNC0xN2oMCAISCC9tLzBmdGt4cgcIARIDSUNOQAFIAVIDS1JXYODcKnp8Q2pSSVEwTjNlV3RQTUc0eE5tOUJRbGRIY2tGQ1J5MHRMUzB0TFMwdExXOTVjbWd4TlVGQlFVRkJSM0p3VGpWRlRHZHVOamhCRWhORVpXRnNRMjl1YzNSeVlXbHVkSE13TFRFMkdnc0k5YjRNRUFBYUEwdFNWemc0Y0pGMw&curr=KRW&hl=ko&gl=KR&gsas=1",
-      "value_ratio": 1.023,
+      "value_ratio": 0.0,
       "value_grade": "",
       "alt_dates": [],
       "last_confirmed_at": "2026-11-03T10:23:35.694299+09:00",
-      "is_carryover": false
+      "is_carryover": true
     },
     {
       "origin": "ICN",
@@ -2944,17 +2744,17 @@
       "destination_country": "필리핀",
       "depart_date": "2027-02-21",
       "return_date": "2027-03-07",
-      "price": 253947,
+      "price": 253966,
       "average_price": 357300,
       "discount_percentage": 29,
       "airline": "세부퍼시픽",
       "duration": 0,
       "stops": 0,
-      "booking_link": "https://www.google.com/travel/flights?tfs=CCoQAhokEgoyMDI3LTAyLTIxagcIARIDSUNOcg0IAhIJL20vMDE5NXBkGiQSCjIwMjctMDMtMDdqDQgCEgkvbS8wMTk1cGRyBwgBEgNJQ05AAUgBUgNLUldg4NwqeoABQ2pSSVEwTjNlV3RQTUc0eE5tOUJRbGRIY2tGQ1J5MHRMUzB0TFMwdExXOTVjbWd4TlVGQlFVRkJSM0p3VGpWRlRHZHVOamhCRWhORVpXRnNRMjl1YzNSeVlXbHVkSE13TFRFNEdnc0krNzhQRUFBYUEwdFNWemc0Y09xVEFRPT0&curr=KRW&hl=ko&gl=KR&gsas=1",
+      "booking_link": "https://www.google.com/travel/flights?tfs=CCoQAhokEgoyMDI3LTAyLTIxagcIARIDSUNOcg0IAhIJL20vMDE5NXBkGiQSCjIwMjctMDMtMDdqDQgCEgkvbS8wMTk1cGRyBwgBEgNJQ05AAUgBUgNLUldg4NwqeoABQ2pSSVYzSldZbk01ZEVNNU9VbEJRbWd4VWxGQ1J5MHRMUzB0TFMwdExYWjBkWE15TVVGQlFVRkJSM0p4WTJWWlJsOTFjRFpCRWhORVpXRnNRMjl1YzNSeVlXbHVkSE13TFRJd0dnc0lqc0FQRUFBYUEwdFNWemc0Y051VEFRPT0&curr=KRW&hl=ko&gl=KR&gsas=1",
       "value_ratio": 1.016,
       "value_grade": "",
       "alt_dates": [],
-      "last_confirmed_at": "2026-11-03T10:23:35.694299+09:00",
+      "last_confirmed_at": "2026-11-04T08:44:43.540343+09:00",
       "is_carryover": false
     },
     {
@@ -2971,11 +2771,11 @@
       "duration": 0,
       "stops": 0,
       "booking_link": "https://www.google.com/travel/flights?tfs=CCoQAhojEgoyMDI2LTExLTE4agcIARIDSUNOcgwIAhIIL20vMDQ5d20aIxIKMjAyNi0xMS0yNWoMCAISCC9tLzA0OXdtcgcIARIDSUNOQAFIAVIDS1JXYMCLEXp8Q2pSSWEwZ3dZMlJrV0ZwVVRtOUJRbEpsY1VGQ1J5MHRMUzB0TFMwdGNHcGlabWd4TlVGQlFVRkJSM0p3VGpWWlRtRmlVbE5CRWhKRVpXRnNRMjl1YzNSeVlXbHVkSE13TFRRYUN3aWdzQXNRQUJvRFMxSlhPRGh3d1d3PQ&curr=KRW&hl=ko&gl=KR&gsas=1",
-      "value_ratio": 1.243,
+      "value_ratio": 0.0,
       "value_grade": "",
       "alt_dates": [],
       "last_confirmed_at": "2026-11-03T10:23:35.694299+09:00",
-      "is_carryover": false
+      "is_carryover": true
     },
     {
       "origin": "ICN",
@@ -2991,11 +2791,11 @@
       "duration": 0,
       "stops": 0,
       "booking_link": "https://www.google.com/travel/flights?tfs=CCoQAhojEgoyMDI2LTEyLTAzagcIARIDSUNOcgwIAhIIL20vMDNoNjQaIxIKMjAyNi0xMi0wNmoMCAISCC9tLzAzaDY0cgcIARIDSUNOQAFIAVIDS1JXYMCLEXp8Q2pSSWEwZ3dZMlJrV0ZwVVRtOUJRbEpsY1VGQ1J5MHRMUzB0TFMwdGNHcGlabWd4TlVGQlFVRkJSM0p3VGpWWlRtRmlVbE5CRWhKRVpXRnNRMjl1YzNSeVlXbHVkSE13TFRnYUN3anc2QTRRQUJvRFMxSlhPRGh3cTQwQg&curr=KRW&hl=ko&gl=KR&gsas=1",
-      "value_ratio": 1.214,
+      "value_ratio": 0.0,
       "value_grade": "",
       "alt_dates": [],
       "last_confirmed_at": "2026-11-03T10:23:35.694299+09:00",
-      "is_carryover": false
+      "is_carryover": true
     },
     {
       "origin": "ICN",
@@ -3011,10 +2811,230 @@
       "duration": 0,
       "stops": 0,
       "booking_link": "https://www.google.com/travel/flights?tfs=CCoQAhojEgoyMDI2LTExLTI2agcIARIDSUNOcgwIAhIIL20vMDM0dGwaIxIKMjAyNi0xMi0wMmoMCAISCC9tLzAzNHRscgcIARIDSUNOQAFIAVIDS1JXYMCLEXqAAUNqUklhMGd3WTJSa1dGcFVUbTlCUWxKbGNVRkNSeTB0TFMwdExTMHRjR3BpWm1neE5VRkJRVUZCUjNKd1RqVlpUbUZpVWxOQkVoTkVaV0ZzUTI5dWMzUnlZV2x1ZEhNd0xURTRHZ3NJcWNzUEVBQWFBMHRTVnpnNGNOYVVBUT09&curr=KRW&hl=ko&gl=KR&gsas=1",
-      "value_ratio": 0.73,
+      "value_ratio": 0.0,
       "value_grade": "",
       "alt_dates": [],
       "last_confirmed_at": "2026-11-03T10:23:35.694299+09:00",
+      "is_carryover": true
+    },
+    {
+      "origin": "CJJ",
+      "destination": "/m/026yqf",
+      "destination_name": "다낭",
+      "destination_country": "베트남",
+      "depart_date": "2026-11-07",
+      "return_date": "2026-11-12",
+      "price": 265209,
+      "average_price": 705702,
+      "discount_percentage": 62,
+      "airline": "Trinity Airways",
+      "duration": 0,
+      "stops": 0,
+      "booking_link": "https://www.google.com/travel/flights?tfs=CCoQAhokEgoyMDI2LTExLTA3agcIARIDQ0pKcg0IAhIJL20vMDI2eXFmGiQSCjIwMjYtMTEtMTJqDQgCEgkvbS8wMjZ5cWZyBwgBEgNDSkpAAUgBUgNLUldgwIsRenxDalJJTms1SmFqSkZPVkIzWkdOQlNFTmtkbWRDUnkwdExTMHRMUzB0TFMxdmVXVnRPVUZCUVVGQlIzSnhZMlZaUW5Ob1ZVRkJFaEpFWldGc1EyOXVjM1J5WVdsdWRITXdMVEFhQ3dqNWx4QVFBQm9EUzFKWE9EaHdvSm9C&curr=KRW&hl=ko&gl=KR&gsas=1",
+      "value_ratio": 1.061,
+      "value_grade": "",
+      "alt_dates": [],
+      "last_confirmed_at": "2026-11-04T08:44:43.540343+09:00",
+      "is_carryover": false
+    },
+    {
+      "origin": "CJJ",
+      "destination": "/m/06wjf",
+      "destination_name": "상하이",
+      "destination_country": "중국",
+      "depart_date": "2026-11-07",
+      "return_date": "2026-11-10",
+      "price": 227004,
+      "average_price": 296198,
+      "discount_percentage": 23,
+      "airline": "스프링항공",
+      "duration": 0,
+      "stops": 0,
+      "booking_link": "https://www.google.com/travel/flights?tfs=CCoQAhojEgoyMDI2LTExLTA3agcIARIDQ0pKcgwIAhIIL20vMDZ3amYaIxIKMjAyNi0xMS0xMGoMCAISCC9tLzA2d2pmcgcIARIDQ0pKQAFIAVIDS1JXYMCLEXp8Q2pSSU5rNUphakpGT1ZCM1pHTkJTRU5rZG1kQ1J5MHRMUzB0TFMwdExTMXZlV1Z0T1VGQlFVRkJSM0p4WTJWWlFuTm9WVUZCRWhKRVpXRnNRMjl1YzNSeVlXbHVkSE13TFRJYUN3aTg3UTBRQUJvRFMxSlhPRGh3ZzRRQg&curr=KRW&hl=ko&gl=KR&gsas=1",
+      "value_ratio": 1.032,
+      "value_grade": "",
+      "alt_dates": [],
+      "last_confirmed_at": "2026-11-04T08:44:43.540343+09:00",
+      "is_carryover": false
+    },
+    {
+      "origin": "ICN",
+      "destination": "/m/0ftkx",
+      "destination_name": "타이베이",
+      "destination_country": "대만",
+      "depart_date": "2026-12-09",
+      "return_date": "2026-12-15",
+      "price": 231805,
+      "average_price": 331000,
+      "discount_percentage": 30,
+      "airline": "타이거항공 타이완",
+      "duration": 0,
+      "stops": 0,
+      "booking_link": "https://www.google.com/travel/flights?tfs=CCoQAhojEgoyMDI2LTEyLTA5agcIARIDSUNOcgwIAhIIL20vMGZ0a3gaIxIKMjAyNi0xMi0xNWoMCAISCC9tLzBmdGt4cgcIARIDSUNOQAFIAVIDS1JXYICmHXqAAUNqUkliR1l3YVVzMFFqSlhaakJCU0hoUFVYZENSeTB0TFMwdExTMHRMUzEyZEhkaE4wRkJRVUZCUjNKeFkyVlpRM2hMZG5OQkVoTkVaV0ZzUTI5dWMzUnlZV2x1ZEhNd0xURTFHZ3NJL1pJT0VBQWFBMHRTVnpnNGNPbUdBUT09&curr=KRW&hl=ko&gl=KR&gsas=1",
+      "value_ratio": 1.159,
+      "value_grade": "",
+      "alt_dates": [],
+      "last_confirmed_at": "2026-11-04T08:44:43.540343+09:00",
+      "is_carryover": false
+    },
+    {
+      "origin": "ICN",
+      "destination": "/m/0hn4h",
+      "destination_name": "호찌민시",
+      "destination_country": "베트남",
+      "depart_date": "2027-02-28",
+      "return_date": "2027-03-09",
+      "price": 295133,
+      "average_price": 408100,
+      "discount_percentage": 28,
+      "airline": "Unknown",
+      "duration": 0,
+      "stops": 0,
+      "booking_link": "https://www.google.com/travel/flights?tfs=CCoQAhojEgoyMDI3LTAyLTI4agcIARIDSUNOcgwIAhIIL20vMGhuNGgaIxIKMjAyNy0wMy0wOWoMCAISCC9tLzBobjRocgcIARIDSUNOQAFIAVIDS1JXYICmHXqAAUNqUkliR1l3YVVzMFFqSlhaakJCU0hoUFVYZENSeTB0TFMwdExTMHRMUzEyZEhkaE4wRkJRVUZCUjNKeFkyVlpRM2hMZG5OQkVoTkVaV0ZzUTI5dWMzUnlZV2x1ZEhNd0xUSXdHZ3NJM1lFU0VBQWFBMHRTVnpnNGNOT3JBUT09&curr=KRW&hl=ko&gl=KR&gsas=1",
+      "value_ratio": 1.181,
+      "value_grade": "",
+      "alt_dates": [],
+      "last_confirmed_at": "2026-11-04T08:44:43.540343+09:00",
+      "is_carryover": false
+    },
+    {
+      "origin": "ICN",
+      "destination": "/m/049wm",
+      "destination_name": "가고시마시",
+      "destination_country": "일본",
+      "depart_date": "2026-11-10",
+      "return_date": "2026-11-16",
+      "price": 186900,
+      "average_price": 279420,
+      "discount_percentage": 33,
+      "airline": "제주항공",
+      "duration": 0,
+      "stops": 0,
+      "booking_link": "https://www.google.com/travel/flights?tfs=CCoQAhojEgoyMDI2LTExLTEwagcIARIDSUNOcgwIAhIIL20vMDQ5d20aIxIKMjAyNi0xMS0xNmoMCAISCC9tLzA0OXdtcgcIARIDSUNOQAFIAVIDS1JXYMCLEXp8Q2pSSVVuWlVUalV3Ym1Wck5uTkJSekV5WkdkQ1J5MHRMUzB0TFc5cmRXRXlNeTF1TVVGQlFVRkJSM0p4WTJWWlJUVmpha0ZCRWhKRVpXRnNRMjl1YzNSeVlXbHVkSE13TFRVYUN3aVV0QXNRQUJvRFMxSlhPRGh3Mm13PQ&curr=KRW&hl=ko&gl=KR&gsas=1",
+      "value_ratio": 1.246,
+      "value_grade": "",
+      "alt_dates": [],
+      "last_confirmed_at": "2026-11-04T08:44:43.540343+09:00",
+      "is_carryover": false
+    },
+    {
+      "origin": "ICN",
+      "destination": "/m/034tl",
+      "destination_name": "괌",
+      "destination_country": "괌",
+      "depart_date": "2026-11-27",
+      "return_date": "2026-12-02",
+      "price": 255590,
+      "average_price": 287016,
+      "discount_percentage": 11,
+      "airline": "Unknown",
+      "duration": 0,
+      "stops": 0,
+      "booking_link": "https://www.google.com/travel/flights?tfs=CCoQAhojEgoyMDI2LTExLTI3agcIARIDSUNOcgwIAhIIL20vMDM0dGwaIxIKMjAyNi0xMi0wMmoMCAISCC9tLzAzNHRscgcIARIDSUNOQAFIAVIDS1JXYMCLEXqAAUNqUklVblpVVGpVd2JtVnJObk5CUnpFeVpHZENSeTB0TFMwdExXOXJkV0V5TXkxdU1VRkJRVUZCUjNKeFkyVlpSVFZqYWtGQkVoTkVaV0ZzUTI5dWMzUnlZV2x1ZEhNd0xURTVHZ3NJNXN3UEVBQWFBMHRTVnpnNGNOT1VBUT09&curr=KRW&hl=ko&gl=KR&gsas=1",
+      "value_ratio": 0.73,
+      "value_grade": "",
+      "alt_dates": [],
+      "last_confirmed_at": "2026-11-04T08:44:43.540343+09:00",
+      "is_carryover": false
+    },
+    {
+      "origin": "ICN",
+      "destination": "/m/044cjv",
+      "destination_name": "Nha Trang",
+      "destination_country": "베트남",
+      "depart_date": "2027-03-13",
+      "return_date": "2027-03-25",
+      "price": 232969,
+      "average_price": 402300,
+      "discount_percentage": 42,
+      "airline": "에어서울",
+      "duration": 0,
+      "stops": 0,
+      "booking_link": "https://www.google.com/travel/flights?tfs=CCoQAhokEgoyMDI3LTAzLTEzagcIARIDSUNOcg0IAhIJL20vMDQ0Y2p2GiQSCjIwMjctMDMtMjVqDQgCEgkvbS8wNDRjanZyBwgBEgNJQ05AAUgBUgNLUldg4NwqenxDalJJVjNKV1luTTVkRU01T1VsQlFtZ3hVbEZDUnkwdExTMHRMUzB0TFhaMGRYTXlNVUZCUVVGQlIzSnhZMlZaUmw5MWNEWkJFaEpFWldGc1EyOXVjM1J5WVdsdWRITXdMVGNhQ3dpSm5BNFFBQm9EUzFKWE9EaHd2NGNC&curr=KRW&hl=ko&gl=KR&gsas=1",
+      "value_ratio": 0.932,
+      "value_grade": "",
+      "alt_dates": [],
+      "last_confirmed_at": "2026-11-04T08:44:43.540343+09:00",
+      "is_carryover": false
+    },
+    {
+      "origin": "ICN",
+      "destination": "/m/01b8jj",
+      "destination_name": "브리즈번",
+      "destination_country": "오스트레일리아",
+      "depart_date": "2027-03-02",
+      "return_date": "2027-03-13",
+      "price": 637049,
+      "average_price": 946600,
+      "discount_percentage": 33,
+      "airline": "젯스타",
+      "duration": 0,
+      "stops": 0,
+      "booking_link": "https://www.google.com/travel/flights?tfs=CCoQAhokEgoyMDI3LTAzLTAyagcIARIDSUNOcg0IAhIJL20vMDFiOGpqGiQSCjIwMjctMDMtMTNqDQgCEgkvbS8wMWI4ampyBwgBEgNJQ05AAUgBUgNLUldg4NwqeoABQ2pSSVYzSldZbk01ZEVNNU9VbEJRbWd4VWxGQ1J5MHRMUzB0TFMwdExYWjBkWE15TVVGQlFVRkJSM0p4WTJWWlJsOTFjRFpCRWhORVpXRnNRMjl1YzNSeVlXbHVkSE13TFRFMUdnc0krZkFtRUFBYUEwdFNWemc0Y01IeUFnPT0&curr=KRW&hl=ko&gl=KR&gsas=1",
+      "value_ratio": 0.796,
+      "value_grade": "",
+      "alt_dates": [],
+      "last_confirmed_at": "2026-11-04T08:44:43.540343+09:00",
+      "is_carryover": false
+    },
+    {
+      "origin": "ICN",
+      "destination": "/m/026yqf",
+      "destination_name": "다낭",
+      "destination_country": "베트남",
+      "depart_date": "2027-03-03",
+      "return_date": "2027-03-11",
+      "price": 226612,
+      "average_price": 326160,
+      "discount_percentage": 31,
+      "airline": "에어서울",
+      "duration": 0,
+      "stops": 0,
+      "booking_link": "https://www.google.com/travel/flights?tfs=CCoQAhokEgoyMDI3LTAzLTAzagcIARIDSUNOcg0IAhIJL20vMDI2eXFmGiQSCjIwMjctMDMtMTFqDQgCEgkvbS8wMjZ5cWZyBwgBEgNJQ05AAUgBUgNLUldg4NwqeoABQ2pSSVYzSldZbk01ZEVNNU9VbEJRbWd4VWxGQ1J5MHRMUzB0TFMwdExYWjBkWE15TVVGQlFVRkJSM0p4WTJWWlJsOTFjRFpCRWhORVpXRnNRMjl1YzNSeVlXbHVkSE13TFRFM0dnc0l0T29ORUFBYUEwdFNWemc0Y09hREFRPT0&curr=KRW&hl=ko&gl=KR&gsas=1",
+      "value_ratio": 0.906,
+      "value_grade": "",
+      "alt_dates": [],
+      "last_confirmed_at": "2026-11-04T08:44:43.540343+09:00",
+      "is_carryover": false
+    },
+    {
+      "origin": "ICN",
+      "destination": "/m/026yqf",
+      "destination_name": "다낭",
+      "destination_country": "베트남",
+      "depart_date": "2027-03-03",
+      "return_date": "2027-03-09",
+      "price": 225269,
+      "average_price": 326160,
+      "discount_percentage": 31,
+      "airline": "에어서울",
+      "duration": 0,
+      "stops": 0,
+      "booking_link": "https://www.google.com/travel/flights?tfs=CCoQAhokEgoyMDI3LTAzLTAzagcIARIDSUNOcg0IAhIJL20vMDI2eXFmGiQSCjIwMjctMDMtMDlqDQgCEgkvbS8wMjZ5cWZyBwgBEgNJQ05AAUgBUgNLUldggLUYeoABQ2pSSVNqazBXV2RKTVcxNmFITkJSa05EZUhkQ1J5MHRMUzB0TFMwdExTMTJkMngyTVVGQlFVRkJSM0p4WTJWdlRubFFNMmRCRWhORVpXRnNRMjl1YzNSeVlXbHVkSE13TFRFekdnc0k5ZDhORUFBYUEwdFNWemc0Y0lLREFRPT0&curr=KRW&hl=ko&gl=KR&gsas=1",
+      "value_ratio": 0.901,
+      "value_grade": "",
+      "alt_dates": [],
+      "last_confirmed_at": "2026-11-04T08:44:43.540343+09:00",
+      "is_carryover": false
+    },
+    {
+      "origin": "ICN",
+      "destination": "/m/034tl",
+      "destination_name": "괌",
+      "destination_country": "괌",
+      "depart_date": "2027-03-08",
+      "return_date": "2027-03-12",
+      "price": 255483,
+      "average_price": 246900,
+      "discount_percentage": 0,
+      "airline": "Unknown",
+      "duration": 0,
+      "stops": 0,
+      "booking_link": "https://www.google.com/travel/flights?tfs=CCoQAhojEgoyMDI3LTAzLTA4agcIARIDSUNOcgwIAhIIL20vMDM0dGwaIxIKMjAyNy0wMy0xMmoMCAISCC9tLzAzNHRscgcIARIDSUNOQAFIAVIDS1JXYIC1GHqAAUNqUklTamswV1dkSk1XMTZhSE5CUmtORGVIZENSeTB0TFMwdExTMHRMUzEyZDJ4Mk1VRkJRVUZCUjNKeFkyVnZUbmxRTTJkQkVoTkVaV0ZzUTI5dWMzUnlZV2x1ZEhNd0xUSTFHZ3NJKzhzUEVBQWFBMHRTVnpnNGNNdVVBUT09&curr=KRW&hl=ko&gl=KR&gsas=1",
+      "value_ratio": 0.73,
+      "value_grade": "",
+      "alt_dates": [],
+      "last_confirmed_at": "2026-11-04T08:44:43.540343+09:00",
       "is_carryover": false
     }
   ]
